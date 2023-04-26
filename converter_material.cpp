@@ -42,7 +42,7 @@ int idNETLizardConverter::ConvertMaterials()
 		}
 	}
 	std::ofstream os(mtrFile);
-	for(const auto &idMaterial : mats)
+	for(const auto &mat : mats)
 		os << mat << "\n";
 	os.flush();
 	os.close();
