@@ -19,7 +19,6 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	int texIndex = p->tex_index;
 	idStr material = gamename / idStr::va(config->tex_path_format, texIndex);
 	material.RemoveExtension();
-	//idStr material = "textures/base_wall/lfwall13f3";
 	idStr invisibleMaterial = "common/caulk";
 
 	idDrawVert vertex[3];
@@ -252,7 +251,7 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 			entity.spawnArgs.SetVec3("origin", idVec3(mesh->position[0] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[1] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[2] * NETLIZARD_MAP_TO_IDTECH4));
 			idMat4 m4;
 			m4.Rotate(mesh->rotation[0], {1.0f, 0.0f, 0.0f});
-			m4.Rotate(mesh->rotation[1], {0.0f, 1.0f, 0.0f});
+			m4.Rotate(mesh->rotation[1], {0.0f, 0.0f, 1.0f});
 			//m->item_type = nlGetItemType(game, mesh->obj_index);
 			entity.spawnArgs.SetMat3("rotation", m4);
 			if(mesh->item_mesh.vertex.count && mesh->item_mesh.primitive.count)
