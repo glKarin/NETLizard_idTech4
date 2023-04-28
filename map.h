@@ -21,6 +21,10 @@ class idBrushDef3Side
 		idVec3 textureMatrix[2];
 		idStr material;
 
+/* Quake3
+		side->texMat[0] = idVec3(0.03125f, 0.0f, 0.0f);
+		side->texMat[1] = idVec3(0.0f, 0.03125f, 0.0f);
+*/
 		idBrushDef3Side()
 		{
 			textureMatrix[0].Set(1, 0, 0);

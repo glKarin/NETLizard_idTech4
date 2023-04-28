@@ -20,6 +20,7 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	idStr material = gamename / idStr::va(config->tex_path_format, texIndex);
 	material.RemoveExtension();
 	idStr invisibleMaterial = "common/caulk";
+	float w = config->tex_width;
 
 	idDrawVert vertex[3];
 	int i0 = p->index[0] / index_factory;
@@ -50,7 +51,6 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	vertex[2].normal[2] = v_normal[2];
 
 	//GLfloat w = tex ? tex->width : 1.0;
-	float w = 128;
 	vertex[0].st[0] = (float)p->texcoord[0] / w;
 	vertex[0].st[1] = (float)p->texcoord[1] / w;
 
@@ -89,13 +89,13 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 		return false;
 	if(invert_texcoord_y)
 	{
-		side.textureMatrix[0][0] = tb[1][1] / 128.0;
-		side.textureMatrix[1][1] = tb[1][1] / 128.0;
+		side.textureMatrix[0][0] = tb[1][1] / w;
+		side.textureMatrix[1][1] = tb[1][1] / w;
 	}
 	else
 	{
-		side.textureMatrix[0][0] = 1.0 / 128.0;
-		side.textureMatrix[1][1] = 1.0 / 128.0;
+		side.textureMatrix[0][0] = 1.0 / w;
+		side.textureMatrix[1][1] = 1.0 / w;
 	}
 	brush.sides.push_back(side);
 
@@ -244,6 +244,11 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 		{
 			const NETLizard_3D_Item_Mesh *mesh = model->item_data.data + i;
 			const NLint *mesh_vertex = mesh->item_mesh.vertex.data;
+
+			NLint item_type = nlGetItemType(game, mesh->obj_index);
+			if(item_type & (NL_3D_ITEM_TYPE_DOOR_HORIZONTAL | NL_3D_ITEM_TYPE_DOOR_VERTICAL))
+				continue;
+
 			idEntity entity;
 			entity.classname = "func_static";
 			entity.name = idStr::va("entity%d_%d", mesh->obj_index, i);
@@ -252,7 +257,6 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 			idMat4 m4;
 			m4.Rotate(mesh->rotation[0], {1.0f, 0.0f, 0.0f});
 			m4.Rotate(mesh->rotation[1], {0.0f, 0.0f, 1.0f});
-			//m->item_type = nlGetItemType(game, mesh->obj_index);
 			entity.spawnArgs.SetMat3("rotation", m4);
 			if(mesh->item_mesh.vertex.count && mesh->item_mesh.primitive.count)
 			{
@@ -275,12 +279,6 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 			m->box.max[0] = (GLfloat)mesh->item_mesh.box.max[0];
 			m->box.max[1] = (GLfloat)mesh->item_mesh.box.max[1];
 			m->box.max[2] = (GLfloat)mesh->item_mesh.box.max[2];
-#endif
-
-#if 0
-			if(/*(m->item_type & NL_3D_ITEM_TYPE_DOOR_VERTICAL) || */(m->item_type & NL_3D_ITEM_TYPE_DOOR_HORIZONTAL))
-			{
-			}
 #endif
 		}
 	}
@@ -331,6 +329,8 @@ int idNETLizardConverter::ConvertMaps()
 		format = "lvl%d.png";
 		for(i = 1; i <= config->level_count; i++)
 		{
+			if(game == NL_CONTR_TERRORISM_3D_EPISODE_3 && (i == 13 || i == 15))
+				continue; // lvl13 15 not supprot in CT3D-Ep3
 			idMap map;
 			file = idStr::va(format, i);
 			if(ConvertMap(idStr(file), i) == 0)

@@ -161,7 +161,8 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         RE3D_SKY_FILE,
         "",
         "",
-        RE3D_LEVEL
+        RE3D_LEVEL,
+        0
     },
     {
         NL_CONTR_TERRORISM_3D,
@@ -174,7 +175,8 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         CT3D_SKY_FILE,
         CT3D_TEX_SUBFIX,
         CT3D_OBJ_SUBFIX,
-        CT3D_LEVEL
+        CT3D_LEVEL,
+        64
     },
     {
         NL_ARMY_RANGER_3D,
@@ -187,7 +189,8 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         SPECNAZ3D_SKY_FILE,
         SPECNAZ3D_TEX_SUBFIX,
         SPECNAZ3D_OBJ_SUBFIX,
-        SPECNAZ3D_LEVEL
+        SPECNAZ3D_LEVEL,
+        64
     },
     {
         NL_CONTR_TERRORISM_3D_EPISODE_2,
@@ -200,7 +203,8 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         CT3DEP2_SKY_FILE,
         CT3DEP2_TEX_SUBFIX,
         CT3DEP2_OBJ_SUBFIX,
-        CT3DEP2_LEVEL
+        CT3DEP2_LEVEL,
+        64
     },
     {
         NL_SHADOW_OF_EGYPT_3D,
@@ -213,7 +217,8 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         "",
         EGYPT3D_TEX_SUBFIX,
         EGYPT3D_OBJ_SUBFIX,
-        EGYPT3D_LEVEL
+        EGYPT3D_LEVEL,
+        256
     },
     {
         NL_CLONE_3D,
@@ -226,7 +231,8 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         "",
         CLONE3D_TEX_SUBFIX,
         CLONE3D_OBJ_SUBFIX,
-        CLONE3D_LEVEL
+        CLONE3D_LEVEL,
+        256
     },
     {
         NL_CONTR_TERRORISM_3D_EPISODE_3,
@@ -239,7 +245,8 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         CT3DEP3_SKY_FILE,
         CT3DEP3_TEX_SUBFIX,
         CT3DEP3_OBJ_SUBFIX,
-        CT3DEP3_LEVEL
+        CT3DEP3_LEVEL,
+        64
     },
 };
 

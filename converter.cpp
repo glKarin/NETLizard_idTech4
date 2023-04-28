@@ -12,7 +12,7 @@ idNETLizardConverter::idNETLizardConverter(NETLizard_Game game, const char *sour
         config(0)
 {
     config = nlGet3DGameModelConfig(this->game);
-    gamename = idStr(nlGet3DGameName(this->game)).Replace(" ", "_").ToLower();
+    gamename = idStr(nlGet3DGameName(this->game)).Replace(" ", "_").Replace(":", "_").ToLower();
 }
 
 bool idNETLizardConverter::ReadFile(idBuffer &buffer, const char *path) const

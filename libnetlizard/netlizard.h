@@ -421,6 +421,7 @@ typedef struct NETLizard_3D_Model_Config_s
     char tex_path_format[12];
     char obj_path_format[14];
     NLuint level_count;
+    NLuint tex_width;
 } NETLizard_3D_Model_Config;
 
 /* NETLizard 3D map teleport config, Egypt 3D */

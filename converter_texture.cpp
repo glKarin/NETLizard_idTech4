@@ -19,7 +19,7 @@ int idNETLizardConverter::ConvertTextureToTGA(const char *name, int i)
             ok = nlLoadTextureV2Data(buffer.Data(), buffer.Size(), &tex);
                 break;
         case NL_TEXTURE_3D_ENGINE_V3:
-            ok = nlLoadTextureV3Data(buffer.Data(), buffer.Size(), i, &tex);
+            ok = nlLoadTextureV3Data(buffer.Data(), buffer.Size(), game == NL_CONTR_TERRORISM_3D_EPISODE_3 ? -1 : i, &tex);
                 break;
         case NL_TEXTURE_3D_ENGINE_V3_COMPRESS:
             ok = nlLoadCompressTextureV3Data(buffer.Data(), buffer.Size(), &tex);
