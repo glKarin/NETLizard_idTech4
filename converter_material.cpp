@@ -38,7 +38,6 @@ int idNETLizardConverter::ConvertMaterials()
 		if(ConvertMaterial(mat, file) == 0)
 		{
 			mats.push_back(mat);
-			i++;
 		}
 	}
 	std::ofstream os(mtrFile);
