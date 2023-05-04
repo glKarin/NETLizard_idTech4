@@ -75,37 +75,7 @@ void idMap::FillExtras(void)
 	e.spawnArgs.SetVec3("light_radius", radius);
 	e.spawnArgs.SetBool("noshadows", true);
 	e.spawnArgs.SetBool("nospecular", true);
-	e.spawnArgs.SetBool("nodiffuse", false);
-	e.spawnArgs.SetBool("nodiffuse", false);
 	e.spawnArgs.SetFloat("falloff", 0);
-	e.spawnArgs.SetVec3("nodiffuse", {0.78, 0.78, 0.84});
+	e.spawnArgs.SetVec3("_color", {0.78, 0.78, 0.84});
 	entitys.push_back(e);
-
-	for(const auto &area : areas)
-	{
-		center = area.second.Center();
-		e.spawnArgs.Clear();
-		e.classname = "info_player_deathmatch";
-		e.name = idStr::va("info_player_deathmatch_%d", area.first);
-		e.spawnArgs.SetVec3("origin", {center[0], center[1], area.second[0][2]});
-		entitys.push_back(e);
-	}
-
-	for(const auto &area : areas)
-	{
-		center = area.second.Center();
-		radius = area.second.Size();
-		e.spawnArgs.Clear();
-		e.classname = "light";
-		e.name = idStr::va("area_light_%d", area.first);
-		e.spawnArgs.SetVec3("origin", center);
-		e.spawnArgs.SetVec3("light_radius", radius);
-		e.spawnArgs.SetBool("noshadows", true);
-		e.spawnArgs.SetBool("nospecular", true);
-		e.spawnArgs.SetBool("nodiffuse", false);
-		e.spawnArgs.SetBool("nodiffuse", false);
-		e.spawnArgs.SetFloat("falloff", 0);
-		e.spawnArgs.SetVec3("nodiffuse", {0.78, 0.78, 0.84});
-		entitys.push_back(e);
-	}
 }

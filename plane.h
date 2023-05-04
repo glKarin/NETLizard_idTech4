@@ -47,6 +47,7 @@ inline void idPlane::FromPoints(const idVec3 &a, const idVec3 &b, const idVec3 &
 
 	normal = first ^ second;
 	normal.Normalize();
+	normal.FixDegenerateNormal();
 
 	this->d = -(normal * a);
 	this->a = normal[0];

@@ -29,6 +29,7 @@ class idNETLizardConverter
         idStr TargetFilePath(const char *path) const;
         idStr SourceFilePath(const char *path) const;
         bool GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, bool isItem = false) const;
+        bool GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_Tree_Node *node, bool invert = false) const;
         bool LoadNETLizard3DMapModel(NETLizard_3D_Model &model, const char *file, int level);
 
         static int TEXTURE_FILE_TYPE;

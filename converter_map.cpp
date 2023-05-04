@@ -19,7 +19,7 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	int texIndex = p->tex_index;
 	idStr material = gamename / idStr::va(config->tex_path_format, texIndex);
 	material.RemoveExtension();
-	idStr invisibleMaterial = "common/caulk";
+	idStr invisibleMaterial = idMaterial::CAULK_MATERIAL;
 	float w = config->tex_width;
 
 	idDrawVert vertex[3];
@@ -87,7 +87,7 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	side.plane.FromPoints(points[0], points[1], points[2]);
 	if(side.plane.Normal().IsZero())
 		return false;
-	if(invert_texcoord_y)
+	if(invert_texcoord_y && 0)
 	{
 		side.textureMatrix[0][0] = tb[1][1] / w;
 		side.textureMatrix[1][1] = tb[1][1] / w;
@@ -286,6 +286,46 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 	/* cout << bounds[0][0] << ", " << bounds[0][1] << "," << bounds[0][2]
 		<< " | " << bounds[1][0] << ", " << bounds[1][1] << ", " << bounds[1][2] << endl; */
 		
+	if(model->bsp_data.data)
+	{
+		for(int i = 0; i < model->bsp_data.count; i++)
+		{
+			idEntity e;
+			e.classname = "info_player_deathmatch";
+			e.name = idStr::va("info_player_deathmatch_%d", i);
+			const NETLizard_BSP_Tree_Node *node = model->bsp_data.data + i;
+			idVec3 v(node->plane[0][0], node->plane[0][1], node->plane[0][2]);
+			v *= NETLIZARD_MAP_TO_IDTECH4;
+			idBounds bv({v, v});
+			bv.AddPoint(idVec3(node->plane[1][0], node->plane[1][1], node->plane[1][2]) *= NETLIZARD_MAP_TO_IDTECH4);
+			bv.AddPoint(idVec3(node->plane[2][0], node->plane[2][1], node->plane[2][2]) *= NETLIZARD_MAP_TO_IDTECH4);
+			bv.AddPoint(idVec3(node->plane[3][0], node->plane[3][1], node->plane[3][2]) *= NETLIZARD_MAP_TO_IDTECH4);
+			idVec3 center = bv.Center();
+			e.spawnArgs.SetVec3("origin", {center[0], center[1], bv[0][2] + 1.0f});
+			map.entitys.push_back(e);
+
+			bv = map.areas[node->prev_scene];
+			bv += map.areas[node->next_scene];
+			idVec3 radius = bv.Size();
+			e.spawnArgs.Clear();
+			e.classname = "light";
+			e.name = idStr::va("area_light_%d", i);
+			e.spawnArgs.SetVec3("origin", center);
+			e.spawnArgs.SetVec3("light_radius", radius);
+			e.spawnArgs.SetBool("noshadows", true);
+			e.spawnArgs.SetBool("nospecular", true);
+			e.spawnArgs.SetFloat("falloff", 0);
+			e.spawnArgs.SetVec3("_color", {0.78, 0.78, 0.84});
+			map.entitys.push_back(e);
+
+			idBrushDef3 brush;
+			if(GenMapBrush(brush, node))
+			{
+				map.entitys[0].brushs.push_back(brush);
+			}
+		}
+	}
+		
 	map.FillExtras();
 
 	idStr fname("maps");
@@ -297,6 +337,86 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 	
 	nlDeleteNETLizard3DModel(&m);
 	return res > 0 ? 0 : -2;
+}
+
+bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_Tree_Node *node, bool invert) const
+{
+	idStr material = idMaterial::AREA_PORTAL_MATERIAL;
+	idStr invisibleMaterial = idMaterial::NODRAW_MATERIAL;
+
+	idVec3 points[4];
+	for(int i = 0; i < 4; i++)
+	{
+		for(int m = 0; m < 3; m++)
+			points[i][m] = (float)node->plane[i][m] * NETLIZARD_MAP_TO_IDTECH4;
+	}
+	if(invert)
+	{
+		std::swap(points[0], points[1]);
+		std::swap(points[2], points[3]);
+	}
+
+	idVec3 v_normal = idVec3::TriangleCaleNormal(points[0], points[1], points[2]);
+
+	idBrushDef3Side side;
+	side.material = material;
+
+	// raw front
+	idVec3 points_[4];
+	side.plane.FromPoints(points[0], points[1], points[2]);
+	if(side.plane.Normal().IsZero())
+		return false;
+	float w = 256.0;
+	side.textureMatrix[0][0] = 1.0 / w;
+	side.textureMatrix[1][1] = 1.0 / w;
+	brush.sides.push_back(side);
+
+	side.material = invisibleMaterial;
+	// back
+	idVec3 normal_ = -v_normal;
+	points_[0] = points[0] + normal_;
+	points_[1] = points[1] + normal_;
+	points_[2] = points[2] + normal_;
+	points_[3] = points[3] + normal_;
+	side.plane.FromPoints(points_[2], points_[1], points_[0]);
+	if(side.plane.Normal().IsZero())
+		return false;
+	brush.sides.push_back(side);
+
+	// 4 sides
+	idVec3 mid = (points[0] - points[1]);
+	mid.Normalize();
+	idVec3 nor = v_normal ^ mid;
+	side.plane.FromPointAndNormal(points[0], nor);
+	if(side.plane.Normal().IsZero())
+		return false;
+	brush.sides.push_back(side);
+
+	mid = (points[1] - points[3]);
+	mid.Normalize();
+	nor = v_normal ^ mid;
+	side.plane.FromPointAndNormal(points[1], nor);
+	if(side.plane.Normal().IsZero())
+		return false;
+	brush.sides.push_back(side);
+
+	mid = (points[3] - points[2]);
+	mid.Normalize();
+	nor = v_normal ^ mid;
+	side.plane.FromPointAndNormal(points[3], nor);
+	if(side.plane.Normal().IsZero())
+		return false;
+	brush.sides.push_back(side);
+
+	mid = (points[2] - points[0]);
+	mid.Normalize();
+	nor = v_normal ^ mid;
+	side.plane.FromPointAndNormal(points[2], nor);
+	if(side.plane.Normal().IsZero())
+		return false;
+	brush.sides.push_back(side);
+
+	return true;
 }
 
 int idNETLizardConverter::ConvertMaps()

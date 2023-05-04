@@ -11,6 +11,10 @@ class idMaterial
 		idStr diffusemap;
 
 		friend std::ostream & operator<<(std::ostream &o, const idMaterial &v);
+
+		static const char *AREA_PORTAL_MATERIAL;
+		static const char *NODRAW_MATERIAL;
+		static const char *CAULK_MATERIAL;
 };
 
 #endif

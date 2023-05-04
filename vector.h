@@ -84,9 +84,10 @@ class idVec3
 		friend idVec3 operator/(const idVec3 &v, float f);
 		friend idVec3 operator*(const idVec3 &v, float f);
 		friend idVec3 operator-(const idVec3 &v);
-		void operator*=(float n);
+		idVec3 & operator*=(float n);
 		float Length(void) const;
 		void Normalize(void);
+		bool FixDegenerateNormal(void);
 
 		static idVec3 TriangleCaleNormal(const idVec3 &a, const idVec3 &b, const idVec3 &c);
 };
@@ -123,11 +124,12 @@ inline idVec3 operator^(const idVec3 &a, const idVec3 &b)
 	return idVec3(x, y, z);
 }
 
-inline void idVec3::operator*=(float n)
+inline idVec3 & idVec3::operator*=(float n)
 {
 	v[0] *= n;
 	v[1] *= n;
 	v[2] *= n;
+	return *this;
 }
 
 inline idVec3 operator-(const idVec3 &v)
@@ -169,7 +171,9 @@ inline void idVec3::Normalize(void)
 	if(m != 0.0)
 	{
 		m = 1.0 / m;
-		*this *= m;
+		v[0] *= m;
+		v[1] *= m;
+		v[2] *= m;
 	}
 }
 
@@ -195,5 +199,81 @@ inline void idVec3::Set(float x, float y, float z)
 	v[0] = x;
 	v[1] = y;
 	v[2] = z;
+}
+
+inline bool idVec3::FixDegenerateNormal(void)
+{
+	if (v[0] == 0.0f) {
+		if (v[1] == 0.0f) {
+			if (v[2] > 0.0f) {
+				if (v[2] != 1.0f) {
+					v[2] = 1.0f;
+					return true;
+				}
+			} else {
+				if (v[2] != -1.0f) {
+					v[2] = -1.0f;
+					return true;
+				}
+			}
+
+			return false;
+		} else if (v[2] == 0.0f) {
+			if (v[1] > 0.0f) {
+				if (v[1] != 1.0f) {
+					v[1] = 1.0f;
+					return true;
+				}
+			} else {
+				if (v[1] != -1.0f) {
+					v[1] = -1.0f;
+					return true;
+				}
+			}
+
+			return false;
+		}
+	} else if (v[1] == 0.0f) {
+		if (v[2] == 0.0f) {
+			if (v[0] > 0.0f) {
+				if (v[0] != 1.0f) {
+					v[0] = 1.0f;
+					return true;
+				}
+			} else {
+				if (v[0] != -1.0f) {
+					v[0] = -1.0f;
+					return true;
+				}
+			}
+
+			return false;
+		}
+	}
+
+	if (fabs(v[0]) == 1.0f) {
+		if (v[1] != 0.0f || v[2] != 0.0f) {
+			v[1] = v[2] = 0.0f;
+			return true;
+		}
+
+		return false;
+	} else if (fabs(v[1]) == 1.0f) {
+		if (v[0] != 0.0f || v[2] != 0.0f) {
+			v[0] = v[2] = 0.0f;
+			return true;
+		}
+
+		return false;
+	} else if (fabs(v[2]) == 1.0f) {
+		if (v[0] != 0.0f || v[1] != 0.0f) {
+			v[0] = v[1] = 0.0f;
+			return true;
+		}
+
+		return false;
+	}
+
+	return false;
 }
 #endif
