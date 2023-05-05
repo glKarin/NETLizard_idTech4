@@ -79,9 +79,6 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	points[0] = vertex[0].xyz;
 	points[1] = vertex[1].xyz;
 	points[2] = vertex[2].xyz;
-	points[0] *= NETLIZARD_MAP_TO_IDTECH4;
-	points[1] *= NETLIZARD_MAP_TO_IDTECH4;
-	points[2] *= NETLIZARD_MAP_TO_IDTECH4;
 
 	// raw front
 	idVec3 points_[3];
