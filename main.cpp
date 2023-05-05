@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
 	using namespace std;
 
-#if 0
+#if 1
 	const char *game = argv[1];
 	const char *source_path = argv[2];
 	const char *target_path = argv[3];
