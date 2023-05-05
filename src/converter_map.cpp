@@ -40,6 +40,10 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	vertex[2].xyz[2] = mesh_vertex[i2 * 3 + 2];
 
 	idVec3 v_normal = idVec3::TriangleCaleNormal(vertex[0].xyz, vertex[1].xyz, vertex[2].xyz);
+	if(v_normal.IsZero())
+	{
+		return false;
+	}
 	vertex[0].normal[0] = v_normal[0];
 	vertex[0].normal[1] = v_normal[1];
 	vertex[0].normal[2] = v_normal[2];
@@ -50,7 +54,6 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	vertex[2].normal[1] = v_normal[1];
 	vertex[2].normal[2] = v_normal[2];
 
-	//GLfloat w = tex ? tex->width : 1.0;
 	vertex[0].st[0] = (float)p->texcoord[0] / w;
 	vertex[0].st[1] = (float)p->texcoord[1] / w;
 
@@ -66,11 +69,9 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 		vertex[1].st[1] = 1.0 - vertex[1].st[1];
 		vertex[2].st[1] = 1.0 - vertex[2].st[1];
 	}
-
-	idVec3 t0(vertex[0].st[0], vertex[0].st[1], 0.0);
-	idBounds tb({t0, t0});
-	tb.AddPoint({vertex[1].st[0], vertex[1].st[1], 0.0});
-	tb.AddPoint({vertex[2].st[0], vertex[2].st[1], 0.0});
+	vertex[0].xyz *= NETLIZARD_MAP_TO_IDTECH4;
+	vertex[1].xyz *= NETLIZARD_MAP_TO_IDTECH4;
+	vertex[2].xyz *= NETLIZARD_MAP_TO_IDTECH4;
 
 	idBrushDef3Side side;
 	side.material = material;
@@ -86,17 +87,17 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	idVec3 points_[3];
 	side.plane.FromPoints(points[0], points[1], points[2]);
 	if(side.plane.Normal().IsZero())
+	{
 		return false;
-	if(invert_texcoord_y && 0)
-	{
-		side.textureMatrix[0][0] = tb[1][1] / w;
-		side.textureMatrix[1][1] = tb[1][1] / w;
 	}
-	else
+	side.textureMatrix[0][0] = 1.0 / w;
+	side.textureMatrix[1][1] = 1.0 / w;
+
+	side.FromDrawVerts(vertex);
 	{
-		side.textureMatrix[0][0] = 1.0 / w;
-		side.textureMatrix[1][1] = 1.0 / w;
+		return false;
 	}
+
 	brush.sides.push_back(side);
 
 	// back
@@ -107,32 +108,40 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	points_[2] = points[2] + normal_;
 	side.plane.FromPoints(points_[2], points_[1], points_[0]);
 	if(side.plane.Normal().IsZero())
+	{
 		return false;
+	}
 	brush.sides.push_back(side);
 
 	// 3 sides
 	idVec3 mid = (points[0] - points[1]);
-	mid.Normalize();
+	mid.Normalized();
 	idVec3 nor = v_normal ^ mid;
 	side.plane.FromPointAndNormal(points[0], nor);
 	if(side.plane.Normal().IsZero())
+	{
 		return false;
+	}
 	brush.sides.push_back(side);
 
 	mid = (points[1] - points[2]);
-	mid.Normalize();
+	mid.Normalized();
 	nor = v_normal ^ mid;
 	side.plane.FromPointAndNormal(points[1], nor);
 	if(side.plane.Normal().IsZero())
+	{
 		return false;
+	}
 	brush.sides.push_back(side);
 
 	mid = (points[2] - points[0]);
-	mid.Normalize();
+	mid.Normalized();
 	nor = v_normal ^ mid;
 	side.plane.FromPointAndNormal(points[2], nor);
 	if(side.plane.Normal().IsZero())
+	{
 		return false;
+	}
 	brush.sides.push_back(side);
 
 	bounds[0] = points[0];
@@ -365,7 +374,9 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_T
 	idVec3 points_[4];
 	side.plane.FromPoints(points[0], points[1], points[2]);
 	if(side.plane.Normal().IsZero())
+	{
 		return false;
+	}
 	float w = 256.0;
 	side.textureMatrix[0][0] = 1.0 / w;
 	side.textureMatrix[1][1] = 1.0 / w;
@@ -380,40 +391,50 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_T
 	points_[3] = points[3] + normal_;
 	side.plane.FromPoints(points_[2], points_[1], points_[0]);
 	if(side.plane.Normal().IsZero())
+	{
 		return false;
+	}
 	brush.sides.push_back(side);
 
 	// 4 sides
 	idVec3 mid = (points[0] - points[1]);
-	mid.Normalize();
+	mid.Normalized();
 	idVec3 nor = v_normal ^ mid;
 	side.plane.FromPointAndNormal(points[0], nor);
 	if(side.plane.Normal().IsZero())
+	{
 		return false;
+	}
 	brush.sides.push_back(side);
 
 	mid = (points[1] - points[3]);
-	mid.Normalize();
+	mid.Normalized();
 	nor = v_normal ^ mid;
 	side.plane.FromPointAndNormal(points[1], nor);
 	if(side.plane.Normal().IsZero())
+	{
 		return false;
+	}
 	brush.sides.push_back(side);
 
 	mid = (points[3] - points[2]);
-	mid.Normalize();
+	mid.Normalized();
 	nor = v_normal ^ mid;
 	side.plane.FromPointAndNormal(points[3], nor);
 	if(side.plane.Normal().IsZero())
+	{
 		return false;
+	}
 	brush.sides.push_back(side);
 
 	mid = (points[2] - points[0]);
-	mid.Normalize();
+	mid.Normalized();
 	nor = v_normal ^ mid;
 	side.plane.FromPointAndNormal(points[2], nor);
 	if(side.plane.Normal().IsZero())
+	{
 		return false;
+	}
 	brush.sides.push_back(side);
 
 	return true;
@@ -453,8 +474,12 @@ int idNETLizardConverter::ConvertMaps()
 				continue; // lvl13 15 not supprot in CT3D-Ep3
 			idMap map;
 			file = idStr::va(format, i);
+			Log("Handle map %d - %s", i, file);
 			if(ConvertMap(idStr(file), i) == 0)
+			{
 				res++;
+				Log("Handle map success");
+			}
 		}
 	}
     return res;

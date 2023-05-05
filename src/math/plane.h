@@ -1,7 +1,7 @@
 #ifndef _KARIN_PLANE_H
 #define _KARIN_PLANE_H
 
-#include "vector.h"
+class idVec3;
 
 class idPlane
 {
@@ -38,28 +38,4 @@ class idPlane
 		void FromPoints(const idVec3 &a, const idVec3 &b, const idVec3 &c);
 		void FromPointAndNormal(const idVec3 &point, const idVec3 &normal);
 };
-
-inline void idPlane::FromPoints(const idVec3 &a, const idVec3 &b, const idVec3 &c)
-{
-	idVec3 normal;
-	idVec3 first = b - a;
-	idVec3 second = c - a;
-
-	normal = first ^ second;
-	normal.Normalize();
-	normal.FixDegenerateNormal();
-
-	this->d = -(normal * a);
-	this->a = normal[0];
-	this->b = normal[1];
-	this->c = normal[2];
-}
-
-inline void idPlane::FromPointAndNormal(const idVec3 &point, const idVec3 &normal)
-{
-	this->a = normal[0];
-	this->b = normal[1];
-	this->c = normal[2];
-	this->d = -(normal * point);
-}
 #endif

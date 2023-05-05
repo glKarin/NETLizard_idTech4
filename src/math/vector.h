@@ -2,6 +2,10 @@
 #define _KARIN_VERTOR_H
 
 #include <math.h>
+
+class idMat4;
+class idStr;
+
 class idVec2
 {
 	public:
@@ -29,6 +33,12 @@ class idVec2
 		}
 		float & Y() {
 			return v[1];
+		}
+		float & operator()(int i) {
+			return v[i];
+		}
+		float operator()(int i) const {
+			return v[i];
 		}
 };
 
@@ -76,6 +86,12 @@ class idVec3
 		float & Z() {
 			return v[2];
 		}
+		float & operator()(int i) {
+			return v[i];
+		}
+		float operator()(int i) const {
+			return v[i];
+		}
 
 		friend idVec3 operator+(const idVec3 &a, const idVec3 &b);
 		friend idVec3 operator-(const idVec3 &a, const idVec3 &b);
@@ -86,9 +102,13 @@ class idVec3
 		friend idVec3 operator-(const idVec3 &v);
 		idVec3 & operator*=(float n);
 		float Length(void) const;
-		void Normalize(void);
+		void Normalized(void);
 		bool FixDegenerateNormal(void);
+		idStr ToString(const char *c = " ") const;
+		void ComputeAxisBase(idVec3 &texS, idVec3 &texT) const;
+		idMat4 GetBasisTransformForNormal(void) const;
 
+		static bool IsNear(const idVec3& v1, const idVec3& v2, float epsilon);
 		static idVec3 TriangleCaleNormal(const idVec3 &a, const idVec3 &b, const idVec3 &c);
 };
 
@@ -163,7 +183,7 @@ inline float idVec3::Length(void) const
 #undef POW2
 }
 
-inline void idVec3::Normalize(void)
+inline void idVec3::Normalized(void)
 {
 	float m;
 
@@ -177,18 +197,6 @@ inline void idVec3::Normalize(void)
 	}
 }
 
-inline idVec3 idVec3::TriangleCaleNormal(const idVec3 &a, const idVec3 &b, const idVec3 &c)
-{
-	idVec3 normal;
-	idVec3 first = b - a;
-	idVec3 second = c - a;
-
-	//vector3_crossv(normal, &second, &first); // org
-	normal = first ^ second;
-	normal.Normalize();
-	return normal;
-}
-
 inline bool idVec3::IsZero() const
 {
 	return v[0] == 0.0 && v[1] == 0.0 && v[2] == 0.0;
@@ -199,81 +207,5 @@ inline void idVec3::Set(float x, float y, float z)
 	v[0] = x;
 	v[1] = y;
 	v[2] = z;
-}
-
-inline bool idVec3::FixDegenerateNormal(void)
-{
-	if (v[0] == 0.0f) {
-		if (v[1] == 0.0f) {
-			if (v[2] > 0.0f) {
-				if (v[2] != 1.0f) {
-					v[2] = 1.0f;
-					return true;
-				}
-			} else {
-				if (v[2] != -1.0f) {
-					v[2] = -1.0f;
-					return true;
-				}
-			}
-
-			return false;
-		} else if (v[2] == 0.0f) {
-			if (v[1] > 0.0f) {
-				if (v[1] != 1.0f) {
-					v[1] = 1.0f;
-					return true;
-				}
-			} else {
-				if (v[1] != -1.0f) {
-					v[1] = -1.0f;
-					return true;
-				}
-			}
-
-			return false;
-		}
-	} else if (v[1] == 0.0f) {
-		if (v[2] == 0.0f) {
-			if (v[0] > 0.0f) {
-				if (v[0] != 1.0f) {
-					v[0] = 1.0f;
-					return true;
-				}
-			} else {
-				if (v[0] != -1.0f) {
-					v[0] = -1.0f;
-					return true;
-				}
-			}
-
-			return false;
-		}
-	}
-
-	if (fabs(v[0]) == 1.0f) {
-		if (v[1] != 0.0f || v[2] != 0.0f) {
-			v[1] = v[2] = 0.0f;
-			return true;
-		}
-
-		return false;
-	} else if (fabs(v[1]) == 1.0f) {
-		if (v[0] != 0.0f || v[2] != 0.0f) {
-			v[0] = v[2] = 0.0f;
-			return true;
-		}
-
-		return false;
-	} else if (fabs(v[2]) == 1.0f) {
-		if (v[0] != 0.0f || v[1] != 0.0f) {
-			v[0] = v[1] = 0.0f;
-			return true;
-		}
-
-		return false;
-	}
-
-	return false;
 }
 #endif

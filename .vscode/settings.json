@@ -65,6 +65,8 @@
         "ios": "cpp",
         "xfacet": "cpp",
         "xiosbase": "cpp",
-        "xlocnum": "cpp"
+        "xlocnum": "cpp",
+        "xhash": "cpp",
+        "xtree": "cpp"
     }
 }

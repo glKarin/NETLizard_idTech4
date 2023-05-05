@@ -1,6 +1,8 @@
 #include "converter.h"
 
 #include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include "filesystem.h"
 
 int idNETLizardConverter::TEXTURE_FILE_TYPE = 0; // tga
@@ -9,10 +11,10 @@ idNETLizardConverter::idNETLizardConverter(NETLizard_Game game, const char *sour
     : game(game),
         sourceDir(sourceDir),
         targetDir(targetDir),
-        config(0)
+        config(nullptr)
 {
     config = nlGet3DGameModelConfig(this->game);
-    gamename = idStr(nlGet3DGameName(this->game)).Replace(" ", "_").Replace(":", "_").ToLower();
+    gamename = idStr(nlGet3DGameName(this->game)).Replace(" ", "").Replace(":", "_").ToLower();
 }
 
 bool idNETLizardConverter::ReadFile(idBuffer &buffer, const char *path) const
@@ -43,4 +45,13 @@ idStr idNETLizardConverter::SourceFilePath(const char *path) const
     if(path)
         str /= path;
     return str;
+}
+
+void idNETLizardConverter::Log(const char *str, ...) const
+{
+    va_list va;
+    va_start(va, str);
+    vprintf(str, va);
+    va_end(va);
+    printf("\n");
 }

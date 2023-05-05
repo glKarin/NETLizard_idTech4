@@ -1,18 +1,14 @@
-#ifndef _KARIN_MAP_H
-#define _KARIN_MAP_H
+#ifndef _KARIN_BRUSH_H
+#define _KARIN_BRUSH_H
 
 #include <vector>
 #include <iostream>
-#include <map>
 
 #include "vector.h"
 #include "plane.h"
 #include "str.h"
-#include "bounds.h"
-#include "dict.h"
 
-#define MAP_VERSION_DOOM3 "2"
-#define MAP_VERSION_QUAKE4 "3"
+class idDrawVert;
 
 class idBrushDef3Side
 {
@@ -31,6 +27,8 @@ class idBrushDef3Side
 			textureMatrix[1].Set(0, 1, 0);
 		}
 		friend std::ostream & operator<<(std::ostream &o, const idBrushDef3Side &v);
+
+		bool FromDrawVerts(const idDrawVert verts[3]);
 };
 using idBrushDef3SideList = std::vector<idBrushDef3Side>;
 
@@ -41,32 +39,5 @@ class idBrushDef3
 		friend std::ostream & operator<<(std::ostream &o, const idBrushDef3 &v);
 };
 using idBrushDef3List = std::vector<idBrushDef3>;
-
-class idEntity
-{
-	public:
-		idStr name;
-		idStr classname;
-		idBrushDef3List brushs;
-		idDict spawnArgs;
-
-		friend std::ostream & operator<<(std::ostream &o, const idEntity &v);
-};
-using idEntityList = std::vector<idEntity>;
-
-class idMap
-{
-	public:
-		idStr version = MAP_VERSION_DOOM3;
-		idEntityList entitys;
-		idVec3 startPos;
-		float startAngle;
-		idBounds bounds;
-		std::map<int, idBounds> areas;
-
-		void FillExtras(void);
-
-		friend std::ostream & operator<<(std::ostream &o, const idMap &v);
-};
 
 #endif

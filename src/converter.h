@@ -31,6 +31,7 @@ class idNETLizardConverter
         bool GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, bool isItem = false) const;
         bool GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_Tree_Node *node, bool invert = false) const;
         bool LoadNETLizard3DMapModel(NETLizard_3D_Model &model, const char *file, int level);
+        void Log(const char *str, ...) const;
 
         static int TEXTURE_FILE_TYPE;
         static float NETLIZARD_MAP_TO_IDTECH4;
