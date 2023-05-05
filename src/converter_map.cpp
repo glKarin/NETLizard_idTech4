@@ -93,7 +93,7 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	side.textureMatrix[0][0] = 1.0 / w;
 	side.textureMatrix[1][1] = 1.0 / w;
 
-	side.FromDrawVerts(vertex);
+	if(!side.FromDrawVerts(vertex))
 	{
 		return false;
 	}
