@@ -4,6 +4,13 @@
 #include "str.h"
 #include "maths.h"
 
+idStr idVec2::ToString(const char *c) const
+{
+	return idStr::va("%f%s%f", v[0], c, v[1]);
+}
+
+
+
 bool idVec3::IsNear(const idVec3& v1, const idVec3& v2, float epsilon)
 {
     idVec3 diff = v1 - v2;

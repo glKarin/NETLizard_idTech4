@@ -66,6 +66,7 @@ bool idMath::CalculateFromPoints(idMat3 &mat, const idVec3 points[3], const idVe
     }
     else
     {
+		//std::cout << transform.ToString().c_str() << std::endl;
 		return false;
     }
 }

@@ -42,6 +42,7 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	idVec3 v_normal = idVec3::TriangleCaleNormal(vertex[0].xyz, vertex[1].xyz, vertex[2].xyz);
 	if(v_normal.IsZero())
 	{
+		Log("Point(%s, %s, %s) all in one line", vertex[0].xyz.ToString().c_str(), vertex[1].xyz.ToString().c_str(), vertex[2].xyz.ToString().c_str());
 		return false;
 	}
 	vertex[0].normal[0] = v_normal[0];
@@ -75,10 +76,11 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 
 	idBrushDef3Side side;
 	side.material = material;
-	idVec3 points[3];
-	points[0] = vertex[0].xyz;
-	points[1] = vertex[1].xyz;
-	points[2] = vertex[2].xyz;
+	idVec3 points[3] = {
+		vertex[0].xyz,
+		vertex[1].xyz,
+		vertex[2].xyz,
+	};
 
 	// raw front
 	idVec3 points_[3];
@@ -87,12 +89,12 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	{
 		return false;
 	}
-	side.textureMatrix[0][0] = 1.0 / w;
-	side.textureMatrix[1][1] = 1.0 / w;
 
 	if(!side.FromDrawVerts(vertex))
 	{
-		return false;
+		Log("Vertex((xyz(%s), uv(%s)), (xyz(%s), uv(%s)), (xyz(%s), uv(%s)), (normal(%s))) can't generate texture matrix", vertex[0].xyz.ToString().c_str(), vertex[0].st.ToString().c_str(), vertex[1].xyz.ToString().c_str(), vertex[1].st.ToString().c_str(), vertex[2].xyz.ToString().c_str(), vertex[2].st.ToString().c_str(), v_normal.ToString().c_str());
+		side.textureMatrix[0][0] = 1.0 / w;
+		side.textureMatrix[1][1] = 1.0 / w;
 	}
 
 	brush.sides.push_back(side);

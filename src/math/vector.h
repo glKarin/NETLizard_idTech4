@@ -40,6 +40,7 @@ class idVec2
 		float operator()(int i) const {
 			return v[i];
 		}
+		idStr ToString(const char *c = " ") const;
 };
 
 class idVec3

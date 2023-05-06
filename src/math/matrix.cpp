@@ -1,6 +1,7 @@
 #include "matrix.h"
 
 #include "vector.h"
+#include "str.h"
 
 #define MATRIX_INVERSE_EPSILON		1e-14
 
@@ -69,6 +70,17 @@ bool idMat3::Inverse(void)
 
 	return true;
 }
+
+idStr idMat3::ToString(const char *s) const
+{
+   return idStr(idStr::va("%f%s%f%s%f%s%f%s%f%s%f%s%f%s%f%s%f",
+      m[0], s, m[1], s, m[2], s, 
+      m[3], s, m[4], s, m[5], s, 
+      m[6], s, m[7], s, m[8]
+   ));
+}
+
+
 
 void idMat4::Translate(const idVec3 &v)
 {

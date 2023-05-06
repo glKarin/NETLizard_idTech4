@@ -35,12 +35,16 @@ bool idBrushDef3Side::FromDrawVerts(const idDrawVert verts[3])
 	}
 	const idVec3 points[] = {verts[0].xyz, verts[1].xyz, verts[2].xyz};
 	const idVec2 uvs[] = {verts[0].st, verts[1].st, verts[2].st};
-	idMat3 mat;
-	if(!idMath::CalculateFromPoints(mat, points, uvs, plane.Normal()))
+	idMat3 transform;
+	if(!idMath::CalculateFromPoints(transform, points, uvs, plane.Normal()))
 	{
 		return false;
 	}
-	textureMatrix[0] = mat(0);
-	textureMatrix[1] = mat(1);
+    textureMatrix[0][0] = transform(0, 0); // xx
+    textureMatrix[0][1] = transform(1, 0); // yx
+    textureMatrix[0][2] = transform(2, 0); // zx
+    textureMatrix[1][0] = transform(0, 1); // xy
+    textureMatrix[1][1] = transform(1, 1); // yy
+    textureMatrix[1][2] = transform(2, 1); // zy
 	return true;
 }

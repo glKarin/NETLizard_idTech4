@@ -6,7 +6,7 @@
 
 using std::string;
 
-#define VA_MAX 1024
+#define VA_MAX 10
 
 const char * idStr::va(const char *fmt, ...)
 {

@@ -6,6 +6,7 @@
 #include <string.h>
 
 class idVec3;
+class idStr;
 
 class idMat3
 {
@@ -85,6 +86,7 @@ class idMat3
 		idVec3Ref & operator()(int col) {
 			return cols[col];
 		}
+		idStr ToString(const char *s = " ") const;
 
 		private:
 		idVec3Ref cols[3] = {
