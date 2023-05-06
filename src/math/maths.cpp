@@ -1,7 +1,10 @@
 #include "maths.h"
 
+#include <iostream>
+
 #include "vector.h"
 #include "matrix.h"
+#include "str.h"
 
 bool idMath::CalculateFromPoints(idMat3 &mat, const idVec3 points[3], const idVec2 uvs[3], const idVec3& normal)
 {

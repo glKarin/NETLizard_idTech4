@@ -113,13 +113,13 @@ void idVec3::ComputeAxisBase(idVec3 &texS, idVec3 &texT) const
 
 	if (IsNear(normal, up, 1e-6)) // straight up?
 	{
-		texS = idVec3(0, 1, 0);
-		texT = idVec3(1, 0, 0);
+		texS.Set(0, 1, 0);
+		texT.Set(1, 0, 0);
 	}
 	else if (IsNear(normal, down, 1e-6)) // straight down?
 	{
-		texS = idVec3(0, 1, 0);
-		texT = idVec3(-1, 0, 0);
+		texS.Set(0, 1, 0);
+		texT.Set(-1, 0, 0);
 	}
 	else
 	{

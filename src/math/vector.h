@@ -56,6 +56,7 @@ class idVec3
 		}
 		void Set(float x, float y, float z);
 		bool IsZero() const;
+		void Zero(void);
 		float & operator[](int i) {
 			return v[i];
 		}
@@ -207,5 +208,10 @@ inline void idVec3::Set(float x, float y, float z)
 	v[0] = x;
 	v[1] = y;
 	v[2] = z;
+}
+
+inline void idVec3::Zero(void)
+{
+	v[0] = v[1] = v[2] = 0;
 }
 #endif

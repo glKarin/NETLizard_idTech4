@@ -97,6 +97,10 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 
 	brush.sides.push_back(side);
 
+	side.textureMatrix[0].Zero();
+	side.textureMatrix[1].Zero();
+	side.textureMatrix[0][0] = 1.0 / w;
+	side.textureMatrix[1][1] = 1.0 / w;
 	// back
 	side.material = invisibleMaterial;
 	idVec3 normal_ = -v_normal;

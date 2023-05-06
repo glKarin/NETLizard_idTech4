@@ -23,6 +23,10 @@
    Q[2] = M[2] * P[0] + M[6] * P[1] + M[10] * P[2] + M[14];	\
    Q[3] = M[3] * P[0] + M[7] * P[1] + M[11] * P[2] + M[15];
 
+idMat3::idVec3Ref::operator idVec3() const
+{
+   return idVec3(*x, *y, *z);
+}
 
 bool idMat3::Inverse(void)
 {

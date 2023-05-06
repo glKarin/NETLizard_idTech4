@@ -9,6 +9,47 @@ class idVec3;
 
 class idMat3
 {
+
+	public:
+		class idVec3Ref
+		{
+			public:
+			float operator()(int i) const {
+				return operator[](i);
+			}
+			float & operator()(int i) {
+				return operator[](i);
+			}
+			float operator[](int i) const {
+				switch(i)
+				{
+					case 0: return *x;
+					case 1: return *y;
+					case 2: return *z;
+					default: throw "idVec3Ref::operator[](int)const";
+				}
+			}
+			float & operator[](int i) {
+				switch(i)
+				{
+					case 0: return *x;
+					case 1: return *y;
+					case 2: return *z;
+					default: throw "idVec3Ref::operator[](int)";
+				}
+			}
+			operator idVec3() const;
+			
+			private:
+				float *x;
+				float *y;
+				float *z;
+
+				idVec3Ref(float *x, float *y, float *z)
+				: x(x), y(y), z(z) {}
+
+				friend class idMat3;
+		};
 	public:
 		float m[9] = {
 			1, 0, 0,
@@ -32,18 +73,25 @@ class idMat3
 		float & operator[](int i) {
 			return m[i];
 		}
-		float operator()(int row, int col) const {
+		float operator()(int col, int row) const {
 			return m[row * 3 + col];
 		}
-		float & operator()(int row, int col) {
+		float & operator()(int col, int row) {
 			return m[row * 3 + col];
 		}
-		const idVec3 & operator()(int row) const {
-			return *reinterpret_cast<const idVec3 *>(m + row * 3);
+		const idVec3Ref & operator()(int col) const {
+			return cols[col];
 		}
-		idVec3 & operator()(int row) {
-			return *reinterpret_cast<idVec3 *>(m + row * 3);
+		idVec3Ref & operator()(int col) {
+			return cols[col];
 		}
+
+		private:
+		idVec3Ref cols[3] = {
+			{&m[0], &m[3], &m[6]},
+			{&m[1], &m[4], &m[7]},
+			{&m[2], &m[5], &m[8]},
+		};
 };
 
 class idMat4
@@ -77,24 +125,26 @@ class idMat4
 		float & operator[](int i) {
 			return m[i];
 		}
-		float operator()(int row, int col) const {
+		float operator()(int col, int row) const {
 			return m[row * 4 + col];
 		}
-		float & operator()(int row, int col) {
+		float & operator()(int col, int row) {
 			return m[row * 4 + col];
 		}
 };
 
-inline idMat3::idMat3(float f00, float f01, float f02, float f10, float f11, float f12, float f20, float f21, float f22)
+inline idMat3::idMat3(float f00, float f01, float f02,
+ float f10, float f11, float f12,
+  float f20, float f21, float f22)
 {
    m[0] = f00;
-   m[1] = f01;
-   m[2] = f02;
-   m[3] = f10;
+   m[3] = f01;
+   m[6] = f02;
+   m[1] = f10;
    m[4] = f11;
-   m[5] = f12;
-   m[6] = f20;
-   m[7] = f21;
+   m[7] = f12;
+   m[2] = f20;
+   m[5] = f21;
    m[8] = f22;
 }
 
