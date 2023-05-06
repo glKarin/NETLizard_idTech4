@@ -29,6 +29,9 @@ class idBrushDef3Side
 		friend std::ostream & operator<<(std::ostream &o, const idBrushDef3Side &v);
 
 		bool FromDrawVerts(const idDrawVert verts[3]);
+
+		private:
+        static bool CalculateFromPoints(idVec3 mat[2], const idVec3 points[3], const idVec2 uvs[3], const idVec3& normal);
 };
 using idBrushDef3SideList = std::vector<idBrushDef3Side>;
 

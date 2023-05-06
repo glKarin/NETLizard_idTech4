@@ -26,17 +26,10 @@ ostream & operator<<(ostream &o, const idBrushDef3 &v)
 	return o;
 }
 
-bool idBrushDef3Side::FromDrawVerts(const idDrawVert verts[3])
+bool idBrushDef3Side::CalculateFromPoints(idVec3 textureMatrix[2], const idVec3 points[3], const idVec2 uvs[3], const idVec3& normal)
 {
-	plane.FromPoints(verts[0].xyz, verts[1].xyz, verts[2].xyz);
-	if(plane.Normal().IsZero())
-	{
-		return false;
-	}
-	const idVec3 points[] = {verts[0].xyz, verts[1].xyz, verts[2].xyz};
-	const idVec2 uvs[] = {verts[0].st, verts[1].st, verts[2].st};
 	idMat3 transform;
-	if(!idMath::CalculateFromPoints(transform, points, uvs, plane.Normal()))
+	if(!idMath::CalcTextureMatrixFromPointsXYZUVNormal(transform, points, uvs, normal))
 	{
 		return false;
 	}
@@ -47,4 +40,16 @@ bool idBrushDef3Side::FromDrawVerts(const idDrawVert verts[3])
     textureMatrix[1][1] = transform(1, 1); // yy
     textureMatrix[1][2] = transform(2, 1); // zy
 	return true;
+}
+
+bool idBrushDef3Side::FromDrawVerts(const idDrawVert verts[3])
+{
+	plane.FromPoints(verts[0].xyz, verts[1].xyz, verts[2].xyz);
+	if(plane.Normal().IsZero())
+	{
+		return false;
+	}
+	const idVec3 points[] = {verts[0].xyz, verts[1].xyz, verts[2].xyz};
+	const idVec2 uvs[] = {verts[0].st, verts[1].st, verts[2].st};
+	return CalculateFromPoints(textureMatrix, points, uvs, plane.Normal());
 }

@@ -6,7 +6,7 @@
 #include "matrix.h"
 #include "str.h"
 
-bool idMath::CalculateFromPoints(idMat3 &mat, const idVec3 points[3], const idVec2 uvs[3], const idVec3& normal)
+bool idMath::CalcTextureMatrixFromPointsXYZUVNormal(idMat3 &mat, const idVec3 points[3], const idVec2 uvs[3], const idVec3& normal)
 {
     // Calculate the texture projection for the desired set of UVs and XYZ
 
@@ -34,10 +34,10 @@ bool idMath::CalculateFromPoints(idMat3 &mat, const idVec3 points[3], const idVe
 
     // Rotate the three incoming world vertices into the local face plane
     idVec3 localPoints[] =
-    {
-        axisBase * points[0],
-        axisBase * points[1],
-        axisBase * points[2],
+    { // M * v -> v * M
+        points[0] * axisBase,
+        points[1] * axisBase,
+        points[2] * axisBase,
     };
 
     // Arrange the XYZ coords into the columns of matrix A

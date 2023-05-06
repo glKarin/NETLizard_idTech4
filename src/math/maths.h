@@ -13,7 +13,7 @@ class idMath final
 {
     public:
         static bool IsZero(float f);
-        static bool CalculateFromPoints(idMat3 &mat, const idVec3 points[3], const idVec2 uvs[3], const idVec3& normal);
+        static bool CalcTextureMatrixFromPointsXYZUVNormal(idMat3 &mat, const idVec3 points[3], const idVec2 uvs[3], const idVec3& normal);
 };
 
 
