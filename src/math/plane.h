@@ -35,6 +35,9 @@ class idPlane
 		const idVec3 & Normal() const {
 			return *reinterpret_cast<const idVec3 *>(&a);
 		}
+		idVec3 & Normal() {
+			return *reinterpret_cast<idVec3 *>(&a);
+		}
 		void FromPoints(const idVec3 &a, const idVec3 &b, const idVec3 &c);
 		void FromPointAndNormal(const idVec3 &point, const idVec3 &normal);
 };

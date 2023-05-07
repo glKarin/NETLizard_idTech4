@@ -9,10 +9,11 @@
 #include "drawvert.h"
 #include "matrix.h"
 #include "filesystem.h"
+#include "matrix.h"
 
 float idNETLizardConverter::NETLIZARD_MAP_TO_IDTECH4 = 0.35;
 
-bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, bool isItem) const
+bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, const idMat4 *mat, bool isItem) const
 {
 	int invert_texcoord_y = isItem ? config->item_invert_texcoord_y : config->invert_texcoord_y;
 	int index_factory = isItem ? config->item_index_factory : config->index_factory;
@@ -38,6 +39,10 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	vertex[2].xyz[0] = mesh_vertex[i2 * 3];
 	vertex[2].xyz[1] = mesh_vertex[i2 * 3 + 1];
 	vertex[2].xyz[2] = mesh_vertex[i2 * 3 + 2];
+
+	vertex[0].xyz *= NETLIZARD_MAP_TO_IDTECH4;
+	vertex[1].xyz *= NETLIZARD_MAP_TO_IDTECH4;
+	vertex[2].xyz *= NETLIZARD_MAP_TO_IDTECH4;
 
 	idVec3 v_normal = idVec3::TriangleCaleNormal(vertex[0].xyz, vertex[1].xyz, vertex[2].xyz);
 	if(v_normal.IsZero())
@@ -70,9 +75,6 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 		vertex[1].st[1] = 1.0 - vertex[1].st[1];
 		vertex[2].st[1] = 1.0 - vertex[2].st[1];
 	}
-	vertex[0].xyz *= NETLIZARD_MAP_TO_IDTECH4;
-	vertex[1].xyz *= NETLIZARD_MAP_TO_IDTECH4;
-	vertex[2].xyz *= NETLIZARD_MAP_TO_IDTECH4;
 
 	idBrushDef3Side side;
 	side.material = material;
@@ -83,18 +85,28 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	};
 
 	// raw front
-	idVec3 points_[3];
 	side.plane.FromPoints(points[0], points[1], points[2]);
 	if(side.plane.Normal().IsZero())
 	{
 		return false;
 	}
 
+	idPlane tmpPlane = side.plane;
+	if(mat)
+	{
+		vertex[0].xyz = *mat * vertex[0].xyz;
+		vertex[1].xyz = *mat * vertex[1].xyz;
+		vertex[2].xyz = *mat * vertex[2].xyz;
+	}
 	if(!side.FromDrawVerts(vertex))
 	{
 		Log("Vertex((xyz(%s), uv(%s)), (xyz(%s), uv(%s)), (xyz(%s), uv(%s)), (normal(%s))) can't generate texture matrix", vertex[0].xyz.ToString().c_str(), vertex[0].st.ToString().c_str(), vertex[1].xyz.ToString().c_str(), vertex[1].st.ToString().c_str(), vertex[2].xyz.ToString().c_str(), vertex[2].st.ToString().c_str(), v_normal.ToString().c_str());
 		side.textureMatrix[0][0] = 1.0 / w;
 		side.textureMatrix[1][1] = 1.0 / w;
+	}
+	if(mat)
+	{
+		side.plane = tmpPlane;
 	}
 
 	brush.sides.push_back(side);
@@ -106,6 +118,7 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	// back
 	side.material = invisibleMaterial;
 	idVec3 normal_ = -v_normal;
+	idVec3 points_[3];
 	points_[0] = points[0] + normal_;
 	points_[1] = points[1] + normal_;
 	points_[2] = points[2] + normal_;
@@ -258,25 +271,31 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 			const NLint *mesh_vertex = mesh->item_mesh.vertex.data;
 
 			NLint item_type = nlGetItemType(game, mesh->obj_index);
-			if(item_type & (NL_3D_ITEM_TYPE_DOOR_HORIZONTAL | NL_3D_ITEM_TYPE_DOOR_VERTICAL))
+			if(item_type & (NL_3D_ITEM_TYPE_DOOR_HORIZONTAL | NL_3D_ITEM_TYPE_DOOR_VERTICAL | NL_3D_ITEM_TYPE_SKYBOX | NL_3D_ITEM_TYPE_WEAPON))
 				continue;
 
 			idEntity entity;
 			entity.classname = "func_static";
 			entity.name = idStr::va("entity%d_%d", mesh->obj_index, i);
 			entity.spawnArgs.Set("model", entity.name);
-			entity.spawnArgs.SetVec3("origin", idVec3(mesh->position[0] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[1] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[2] * NETLIZARD_MAP_TO_IDTECH4));
+			entity.spawnArgs.SetVec3("origin", {mesh->position[0] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[1] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[2] * NETLIZARD_MAP_TO_IDTECH4});
 			idMat4 m4;
 			m4.Rotate(mesh->rotation[0], {1.0f, 0.0f, 0.0f});
 			m4.Rotate(mesh->rotation[1], {0.0f, 0.0f, 1.0f});
 			entity.spawnArgs.SetMat3("rotation", m4);
+			
 			if(mesh->item_mesh.vertex.count && mesh->item_mesh.primitive.count)
 			{
+				m4.Identity();
+				m4.Translate({mesh->position[0] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[1] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[2] * NETLIZARD_MAP_TO_IDTECH4});
+				m4.Rotate(mesh->rotation[0], {1.0f, 0.0f, 0.0f});
+				m4.Rotate(mesh->rotation[1], {0.0f, 0.0f, 1.0f});
+
 				for(int o = 0; o < mesh->item_mesh.primitive.count; o++)
 				{
 					idBrushDef3 brush;
 					idBounds b;
-					if(GenMapBrush(brush, b, mesh->item_mesh.primitive.data + o, mesh_vertex, true))
+					if(GenMapBrush(brush, b, mesh->item_mesh.primitive.data + o, mesh_vertex, &m4, true))
 					{
 						entity.brushs.push_back(brush);
 					}
