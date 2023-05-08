@@ -4,6 +4,11 @@
 #include "vector.h"
 #include "matrix.h"
 
+void idDict::Clear(void) {
+	sequence.clear();
+	hash.clear();
+}
+
 std::ostream & operator<<(std::ostream &o, const idDict &v)
 {
 	for(const auto &name : v.sequence)
