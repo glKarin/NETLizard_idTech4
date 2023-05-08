@@ -287,9 +287,9 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 			if(mesh->item_mesh.vertex.count && mesh->item_mesh.primitive.count)
 			{
 				m4.Identity();
-				m4.Translate({mesh->position[0] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[1] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[2] * NETLIZARD_MAP_TO_IDTECH4});
 				m4.Rotate(mesh->rotation[0], {1.0f, 0.0f, 0.0f});
 				m4.Rotate(mesh->rotation[1], {0.0f, 0.0f, 1.0f});
+				m4.Translate({mesh->position[0] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[1] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[2] * NETLIZARD_MAP_TO_IDTECH4});
 
 				for(int o = 0; o < mesh->item_mesh.primitive.count; o++)
 				{
