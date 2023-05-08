@@ -102,6 +102,8 @@ class idVec3
 		friend idVec3 operator/(const idVec3 &v, float f);
 		friend idVec3 operator*(const idVec3 &v, float f);
 		friend idVec3 operator-(const idVec3 &v);
+		friend idVec3 operator>>(const idVec3 &a, const idVec3 &b);
+		friend idVec3 operator<<(const idVec3 &a, const idVec3 &b);
 		idVec3 & operator*=(float n);
 		float Length(void) const;
 		void Normalized(void);
@@ -214,5 +216,19 @@ inline void idVec3::Set(float x, float y, float z)
 inline void idVec3::Zero(void)
 {
 	v[0] = v[1] = v[2] = 0;
+}
+
+inline idVec3 operator>>(const idVec3 &a, const idVec3 &b)
+{
+	auto v = (b - a);
+	v.Normalized();
+	return v;
+}
+
+inline idVec3 operator<<(const idVec3 &a, const idVec3 &b)
+{
+	auto v = (a - b);
+	v.Normalized();
+	return v;
 }
 #endif

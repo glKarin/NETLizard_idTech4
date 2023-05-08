@@ -4,13 +4,13 @@
 #include "libnetlizard/netlizard.h"
 
 #include "str.h"
-#include "buffer.h"
 
 class idMaterial;
 class idBounds;
 class idBrushDef3;
 class idMap;
 class idMat4;
+class idBuffer;
 
 class idNETLizardConverter
 {

@@ -1,7 +1,9 @@
 #include "converter.h"
 
 #include <string.h>
+
 #include "filesystem.h"
+#include "buffer.h"
 
 int idNETLizardConverter::ConvertTextureToTGA(const char *name, int i)
 {

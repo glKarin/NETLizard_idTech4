@@ -3,7 +3,9 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+
 #include "filesystem.h"
+#include "buffer.h"
 
 int idNETLizardConverter::TEXTURE_FILE_TYPE = 0; // tga
 

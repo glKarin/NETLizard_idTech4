@@ -25,9 +25,12 @@ class idStr : public std::string
 	bool GetFilePath(std::string &path) const;
 	bool GetBaseName(std::string &ret) const;
 	bool GetFileName(std::string &ret) const;
-	operator const char *() const {
-		return c_str();
-	}
+	operator const char *() const;
 };
+
+inline idStr::operator const char *() const
+{
+	return c_str();
+}
 
 #endif

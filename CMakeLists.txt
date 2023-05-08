@@ -21,6 +21,7 @@ SET(SRC_LIST main.cpp
 src/lib/str.cpp
 src/lib/buffer.cpp
 src/lib/dict.cpp
+src/lib/drawvert.cpp
 src/io/filesystem.cpp
 src/id/material.cpp
 src/id/brush.cpp

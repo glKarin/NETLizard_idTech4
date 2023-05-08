@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-//#include <filesystem>
 #include "str.h"
 
 long idFileSystem::FileSize(const char *name)
@@ -40,9 +39,4 @@ bool idFileSystem::FileExists(const char *path)
 		return false;
 	fclose(file);
 	return true;
-}
-
-int idFileSystem::ListFiles(const char *path, std::vector<idStr> files)
-{
-	throw "fk std::filesystem";
 }
