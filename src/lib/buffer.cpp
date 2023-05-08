@@ -1,12 +1,35 @@
 #include "buffer.h"
 
 #include <stdio.h>
+#include <string.h>
 
-void idBuffer::Alloc(int size)
+idBuffer::idBuffer(const idBuffer &other)
+{
+	size = other.size;
+	data = nullptr;
+	if(other.data)
+	{
+		Alloc(size, other.data);
+	}
+}
+
+idBuffer::idBuffer(idBuffer &&other)
+{
+	size = other.size;
+	data = other.data;
+	other.size = 0;
+	other.data = nullptr;
+}
+
+void idBuffer::Alloc(int size, const char *d)
 {
 	Free();
 	data = new char[size];
 	this->size = size;
+	if(d)
+	{
+		memcpy(data, d, size);
+	}
 }
 
 void idBuffer::Free()
@@ -35,4 +58,24 @@ int idBuffer::file_get_contents(const char *name)
 	fclose(file);
 
 	return ret;
+}
+
+idBuffer & idBuffer::operator=(const idBuffer &other)
+{
+	size = other.size;
+	data = nullptr;
+	if(other.data)
+	{
+		Alloc(size, other.data);
+	}
+	return *this;
+}
+
+idBuffer & idBuffer::operator=(idBuffer &&other)
+{
+	size = other.size;
+	data = other.data;
+	other.size = 0;
+	other.data = nullptr;
+	return *this;
 }
