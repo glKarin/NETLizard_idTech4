@@ -2,6 +2,23 @@
 
 using std::ostream;
 
+idMap & idMap::operator+=(const idBounds &b)
+{
+	if(!boundsInited)
+	{
+		bounds = b;
+		boundsInited = true;
+	}
+	else
+		bounds += b;
+	return *this;
+}
+
+void idMap::AddAreaBounds(int i, const idBounds &b)
+{
+	areas.insert({i, b});
+}
+
 ostream & operator<<(ostream &o, const idMap &v)
 {
 	o << idStr::va("\"Version\" \"%s\"\n", v.version.c_str());
@@ -18,22 +35,22 @@ ostream & operator<<(ostream &o, const idMap &v)
 void idMap::FillExtras(void)
 {
 	idEntity e;
-	e.classname = "info_player_start";
-	e.spawnArgs.Set("name", "info_player_start_1");
-	e.spawnArgs.SetVec3("origin", startPos);
-	e.spawnArgs.SetFloat("angle", startAngle);
+	e.Classname() = "info_player_start";
+	e.Name() = "info_player_start_1";
+	e("origin", startPos);
+	e("angle", startAngle);
 	entitys.push_back(e);
 
 	idVec3 center = bounds.Center();
 	idVec3 radius = bounds.Size();
-	e.spawnArgs.Clear();
-	e.classname = "light";
-	e.name = "light_1";
-	e.spawnArgs.SetVec3("origin", center);
-	e.spawnArgs.SetVec3("light_radius", radius);
-	e.spawnArgs.SetBool("noshadows", true);
-	e.spawnArgs.SetBool("nospecular", true);
-	e.spawnArgs.SetFloat("falloff", 0);
-	e.spawnArgs.SetVec3("_color", {0.78, 0.78, 0.84});
+	e.ClearSpawnArgs();
+	e.Classname() = "light";
+	e.Name() = "light_1";
+	e("origin", center);
+	e("light_radius", radius);
+	e("noshadows", true);
+	e("nospecular", true);
+	e("falloff", 0);
+	e("_color", {0.78, 0.78, 0.84});
 	entitys.push_back(e);
 }

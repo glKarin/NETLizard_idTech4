@@ -77,7 +77,7 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	}
 
 	idBrushDef3Side side;
-	side.material = material;
+	side.Material() = material;
 	idVec3 points[3] = {
 		vertex[0].xyz,
 		vertex[1].xyz,
@@ -85,13 +85,12 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	};
 
 	// raw front
-	side.plane.FromPoints(points[0], points[1], points[2]);
-	if(side.plane.Normal().IsZero())
+	if(!side.PlaneFromPoints(points[0], points[1], points[2]))
 	{
 		return false;
 	}
 
-	idPlane tmpPlane = side.plane;
+	idPlane tmpPlane = side.Plane();
 	if(mat)
 	{
 		vertex[0].xyz = *mat * vertex[0].xyz;
@@ -101,64 +100,58 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	if(!side.FromDrawVerts(vertex))
 	{
 		Log("Vertex((xyz(%s), uv(%s)), (xyz(%s), uv(%s)), (xyz(%s), uv(%s)), (normal(%s))) can't generate texture matrix", vertex[0].xyz.ToString().c_str(), vertex[0].st.ToString().c_str(), vertex[1].xyz.ToString().c_str(), vertex[1].st.ToString().c_str(), vertex[2].xyz.ToString().c_str(), vertex[2].st.ToString().c_str(), v_normal.ToString().c_str());
-		side.textureMatrix[0][0] = 1.0 / w;
-		side.textureMatrix[1][1] = 1.0 / w;
+		side.TextureMatrix(0)[0] = 1.0 / w;
+		side.TextureMatrix(1)[1] = 1.0 / w;
 	}
 	if(mat)
 	{
-		side.plane = tmpPlane;
+		side.Plane() = tmpPlane;
 	}
 
-	brush.sides.push_back(side);
+	brush << side;
 
-	side.textureMatrix[0].Zero();
-	side.textureMatrix[1].Zero();
-	side.textureMatrix[0][0] = 1.0 / w;
-	side.textureMatrix[1][1] = 1.0 / w;
+	side.TextureMatrix(0).Zero();
+	side.TextureMatrix(1).Zero();
+	side.TextureMatrix(0)[0] = 1.0 / w;
+	side.TextureMatrix(1)[1] = 1.0 / w;
+
 	// back
-	side.material = invisibleMaterial;
+	side.Material() = invisibleMaterial;
 	idVec3 normal_ = -v_normal;
 	idVec3 points_[3];
 	points_[0] = points[0] + normal_;
 	points_[1] = points[1] + normal_;
 	points_[2] = points[2] + normal_;
-	side.plane.FromPoints(points_[2], points_[1], points_[0]);
-	if(side.plane.Normal().IsZero())
+	if(!side.PlaneFromPoints(points_[2], points_[1], points_[0]))
 	{
 		return false;
 	}
-	brush.sides.push_back(side);
+	brush << side;
 
 	// 3 sides
-	idVec3 mid = (points[0] - points[1]);
-	mid.Normalized();
+	idVec3 mid = points[1] >> points[0];
 	idVec3 nor = v_normal ^ mid;
-	side.plane.FromPointAndNormal(points[0], nor);
-	if(side.plane.Normal().IsZero())
+	if(!side.PlaneFromPointAndNormal(points[0], nor))
 	{
 		return false;
 	}
-	brush.sides.push_back(side);
+	brush << side;
 
-	mid = (points[1] - points[2]);
-	mid.Normalized();
+	mid = points[2] >> points[1];
 	nor = v_normal ^ mid;
-	side.plane.FromPointAndNormal(points[1], nor);
-	if(side.plane.Normal().IsZero())
+	if(!side.PlaneFromPointAndNormal(points[1], nor))
 	{
 		return false;
 	}
-	brush.sides.push_back(side);
+	brush << side;
 
-	mid = (points[2] - points[0]);
-	mid.Normalized();
+	mid = points[0] >> points[2];
 	nor = v_normal ^ mid;
-	side.plane.FromPointAndNormal(points[2], nor);
-	if(side.plane.Normal().IsZero())
+	if(!side.PlaneFromPointAndNormal(points[2], nor))
 	{
 		return false;
 	}
-	brush.sides.push_back(side);
+	brush << side;
 
 	bounds[0] = points[0];
 	bounds[1] = points[0];
@@ -215,13 +208,11 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 		return -1;
 
 	sky_file = config->sky_file;
-	idBounds bounds;
-	bool boundsInit = false;
 	idEntity worldspawn;
-	worldspawn.classname = "worldspawn";
+	worldspawn.Classname() = "worldspawn";
 
-	map.startPos = idVec3(model->start_position[0], model->start_position[1], model->start_position[2]) * NETLIZARD_MAP_TO_IDTECH4;
-	map.startAngle = model->start_rotation[0];
+	map.StartPos() = idVec3(model->start_position[0], model->start_position[1], model->start_position[2]) * NETLIZARD_MAP_TO_IDTECH4;
+	map.StartAngle() = model->start_rotation[0];
 	if(model->data.data)
 	{
 		for(int i = 0; i < model->data.count; i++)
@@ -237,14 +228,8 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 					idBounds b;
 					if(GenMapBrush(brush, b, mesh->primitive.data + n, mesh_vertex))
 					{
-						if(!boundsInit)
-						{
-							bounds = b;
-							boundsInit = true;
-						}
-						else
-							bounds += b;
-						worldspawn.brushs.push_back(brush);
+						map += b;
+						worldspawn << brush;
 					}
 				}
 			}
@@ -255,13 +240,11 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 			min *= NETLIZARD_MAP_TO_IDTECH4;
 			max *= NETLIZARD_MAP_TO_IDTECH4;
 			idBounds b = {min, max};
-			map.areas.insert({i, b});
+			map.AddAreaBounds(i, b);
 #endif
 		}
-		map.entitys.push_back(worldspawn);
+		map << worldspawn;
 	}
-
-	map.bounds = bounds;
 
 	if(model->item_data.data)
 	{
@@ -275,14 +258,14 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 				continue;
 
 			idEntity entity;
-			entity.classname = "func_static";
-			entity.name = idStr::va("entity%d_%d", mesh->obj_index, i);
-			entity.spawnArgs.Set("model", entity.name);
-			entity.spawnArgs.SetVec3("origin", {mesh->position[0] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[1] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[2] * NETLIZARD_MAP_TO_IDTECH4});
+			entity.Classname() = "func_static";
+			entity.Name() = idStr::va("entity%d_%d", mesh->obj_index, i);
+			entity("model", entity.Name());
+			entity("origin", {mesh->position[0] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[1] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[2] * NETLIZARD_MAP_TO_IDTECH4});
 			idMat4 m4;
 			m4.Rotate(mesh->rotation[0], {1.0f, 0.0f, 0.0f});
 			m4.Rotate(mesh->rotation[1], {0.0f, 0.0f, 1.0f});
-			entity.spawnArgs.SetMat3("rotation", m4);
+			entity("rotation", (idMat3)m4);
 			
 			if(mesh->item_mesh.vertex.count && mesh->item_mesh.primitive.count)
 			{
@@ -297,10 +280,10 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 					idBounds b;
 					if(GenMapBrush(brush, b, mesh->item_mesh.primitive.data + o, mesh_vertex, &m4, true))
 					{
-						entity.brushs.push_back(brush);
+						entity << brush;
 					}
 				}
-				map.entitys.push_back(entity);
+				map << entity;
 			}
 
 #if 0
@@ -322,8 +305,8 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 		for(int i = 0; i < model->bsp_data.count; i++)
 		{
 			idEntity e;
-			e.classname = "info_player_deathmatch";
-			e.name = idStr::va("info_player_deathmatch_%d", i);
+			e.Classname() = "info_player_deathmatch";
+			e.Name() = idStr::va("info_player_deathmatch_%d", i);
 			const NETLizard_BSP_Tree_Node *node = model->bsp_data.data + i;
 			idVec3 v(node->plane[0][0], node->plane[0][1], node->plane[0][2]);
 			v *= NETLIZARD_MAP_TO_IDTECH4;
@@ -332,27 +315,27 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 			bv.AddPoint(idVec3(node->plane[2][0], node->plane[2][1], node->plane[2][2]) *= NETLIZARD_MAP_TO_IDTECH4);
 			bv.AddPoint(idVec3(node->plane[3][0], node->plane[3][1], node->plane[3][2]) *= NETLIZARD_MAP_TO_IDTECH4);
 			idVec3 center = bv.Center();
-			e.spawnArgs.SetVec3("origin", {center[0], center[1], bv[0][2] + 1.0f});
-			map.entitys.push_back(e);
+			e("origin", {center[0], center[1], bv[0][2] + 1.0f});
+			map << e;
 
-			bv = map.areas[node->prev_scene];
-			bv += map.areas[node->next_scene];
+			bv = map.AreaBounds(node->prev_scene);
+			bv += map.AreaBounds(node->next_scene);
 			idVec3 radius = bv.Size();
-			e.spawnArgs.Clear();
-			e.classname = "light";
-			e.name = idStr::va("area_light_%d", i);
-			e.spawnArgs.SetVec3("origin", center);
-			e.spawnArgs.SetVec3("light_radius", radius);
-			e.spawnArgs.SetBool("noshadows", true);
-			e.spawnArgs.SetBool("nospecular", true);
-			e.spawnArgs.SetFloat("falloff", 0);
-			e.spawnArgs.SetVec3("_color", {0.78, 0.78, 0.84});
-			map.entitys.push_back(e);
+			e.ClearSpawnArgs();
+			e.Classname() = "light";
+			e.Name() = idStr::va("area_light_%d", i);
+			e("origin", center);
+			e("light_radius", radius);
+			e("noshadows", true);
+			e("nospecular", true);
+			e("falloff", 0);
+			e("_color", {0.78, 0.78, 0.84});
+			map << e;
 
 			idBrushDef3 brush;
 			if(GenMapBrush(brush, node))
 			{
-				map.entitys[0].brushs.push_back(brush);
+				map[0] << brush;
 			}
 		}
 	}
@@ -390,74 +373,64 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_T
 	idVec3 v_normal = idVec3::TriangleCaleNormal(points[0], points[1], points[2]);
 
 	idBrushDef3Side side;
-	side.material = material;
+	side.Material() = material;
 
 	// raw front
 	idVec3 points_[4];
-	side.plane.FromPoints(points[0], points[1], points[2]);
-	if(side.plane.Normal().IsZero())
+	if(!side.PlaneFromPoints(points[0], points[1], points[2]))
 	{
 		return false;
 	}
 	float w = 256.0;
-	side.textureMatrix[0][0] = 1.0 / w;
-	side.textureMatrix[1][1] = 1.0 / w;
-	brush.sides.push_back(side);
+	side.TextureMatrix(0)[0] = 1.0 / w;
+	side.TextureMatrix(1)[1] = 1.0 / w;
+	brush << side;
 
-	side.material = invisibleMaterial;
+	side.Material() = invisibleMaterial;
 	// back
 	idVec3 normal_ = -v_normal;
 	points_[0] = points[0] + normal_;
 	points_[1] = points[1] + normal_;
 	points_[2] = points[2] + normal_;
 	points_[3] = points[3] + normal_;
-	side.plane.FromPoints(points_[2], points_[1], points_[0]);
-	if(side.plane.Normal().IsZero())
+	if(!side.PlaneFromPoints(points_[2], points_[1], points_[0]))
 	{
 		return false;
 	}
-	brush.sides.push_back(side);
+	brush << side;
 
 	// 4 sides
-	idVec3 mid = (points[0] - points[1]);
-	mid.Normalized();
+	idVec3 mid = points[1] >> points[0];
 	idVec3 nor = v_normal ^ mid;
-	side.plane.FromPointAndNormal(points[0], nor);
-	if(side.plane.Normal().IsZero())
+	if(!side.PlaneFromPointAndNormal(points[0], nor))
 	{
 		return false;
 	}
-	brush.sides.push_back(side);
+	brush << side;
 
-	mid = (points[1] - points[3]);
-	mid.Normalized();
+	mid = points[3] >> points[1];
 	nor = v_normal ^ mid;
-	side.plane.FromPointAndNormal(points[1], nor);
-	if(side.plane.Normal().IsZero())
+	if(!side.PlaneFromPointAndNormal(points[1], nor))
 	{
 		return false;
 	}
-	brush.sides.push_back(side);
+	brush << side;
 
-	mid = (points[3] - points[2]);
-	mid.Normalized();
+	mid = points[2] >> points[3];
 	nor = v_normal ^ mid;
-	side.plane.FromPointAndNormal(points[3], nor);
-	if(side.plane.Normal().IsZero())
+	if(!side.PlaneFromPointAndNormal(points[3], nor))
 	{
 		return false;
 	}
-	brush.sides.push_back(side);
+	brush << side;
 
-	mid = (points[2] - points[0]);
-	mid.Normalized();
+	mid = points[0] >> points[2];
 	nor = v_normal ^ mid;
-	side.plane.FromPointAndNormal(points[2], nor);
-	if(side.plane.Normal().IsZero())
+	if(!side.PlaneFromPointAndNormal(points[2], nor))
 	{
 		return false;
 	}
-	brush.sides.push_back(side);
+	brush << side;
 
 	return true;
 }

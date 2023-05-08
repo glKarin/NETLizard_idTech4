@@ -9,38 +9,94 @@
 #include "str.h"
 
 class idDrawVert;
+class idEntity;
+class idVec3;
 
 class idBrushDef3Side
 {
 	public:
-		idPlane plane;
-		idVec3 textureMatrix[2];
-		idStr material;
+		idPlane & Plane(void);
+		idVec3 * TextureMatrix(void);
+		idStr & Material(void);
+		const idPlane & Plane(void) const;
+		const idVec3 * TextureMatrix(void) const;
+		const idStr & Material(void) const;
+		bool PlaneFromPoints(const idVec3 &a, const idVec3 &b, const idVec3 &c);
+		const idVec3 & TextureMatrix(int i) const;
+		idVec3 & TextureMatrix(int i);
+		bool PlaneFromPointAndNormal(const idVec3 &point, const idVec3 &normal);
 
-/* Quake3
-		side->texMat[0] = idVec3(0.03125f, 0.0f, 0.0f);
-		side->texMat[1] = idVec3(0.0f, 0.03125f, 0.0f);
-*/
-		idBrushDef3Side()
-		{
-			textureMatrix[0].Set(1, 0, 0);
-			textureMatrix[1].Set(0, 1, 0);
-		}
 		friend std::ostream & operator<<(std::ostream &o, const idBrushDef3Side &v);
 
 		bool FromDrawVerts(const idDrawVert verts[3]);
 
-		private:
-        static bool CalculateFromPoints(idVec3 mat[2], const idVec3 points[3], const idVec2 uvs[3], const idVec3& normal);
+	private:
+		idPlane plane;
+		idVec3 textureMatrix[2] = {
+			{1.0, 0.0, 0.0},
+			{0.0, 1.0, 0.0},
+		};
+		idStr material;
 };
 using idBrushDef3SideList = std::vector<idBrushDef3Side>;
 
 class idBrushDef3
 {
 	public:
-		idBrushDef3SideList sides;
+		idBrushDef3 & operator<<(const idBrushDef3Side &side);
 		friend std::ostream & operator<<(std::ostream &o, const idBrushDef3 &v);
+
+	private:
+		idBrushDef3SideList sides;
+		friend class idEntity;
 };
 using idBrushDef3List = std::vector<idBrushDef3>;
 
+
+
+inline idBrushDef3 & idBrushDef3::operator<<(const idBrushDef3Side &side)
+{
+	sides.push_back(side);
+	return *this;
+}
+
+inline idPlane & idBrushDef3Side::Plane(void)
+{
+	return plane;
+}
+
+inline idVec3 * idBrushDef3Side::TextureMatrix(void)
+{
+	return textureMatrix;
+}
+
+inline idStr & idBrushDef3Side::Material(void)
+{
+	return material;
+}
+
+inline const idPlane & idBrushDef3Side::Plane(void) const
+{
+	return plane;
+}
+
+inline const idVec3 * idBrushDef3Side::TextureMatrix(void) const
+{
+	return textureMatrix;
+}
+
+inline const idStr & idBrushDef3Side::Material(void) const
+{
+	return material;
+}
+
+inline const idVec3 & idBrushDef3Side::TextureMatrix(int i) const
+{
+	return textureMatrix[i];
+}
+
+inline idVec3 & idBrushDef3Side::TextureMatrix(int i)
+{
+	return textureMatrix[i];
+}
 #endif

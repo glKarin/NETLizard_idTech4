@@ -1,11 +1,21 @@
 #include "brush.h"
 
-#include "matrix.h"
 #include "vector.h"
 #include "drawvert.h"
-#include "maths.h"
 
 using std::ostream;
+
+bool idBrushDef3Side::PlaneFromPoints(const idVec3 &a, const idVec3 &b, const idVec3 &c)
+{
+	plane.FromPoints(a, b, c);
+	return(!plane.Normal().IsZero());
+}
+
+bool idBrushDef3Side::PlaneFromPointAndNormal(const idVec3 &point, const idVec3 &normal)
+{
+	plane.FromPointAndNormal(point, normal);
+	return(!plane.Normal().IsZero());
+}
 
 ostream & operator<<(ostream &o, const idBrushDef3Side &v)
 {
@@ -26,22 +36,6 @@ ostream & operator<<(ostream &o, const idBrushDef3 &v)
 	return o;
 }
 
-bool idBrushDef3Side::CalculateFromPoints(idVec3 textureMatrix[2], const idVec3 points[3], const idVec2 uvs[3], const idVec3& normal)
-{
-	idMat3 transform;
-	if(!idMath::CalcTextureMatrixFromPointsXYZUVNormal(transform, points, uvs, normal))
-	{
-		return false;
-	}
-    textureMatrix[0][0] = transform(0, 0); // xx
-    textureMatrix[0][1] = transform(1, 0); // yx
-    textureMatrix[0][2] = transform(2, 0); // zx
-    textureMatrix[1][0] = transform(0, 1); // xy
-    textureMatrix[1][1] = transform(1, 1); // yy
-    textureMatrix[1][2] = transform(2, 1); // zy
-	return true;
-}
-
 bool idBrushDef3Side::FromDrawVerts(const idDrawVert verts[3])
 {
 	plane.FromPoints(verts[0].xyz, verts[1].xyz, verts[2].xyz);
@@ -51,5 +45,5 @@ bool idBrushDef3Side::FromDrawVerts(const idDrawVert verts[3])
 	}
 	const idVec3 points[] = {verts[0].xyz, verts[1].xyz, verts[2].xyz};
 	const idVec2 uvs[] = {verts[0].st, verts[1].st, verts[2].st};
-	return CalculateFromPoints(textureMatrix, points, uvs, plane.Normal());
+	return idDrawVert::CalculateFromPoints(textureMatrix, points, uvs, plane.Normal());
 }
