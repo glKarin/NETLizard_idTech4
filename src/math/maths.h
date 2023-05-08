@@ -1,5 +1,5 @@
-#ifndef _KARIN_MATH_H
-#define _KARIN_MATH_H
+#ifndef _KARIN_MATHS_H
+#define _KARIN_MATHS_H
 
 #include <math.h>
 

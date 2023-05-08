@@ -24,9 +24,55 @@
    Q[2] = M[2] * P[0] + M[6] * P[1] + M[10] * P[2] + M[14];	\
    Q[3] = M[3] * P[0] + M[7] * P[1] + M[11] * P[2] + M[15];
 
+
+idMat3::idVec3Ref::idVec3Ref(float *x, float *y, float *z)
+   : x(x), 
+   y(y), 
+   z(z)
+{
+}
+
 idMat3::idVec3Ref::operator idVec3() const
 {
    return idVec3(*x, *y, *z);
+}
+
+float idMat3::idVec3Ref::operator()(int i) const {
+   return operator[](i);
+}
+
+float & idMat3::idVec3Ref::operator()(int i) {
+   return operator[](i);
+}
+
+float idMat3::idVec3Ref::operator[](int i) const {
+   switch(i)
+   {
+      case 0: return *x;
+      case 1: return *y;
+      case 2: return *z;
+      default: throw "idVec3Ref::operator[](int)const";
+   }
+}
+
+float & idMat3::idVec3Ref::operator[](int i) {
+   switch(i)
+   {
+      case 0: return *x;
+      case 1: return *y;
+      case 2: return *z;
+      default: throw "idVec3Ref::operator[](int)";
+   }
+}
+
+const idMat3::idVec3Ref & idMat3::operator()(int col) const
+{
+	return cols[col];
+}
+
+idMat3::idVec3Ref & idMat3::operator()(int col)
+{
+	return cols[col];
 }
 
 bool idMat3::Inverse(void)

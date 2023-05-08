@@ -9,38 +9,23 @@ class idStr;
 class idVec2
 {
 	public:
-		float v[2] = {0, 0};
-		float & operator[](int i) {
-			return v[i];
-		}
-		float operator[](int i) const {
-			return v[i];
-		}
-		operator float *() {
-			return v;
-		}
-		operator const float *() const {
-			return v;
-		}
-		float X() const {
-			return v[0];
-		}
-		float Y() const {
-			return v[1];
-		}
-		float & X() {
-			return v[0];
-		}
-		float & Y() {
-			return v[1];
-		}
-		float & operator()(int i) {
-			return v[i];
-		}
-		float operator()(int i) const {
-			return v[i];
-		}
+		float v[2] = {0.0, 0.0};
+
+		idVec2() = default;
+		idVec2(const float a[2]);
+		idVec2(float x, float y);
+		float & operator[](int i);
+		float operator[](int i) const;
+		operator float *();
+		operator const float *() const;
+		float X() const;
+		float Y() const;
+		float & X();
+		float & Y();
+		float & operator()(int i);
+		float operator()(int i) const;
 		idStr ToString(const char *c = " ") const;
+		void Set(float x, float y);
 };
 
 class idVec3
@@ -49,61 +34,33 @@ class idVec3
 		float v[3] = {0, 0, 0};
 
 		idVec3() = default;
-		idVec3(const float a[3]) {
-			Set(a[0], a[1], a[2]);
-		}
-		idVec3(float x, float y, float z) {
-			Set(x, y, z);
-		}
+		idVec3(const float a[3]);
+		idVec3(float x, float y, float z);
 		void Set(float x, float y, float z);
 		bool IsZero() const;
 		void Zero(void);
-		float & operator[](int i) {
-			return v[i];
-		}
-		float operator[](int i) const {
-			return v[i];
-		}
-		operator float *() {
-			return v;
-		}
-		operator const float *() const {
-			return v;
-		}
-		float X() const {
-			return v[0];
-		}
-		float Y() const {
-			return v[1];
-		}
-		float Z() const {
-			return v[2];
-		}
-		float & X() {
-			return v[0];
-		}
-		float & Y() {
-			return v[1];
-		}
-		float & Z() {
-			return v[2];
-		}
-		float & operator()(int i) {
-			return v[i];
-		}
-		float operator()(int i) const {
-			return v[i];
-		}
+		float & operator[](int i);
+		float operator[](int i) const;
+		operator float *();
+		operator const float *() const;
+		float X() const;
+		float Y() const;
+		float Z() const;
+		float & X();
+		float & Y();
+		float & Z();
+		float & operator()(int i);
+		float operator()(int i) const;
 
 		friend idVec3 operator+(const idVec3 &a, const idVec3 &b);
 		friend idVec3 operator-(const idVec3 &a, const idVec3 &b);
-		friend float operator*(const idVec3 &a, const idVec3 &b);
-		friend idVec3 operator^(const idVec3 &a, const idVec3 &b);
+		friend float operator*(const idVec3 &a, const idVec3 &b); // dot product
+		friend idVec3 operator^(const idVec3 &a, const idVec3 &b); // cross
 		friend idVec3 operator/(const idVec3 &v, float f);
 		friend idVec3 operator*(const idVec3 &v, float f);
 		friend idVec3 operator-(const idVec3 &v);
-		friend idVec3 operator>>(const idVec3 &a, const idVec3 &b);
-		friend idVec3 operator<<(const idVec3 &a, const idVec3 &b);
+		friend idVec3 operator>>(const idVec3 &a, const idVec3 &b); // a -> b dir
+		friend idVec3 operator<<(const idVec3 &a, const idVec3 &b); // a <- b dir
 		idVec3 & operator*=(float n);
 		float Length(void) const;
 		void Normalized(void);
@@ -115,6 +72,146 @@ class idVec3
 		static bool IsNear(const idVec3& v1, const idVec3& v2, float epsilon);
 		static idVec3 TriangleCaleNormal(const idVec3 &a, const idVec3 &b, const idVec3 &c);
 };
+
+
+
+inline idVec2::idVec2(const float a[2])
+{
+	Set(a[0], a[1]);
+}
+
+inline idVec2::idVec2(float x, float y)
+{
+	Set(x, y);
+}
+
+inline void idVec2::Set(float x, float y)
+{
+	v[0] = x;
+	v[1] = y;
+}
+
+inline float & idVec2::operator[](int i)
+{
+	return v[i];
+}
+
+inline float idVec2::operator[](int i) const
+{
+	return v[i];
+}
+
+inline idVec2::operator float *()
+{
+	return v;
+}
+
+inline idVec2::operator const float *() const
+{
+	return v;
+}
+
+inline float idVec2::X() const
+{
+	return v[0];
+}
+
+inline float idVec2::Y() const
+{
+	return v[1];
+}
+
+inline float & idVec2::X()
+{
+	return v[0];
+}
+
+inline float & idVec2::Y()
+{
+	return v[1];
+}
+
+inline float & idVec2::operator()(int i)
+{
+	return v[i];
+}
+
+inline float idVec2::operator()(int i) const
+{
+	return v[i];
+}
+
+
+
+inline idVec3::idVec3(const float a[3])
+{
+	Set(a[0], a[1], a[2]);
+}
+
+inline idVec3::idVec3(float x, float y, float z)
+{
+	Set(x, y, z);
+}
+
+inline float & idVec3::operator[](int i)
+{
+	return v[i];
+}
+
+inline float idVec3::operator[](int i) const
+{
+	return v[i];
+}
+
+inline idVec3::operator float *()
+{
+	return v;
+}
+
+inline idVec3::operator const float *() const
+{
+	return v;
+}
+
+inline float idVec3::X() const
+{
+	return v[0];
+}
+
+inline float idVec3::Y() const
+{
+	return v[1];
+}
+
+inline float idVec3::Z() const
+{
+	return v[2];
+}
+
+inline float & idVec3::X()
+{
+	return v[0];
+}
+
+inline float & idVec3::Y()
+{
+	return v[1];
+}
+
+inline float & idVec3::Z()
+{
+	return v[2];
+}
+
+inline float & idVec3::operator()(int i)
+{
+	return v[i];
+}
+
+inline float idVec3::operator()(int i) const
+{
+	return v[i];
+}
 
 inline idVec3 operator+(const idVec3 &a, const idVec3 &b)
 {

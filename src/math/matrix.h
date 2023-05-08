@@ -15,80 +15,43 @@ class idMat3
 		class idVec3Ref
 		{
 			public:
-			float operator()(int i) const {
-				return operator[](i);
-			}
-			float & operator()(int i) {
-				return operator[](i);
-			}
-			float operator[](int i) const {
-				switch(i)
-				{
-					case 0: return *x;
-					case 1: return *y;
-					case 2: return *z;
-					default: throw "idVec3Ref::operator[](int)const";
-				}
-			}
-			float & operator[](int i) {
-				switch(i)
-				{
-					case 0: return *x;
-					case 1: return *y;
-					case 2: return *z;
-					default: throw "idVec3Ref::operator[](int)";
-				}
-			}
+			float operator()(int i) const;
+			float & operator()(int i);
+			float operator[](int i) const;
+			float & operator[](int i);
 			operator idVec3() const;
 			
 			private:
 				float *x;
 				float *y;
 				float *z;
-
-				idVec3Ref(float *x, float *y, float *z)
-				: x(x), y(y), z(z) {}
-
+				idVec3Ref(float *x, float *y, float *z);
 				friend class idMat3;
 		};
+
 	public:
 		float m[9] = {
 			1, 0, 0,
 			0, 1, 0,
 			0, 0, 1,
 		};
+
 		idMat3() = default;
 		idMat3(float f00, float f01, float f02, float f10, float f11, float f12, float f20, float f21, float f22);
 		void Identity(void);
-      bool Inverse(void);
+      	bool Inverse(void);
 		friend idMat3 operator*(const idMat3 &a, const idMat3 &b);
-		operator const float *() const {
-			return m;
-		}
-		operator float *() {
-			return m;
-		}
-		float operator[](int i) const {
-			return m[i];
-		}
-		float & operator[](int i) {
-			return m[i];
-		}
-		float operator()(int col, int row) const {
-			return m[row * 3 + col];
-		}
-		float & operator()(int col, int row) {
-			return m[row * 3 + col];
-		}
-		const idVec3Ref & operator()(int col) const {
-			return cols[col];
-		}
-		idVec3Ref & operator()(int col) {
-			return cols[col];
-		}
+		operator const float *() const;
+		operator float *();
+		float operator[](int i) const;
+		float & operator[](int i);
+		float operator()(int col, int row) const;
+		float & operator()(int col, int row);
+		const idVec3Ref & operator()(int col) const;
+		idVec3Ref & operator()(int col);
 		idStr ToString(const char *s = " ") const;
 
-		private:
+	private:
 		idVec3Ref cols[3] = {
 			{&m[0], &m[3], &m[6]},
 			{&m[1], &m[4], &m[7]},
@@ -109,30 +72,18 @@ class idMat4
 		void Translate(const idVec3 &v);
 		void Rotate(float angle, const idVec3 &normal);
 		void Identity(void);
-      void Transposed(void);
+      	void Transposed(void);
 		friend idMat4 operator*(const idMat4 &a, const idMat4 &b);
 		friend idVec3 operator*(const idVec3 &v, const idMat4 &m); // u = v * m
 		friend idVec3 operator*(const idMat4 &m, const idVec3 &v); // Q = M * P
-      void SetCol3(int col, const float v[]);
+      	void SetCol3(int col, const float v[]);
 		operator idMat3() const;
-		operator const float *() const {
-			return m;
-		}
-		operator float *() {
-			return m;
-		}
-		float operator[](int i) const {
-			return m[i];
-		}
-		float & operator[](int i) {
-			return m[i];
-		}
-		float operator()(int col, int row) const {
-			return m[row * 4 + col];
-		}
-		float & operator()(int col, int row) {
-			return m[row * 4 + col];
-		}
+		operator const float *() const;
+		operator float *();
+		float operator[](int i) const;
+		float & operator[](int i);
+		float operator()(int col, int row) const;
+		float & operator()(int col, int row);
 };
 
 inline idMat3::idMat3(float f00, float f01, float f02,
@@ -148,6 +99,36 @@ inline idMat3::idMat3(float f00, float f01, float f02,
    m[2] = f20;
    m[5] = f21;
    m[8] = f22;
+}
+
+inline idMat3::operator const float *() const
+{
+	return m;
+}
+
+inline idMat3::operator float *()
+{
+	return m;
+}
+
+inline float idMat3::operator[](int i) const
+{
+	return m[i];
+}
+
+inline float & idMat3::operator[](int i)
+{
+	return m[i];
+}
+
+inline float idMat3::operator()(int col, int row) const
+{
+	return m[row * 3 + col];
+}
+
+inline float & idMat3::operator()(int col, int row)
+{
+	return m[row * 3 + col];
 }
 
 inline void idMat3::Identity(void)
@@ -182,6 +163,36 @@ inline idMat3 operator*(const idMat3 &a, const idMat3 &b)
 }
 
 
+
+inline idMat4::operator const float *() const
+{
+	return m;
+}
+
+inline idMat4::operator float *()
+{
+	return m;
+}
+
+inline float idMat4::operator[](int i) const
+{
+	return m[i];
+}
+
+inline float & idMat4::operator[](int i)
+{
+	return m[i];
+}
+
+inline float idMat4::operator()(int col, int row) const
+{
+	return m[row * 4 + col];
+}
+
+inline float & idMat4::operator()(int col, int row)
+{
+	return m[row * 4 + col];
+}
 
 inline void idMat4::Identity(void)
 {

@@ -31,6 +31,7 @@ src/math/maths.cpp
 src/math/vector.cpp
 src/math/matrix.cpp
 src/math/plane.cpp
+src/math/bounds.cpp
 src/converter.cpp
 src/converter_texture.cpp
 src/converter_material.cpp

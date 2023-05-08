@@ -8,13 +8,13 @@ using std::ostream;
 bool idBrushDef3Side::PlaneFromPoints(const idVec3 &a, const idVec3 &b, const idVec3 &c)
 {
 	plane.FromPoints(a, b, c);
-	return(!plane.Normal().IsZero());
+	return plane.IsValid();
 }
 
 bool idBrushDef3Side::PlaneFromPointAndNormal(const idVec3 &point, const idVec3 &normal)
 {
 	plane.FromPointAndNormal(point, normal);
-	return(!plane.Normal().IsZero());
+	return plane.IsValid();
 }
 
 ostream & operator<<(ostream &o, const idBrushDef3Side &v)
@@ -39,7 +39,7 @@ ostream & operator<<(ostream &o, const idBrushDef3 &v)
 bool idBrushDef3Side::FromDrawVerts(const idDrawVert verts[3])
 {
 	plane.FromPoints(verts[0].xyz, verts[1].xyz, verts[2].xyz);
-	if(plane.Normal().IsZero())
+	if(!plane.IsValid())
 	{
 		return false;
 	}

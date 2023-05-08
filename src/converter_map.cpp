@@ -155,8 +155,8 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 
 	bounds[0] = points[0];
 	bounds[1] = points[0];
-	bounds.AddPoint(points[1]);
-	bounds.AddPoint(points[2]);
+	bounds += points[1];
+	bounds += points[2];
 	return true;
 }
 
@@ -311,9 +311,9 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 			idVec3 v(node->plane[0][0], node->plane[0][1], node->plane[0][2]);
 			v *= NETLIZARD_MAP_TO_IDTECH4;
 			idBounds bv({v, v});
-			bv.AddPoint(idVec3(node->plane[1][0], node->plane[1][1], node->plane[1][2]) *= NETLIZARD_MAP_TO_IDTECH4);
-			bv.AddPoint(idVec3(node->plane[2][0], node->plane[2][1], node->plane[2][2]) *= NETLIZARD_MAP_TO_IDTECH4);
-			bv.AddPoint(idVec3(node->plane[3][0], node->plane[3][1], node->plane[3][2]) *= NETLIZARD_MAP_TO_IDTECH4);
+			bv += (idVec3(node->plane[1][0], node->plane[1][1], node->plane[1][2]) *= NETLIZARD_MAP_TO_IDTECH4);
+			bv += (idVec3(node->plane[2][0], node->plane[2][1], node->plane[2][2]) *= NETLIZARD_MAP_TO_IDTECH4);
+			bv += (idVec3(node->plane[3][0], node->plane[3][1], node->plane[3][2]) *= NETLIZARD_MAP_TO_IDTECH4);
 			idVec3 center = bv.Center();
 			e("origin", {center[0], center[1], bv[0][2] + 1.0f});
 			map << e;

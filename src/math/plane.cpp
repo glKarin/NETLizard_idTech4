@@ -25,3 +25,8 @@ void idPlane::FromPointAndNormal(const idVec3 &point, const idVec3 &normal)
 	this->c = normal[2];
 	this->d = -(normal * point);
 }
+
+bool idPlane::IsValid() const
+{
+	return !Normal().IsZero();
+}

@@ -8,35 +8,23 @@ class idBounds
 	public:
 		idVec3 b[2] = {idVec3(), idVec3()};
 
-		idVec3 & operator[](int i) {
-			return b[i];
-		}
-		const idVec3 & operator[](int i) const {
-			return b[i];
-		}
-		void AddPoint(const idVec3 &p);
+		idVec3 & operator[](int i);
+		const idVec3 & operator[](int i) const;
 		idVec3 Center(void) const;
 		idVec3 Size(void) const;
+		idBounds & operator+=(const idVec3 &p);
 		idBounds & operator+=(const idBounds &b);
 		void Init(const idVec3 &point);
 };
 
-inline void idBounds::AddPoint(const idVec3 &p)
+inline idVec3 & idBounds::operator[](int i)
 {
-	if(p[0] < b[0][0])
-		b[0][0] = p[0];
-	if(p[0] > b[1][0])
-		b[1][0] = p[0];
+	return b[i];
+}
 
-	if(p[1] < b[0][1])
-		b[0][1] = p[1];
-	if(p[1] > b[1][1])
-		b[1][1] = p[1];
-
-	if(p[2] < b[0][2])
-		b[0][2] = p[2];
-	if(p[2] > b[1][2])
-		b[1][2] = p[2];
+inline const idVec3 & idBounds::operator[](int i) const
+{
+	return b[i];
 }
 
 inline idVec3 idBounds::Center(void) const
@@ -51,8 +39,8 @@ inline idVec3 idBounds::Size(void) const
 
 inline idBounds & idBounds::operator+=(const idBounds &b)
 {
-	AddPoint(b[0]);
-	AddPoint(b[1]);
+	operator+=(b[0])
+	.operator+=(b[1]);
 	return *this;
 }
 
