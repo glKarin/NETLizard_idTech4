@@ -211,7 +211,7 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 	idEntity worldspawn;
 	worldspawn.Classname() = "worldspawn";
 
-	map.StartPos() = idVec3(model->start_position[0], model->start_position[1], model->start_position[2]) * NETLIZARD_MAP_TO_IDTECH4;
+	map.StartPos() = idVec3(model->start_position[0], model->start_position[1], model->start_position[2] - 150) * NETLIZARD_MAP_TO_IDTECH4;
 	map.StartAngle() = model->start_rotation[0];
 	if(model->data.data)
 	{
@@ -265,7 +265,9 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 			idMat4 m4;
 			m4.Rotate(mesh->rotation[0], {1.0f, 0.0f, 0.0f});
 			m4.Rotate(mesh->rotation[1], {0.0f, 0.0f, 1.0f});
-			entity("rotation", (idMat3)m4);
+			idMat3 m3 = m4;
+			m3.Transposed();
+			entity("rotation", m3);
 			
 			if(mesh->item_mesh.vertex.count && mesh->item_mesh.primitive.count)
 			{

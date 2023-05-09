@@ -50,6 +50,7 @@ class idMat3
 		const idVec3Ref & operator()(int col) const;
 		idVec3Ref & operator()(int col);
 		idStr ToString(const char *s = " ") const;
+      	void Transposed(void);
 
 	private:
 		idVec3Ref cols[3] = {
@@ -99,6 +100,24 @@ inline idMat3::idMat3(float f00, float f01, float f02,
    m[2] = f20;
    m[5] = f21;
    m[8] = f22;
+}
+
+inline void idMat3::Transposed(void)
+{
+   float to[9];
+   float *from = m;
+
+   to[0] = from[0];
+   to[1] = from[3];
+   to[2] = from[6];
+   to[3] = from[1];
+   to[4] = from[4];
+   to[5] = from[7];
+   to[6] = from[2];
+   to[7] = from[5];
+   to[8] = from[8];
+
+   memcpy(m, to, sizeof(to));
 }
 
 inline idMat3::operator const float *() const

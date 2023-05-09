@@ -40,6 +40,7 @@ void idMap::FillExtras(void)
 	e("origin", startPos);
 	e("angle", startAngle);
 	entitys.push_back(e);
+	return;
 
 	idVec3 center = bounds.Center();
 	idVec3 radius = bounds.Size();

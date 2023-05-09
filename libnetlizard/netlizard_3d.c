@@ -212,13 +212,13 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         NL_TEXTURE_3D_ENGINE_V3,
         3,
         3,
-        NL_TRUE,
-        NL_TRUE,
+        NL_FALSE, // NL_TRUE,
+        NL_FALSE, // NL_TRUE,
         "",
         EGYPT3D_TEX_SUBFIX,
         EGYPT3D_OBJ_SUBFIX,
         EGYPT3D_LEVEL,
-        256
+        128
     },
     {
         NL_CLONE_3D,
@@ -226,13 +226,13 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         NL_TEXTURE_3D_ENGINE_V3,
         3,
         3,
-        NL_FALSE,
-        NL_FALSE,
+        NL_TRUE, // NL_FALSE,
+        NL_TRUE, // NL_FALSE,
         "",
         CLONE3D_TEX_SUBFIX,
         CLONE3D_OBJ_SUBFIX,
         CLONE3D_LEVEL,
-        256
+        128
     },
     {
         NL_CONTR_TERRORISM_3D_EPISODE_3,
