@@ -4,14 +4,25 @@
 #include <fstream>
 #include "material.h"
 
-int idNETLizardConverter::ConvertMaterial(idMaterial &mat, const char *file)
+int idNETLizardConverter::ConvertMaterial(idMaterial &mat, const char *file, int index)
 {
+	NLuint flags = NL_3D_TEXTURE_FLAG_NORMAL;
+
 	idStr fname("textures");
 	fname /= gamename / file;
 	fname.ReplaceExtension(nullptr);
-	mat.name = fname;
+	mat.Name() = fname;
 	fname += ".tga";
-	mat.diffusemap = fname;
+	mat.Diffusemap() = fname;
+	flags = nlGetTextureFlag(game, index);
+	mat.SetLadder(flags & NL_3D_TEXTURE_FLAG_LADDER ? true : false);
+	mat.SetNoCollision(flags & NL_3D_TEXTURE_FLAG_NON_SOLID ? true : false);
+	mat.SetTwoSided(flags & NL_3D_TEXTURE_FLAG_TOW_SIDED ? true : false);
+
+	idMaterialStage stage;
+	stage.Diffusemap() = fname;
+	stage.SetAlphaTest(flags & NL_3D_TEXTURE_FLAG_ALPHA ? 0.1 : -1.0);
+	mat << stage;
 	return 0;
 }
 
@@ -21,7 +32,6 @@ int idNETLizardConverter::ConvertMaterials()
     const char *format;
     const char *file;
     int res;
-	idMaterial mat;
 	std::vector<idMaterial> mats;
 	
     res = 0;
@@ -34,8 +44,9 @@ int idNETLizardConverter::ConvertMaterials()
 	format = config->tex_path_format;
     for(i = 1; i <= config->tex_count; i++)
 	{
+		idMaterial mat;
         file = idStr::va(format, i);
-		if(ConvertMaterial(mat, file) == 0)
+		if(ConvertMaterial(mat, file, i) == 0)
 		{
 			mats.push_back(mat);
 		}

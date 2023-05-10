@@ -24,7 +24,7 @@ class idNETLizardConverter
     private:
         int ConvertTextureToTGA(const char *file, int i);
         int ConvertMap(const char *file, int i);
-        int ConvertMaterial(idMaterial &mat, const char *file);
+        int ConvertMaterial(idMaterial &mat, const char *file, int i);
         bool ReadFile(idBuffer &buffer, const char *path) const;
         idStr GetDir(const char *path);
         idStr TargetFilePath(const char *path) const;

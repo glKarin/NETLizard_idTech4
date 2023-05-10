@@ -110,7 +110,7 @@ NLboolean nlReadCompressTextureV3File(const char *name, NETLizard_Texture *tex)
     return res;
 }
 
-NLboolean nlConvertTextureV3FileToImageFile(const char *from, NLint i, const char *to, int img_type)
+NLboolean nlConvertTextureV3FileToImageFile(const char *from, NLint i, const char *to, NLenum img_type)
 {
     NETLizard_Texture tex;
     NLboolean res = nlReadTextureV3File(from, i, &tex);
@@ -121,7 +121,7 @@ NLboolean nlConvertTextureV3FileToImageFile(const char *from, NLint i, const cha
     return res;
 }
 
-NLboolean nlSaveTextureV3DataToImageFile(const NETLizard_Texture *tex, const char *to, int img_type)
+NLboolean nlSaveTextureV3DataToImageFile(const NETLizard_Texture *tex, const char *to, NLenum img_type)
 {
     if(tex->type != NL_TEXTURE_3D_ENGINE_V3)
         return NL_FALSE;
@@ -132,7 +132,7 @@ NLboolean nlSaveTextureV3DataToImageFile(const NETLizard_Texture *tex, const cha
     return res;
 }
 
-NLboolean nlSavePixelDataToTextureV3File(const NLuchar *data, NLint _i, int width, int height, NETLizard_Texture_format format, const char *to)
+NLboolean nlSavePixelDataToTextureV3File(const NLuchar *data, NLint _i, NLint width, NLint height, NETLizard_Texture_format format, const char *to)
 {
     FILE *file;
 
@@ -401,7 +401,7 @@ NLboolean nlConvertImageFileToTextureV3File(const char *from, NLint _i, const ch
 	return res;
 }
 
-NLboolean nlConvertTextureV3CompressFileToImageFile(const char *from, const char *to, int img_type)
+NLboolean nlConvertTextureV3CompressFileToImageFile(const char *from, const char *to, NLenum img_type)
 {
     NETLizard_Texture tex;
     NLboolean res = nlReadCompressTextureV3File(from, &tex);
@@ -412,7 +412,7 @@ NLboolean nlConvertTextureV3CompressFileToImageFile(const char *from, const char
     return res;
 }
 
-NLboolean nlSaveTextureV3CompressDataToImageFile(const NETLizard_Texture *tex, const char *to, int img_type)
+NLboolean nlSaveTextureV3CompressDataToImageFile(const NETLizard_Texture *tex, const char *to, NLenum img_type)
 {
     NLuchar *data = nlMakePixelDataRGBACompress(tex, NULL);
     int channel = tex->format != NL_RGB ? SOIL_LOAD_RGBA : SOIL_LOAD_RGBA;

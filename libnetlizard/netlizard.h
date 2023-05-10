@@ -206,6 +206,18 @@ typedef enum NETLizard_3D_Model_Type_e
     NL_RE_3D_CAR_MODEL
 } NETLizard_3D_Model_Type;
 
+/* NETLizard 3D game texture flags */
+typedef enum NETLizard_3D_Texture_Flag_e
+{
+    NL_3D_TEXTURE_FLAG_NORMAL = 0, // normal
+    NL_3D_TEXTURE_FLAG_ALPHA = 1, // alpha test, e.g. nets, tree
+    NL_3D_TEXTURE_FLAG_SPRITE = 1 << 1, // sprite, should face to camera always, e.g. tree
+    NL_3D_TEXTURE_FLAG_NON_SOLID = 1 << 2, // non-solid, no collision, e.g. tower
+    NL_3D_TEXTURE_FLAG_TOW_SIDED = 1 << 3, // tow side, no clip face, e.g. nets
+    NL_3D_TEXTURE_FLAG_CUBE_MAP = 1 << 4, // cube map, e.g. skybox
+    NL_3D_TEXTURE_FLAG_LADDER = 1 << 5, // climbable, e.g. ladder
+} NETLizard_3D_Texture_Flag;
+
 ////////// structure //////////
 /* Texture structure */
 typedef struct NETLizard_Texture_s
@@ -519,8 +531,8 @@ NLAPI void nlDeleteNETLizard3DModel(NETLizard_3D_Model *model); // free 3D model
 
 // util
 NLAPI NL_RET_PTR_CONST(char *) const char * nlGet3DModelFrameAnimationName(NETLizard_3D_Animation_Type anim); // get 3D Egypt/3D Clone player character animation name
-NLAPI NLboolean nlCheck3DGameLevelIsAvailable(NETLizard_Game game, int level); // check 3D game level is availabel
-NLAPI int nlGetItemType(NETLizard_Game game, int index); // get 3D game item type
+NLAPI NLboolean nlCheck3DGameLevelIsAvailable(NETLizard_Game game, NLint level); // check 3D game level is availabel
+NLAPI NLuint nlGetItemType(NETLizard_Game game, NLint index); // get 3D game item type
 NLAPI const NETLizard_3D_Frame_Animation * nlGet3DModelFrameAnimationConfig(NETLizard_Game game, NLuint index); // get 3D Egypt/3D Clone player character animation index start and end
 NLAPI NL_RET_PTR_CONST(char *) const char * nlGet3DGameLevelName(NETLizard_Game game, NLuint level);
 NLAPI NLboolean nlGet3DGameLevelRange(NETLizard_Game game, NLint *start, NLint *count);
@@ -529,6 +541,7 @@ NLAPI const NETLizard_3D_Model_Config * nlGet3DGameModelConfig(NETLizard_Game ga
 NLAPI const NETLizard_Level_Teleport * nlGet3DGameTeleport(NLenum game, NLint level, NLint item_id, NLint *length);
 NLAPI const NETLizard_Level_Elevator * nlGet3DGameElevator(NLenum game, NLint level, NLint item_id, NLint *length);
 NLAPI const NETLizard_Level_Door * nlGet3DGameDoor(NLenum game, NLint level, NLint item_id, NLint *length);
+NLAPI NLuint nlGetTextureFlag(NETLizard_Game game, NLint index); // get 3D game texture flags
 
 // Contr Terrisiem 3D
 NLAPI NLboolean nlReadCT3DModelFile(const char* name, NLint level, const char *resc_path, NETLizard_3D_Model *model);
@@ -538,7 +551,7 @@ NLAPI NLboolean nlLoadCT3DItemModelData(const char* data, NLsizei size, NLint in
 
 // Army Ranger 3D: Operation Artcle
 NLAPI NLboolean nlReadSpecnaz3DModelFile(const char* name, NLint level, const char *resc_path, NETLizard_3D_Model *model);
-NLAPI NLboolean nlLoadSpecnaz3DModelData(const char* data, NLsizei size, int level, const char *resc_path, NETLizard_3D_Model *model);
+NLAPI NLboolean nlLoadSpecnaz3DModelData(const char* data, NLsizei size, NLint level, const char *resc_path, NETLizard_3D_Model *model);
 NLAPI NLboolean nlReadSpecnaz3DItemModelFile(const char* name, NLint index, NETLizard_3D_Model *model);
 NLAPI NLboolean nlLoadSpecnaz3DItemModelData(const char* data, NLsizei size, NLint index, NETLizard_3D_Model *model);
 
@@ -592,23 +605,23 @@ NLAPI NLboolean nlSaveAndHandlePNGData(const char *data, NLint len, const char *
 /* Texture v2 */
 NLAPI NLboolean nlReadTextureV2File(const char *name, NETLizard_Texture *tex); // load 3D texture v2 file
 NLAPI NLboolean nlLoadTextureV2Data(const char *data, NLsizei length, NETLizard_Texture *tex); // load 3D texture v2 data
-NLAPI NLboolean nlConvertTextureV2FileToImageFile(const char *from, const char *to, int img_type); // save 3D texture v2 file to normal png/jpg file
-NLAPI NLboolean nlSaveTextureV2DataToImageFile(const NETLizard_Texture *tex, const char *to, int img_type); // save 3D texture v2 data to normal png/jpg file
-NLAPI NLboolean nlSavePixelDataToTextureV2File(const NLuchar *data,  int width, int height, NETLizard_Texture_format format, const char *to); // save raw pixel data to 3D texture v2 file
+NLAPI NLboolean nlConvertTextureV2FileToImageFile(const char *from, const char *to, NLenum img_type); // save 3D texture v2 file to normal png/jpg file
+NLAPI NLboolean nlSaveTextureV2DataToImageFile(const NETLizard_Texture *tex, const char *to, NLenum img_type); // save 3D texture v2 data to normal png/jpg file
+NLAPI NLboolean nlSavePixelDataToTextureV2File(const NLuchar *data, NLint width, NLint height, NETLizard_Texture_format format, const char *to); // save raw pixel data to 3D texture v2 file
 NLAPI NLboolean nlConvertImageFileToTextureV2File(const char *from, const char *to); // save normal png/jpg file to 3D texture v2 file
 
 /* Texture v3 */
 NLAPI NLboolean nlReadTextureV3File(const char *name, NLint i1, NETLizard_Texture *tex); // load 3D texture v3 file
 NLAPI NLboolean nlLoadTextureV3Data(const char *data, NLsizei length, NLint i1, NETLizard_Texture *tex); // load 3D texture v3 data
-NLAPI NLboolean nlConvertTextureV3FileToImageFile(const char *from, NLint i, const char *to, int img_type); // save 3D texture v3 file to normal png/jpg file
-NLAPI NLboolean nlSaveTextureV3DataToImageFile(const NETLizard_Texture *tex, const char *to, int img_type); // save 3D texture v3 data to normal png/jpg file
-NLAPI NLboolean nlSavePixelDataToTextureV3File(const NLuchar *data, NLint _i, int width, int height, NETLizard_Texture_format format, const char *to); // save raw pixel data to 3D texture v3 file
+NLAPI NLboolean nlConvertTextureV3FileToImageFile(const char *from, NLint i, const char *to, NLenum img_type); // save 3D texture v3 file to normal png/jpg file
+NLAPI NLboolean nlSaveTextureV3DataToImageFile(const NETLizard_Texture *tex, const char *to, NLenum img_type); // save 3D texture v3 data to normal png/jpg file
+NLAPI NLboolean nlSavePixelDataToTextureV3File(const NLuchar *data, NLint _i, NLint width, NLint height, NETLizard_Texture_format format, const char *to); // save raw pixel data to 3D texture v3 file
 
 /* Texture v3 compress */
 NLAPI NLboolean nlReadCompressTextureV3File(const char *name, NETLizard_Texture *tex); // load 3D texture v3 file
 NLAPI NLboolean nlLoadCompressTextureV3Data(const char *data, NLsizei length, NETLizard_Texture *tex); // load 3D texture v3 data
-NLAPI NLboolean nlConvertTextureV3CompressFileToImageFile(const char *from, const char *to, int img_type); // save 3D texture v3 file to normal png/jpg file
-NLAPI NLboolean nlSaveTextureV3CompressDataToImageFile(const NETLizard_Texture *tex, const char *to, int img_type); // save 3D texture v3 data to normal png/jpg file
+NLAPI NLboolean nlConvertTextureV3CompressFileToImageFile(const char *from, const char *to, NLenum img_type); // save 3D texture v3 file to normal png/jpg file
+NLAPI NLboolean nlSaveTextureV3CompressDataToImageFile(const NETLizard_Texture *tex, const char *to, NLenum img_type); // save 3D texture v3 data to normal png/jpg file
 
 /* OpenGL util */
 NLAPI NL_RET_PTR_ALLOC(NLuchar *) NLuchar * nlMakePixelDataRGBACompress(const NETLizard_Texture *tex, NLint *rlen);

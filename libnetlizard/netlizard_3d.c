@@ -598,7 +598,7 @@ const NETLizard_3D_Frame_Animation * nlGet3DModelFrameAnimationConfig(NETLizard_
     return NULL;
 }
 
-int nlGetItemType(NETLizard_Game game, int index)
+NLuint nlGetItemType(NETLizard_Game game, NLint index)
 {
     int res = NL_3D_ITEM_TYPE_GENERAL;
 	switch(game)
@@ -723,7 +723,60 @@ int nlGetItemType(NETLizard_Game game, int index)
     return res;
 }
 
-NLboolean nlCheck3DGameLevelIsAvailable(NETLizard_Game game, int level)
+NLuint nlGetTextureFlag(NETLizard_Game game, NLint index)
+{
+    int res = NL_3D_TEXTURE_FLAG_NORMAL;
+	switch(game)
+	{
+        case NL_CLONE_3D:
+			if(index == 42)
+                res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_SPRITE | NL_3D_TEXTURE_FLAG_TOW_SIDED;
+            else if(index == 48)
+                res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED;
+			break;
+
+        case NL_SHADOW_OF_EGYPT_3D:
+			if(index == 36 || index == 37 || index == 49)
+                res |= NL_3D_TEXTURE_FLAG_CUBE_MAP;
+			break;
+
+        case NL_CONTR_TERRORISM_3D:
+			if(index == 70 || index == 71)
+                res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_SPRITE | NL_3D_TEXTURE_FLAG_TOW_SIDED;
+            else if(index == 66)
+                res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED;
+			break;
+
+        case NL_CONTR_TERRORISM_3D_EPISODE_2:
+            if(index == 45 || index == 48)
+                res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED;
+            else if(index == 49 || index == 50)
+                res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED;
+            else if(index == 51)
+                res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED | NL_3D_TEXTURE_FLAG_LADDER;
+			break;
+
+        case NL_ARMY_RANGER_3D:
+            if(index == 33 || index == 34)
+                res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED;
+			break;
+
+        case NL_CONTR_TERRORISM_3D_EPISODE_3:
+            if(index == 45 || index == 48)
+                res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED;
+            else if(index == 49 || index == 50)
+                res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED;
+            else if(index == 51)
+                res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED | NL_3D_TEXTURE_FLAG_LADDER;
+			break;
+
+		default:
+			break;
+	}
+    return res;
+}
+
+NLboolean nlCheck3DGameLevelIsAvailable(NETLizard_Game game, NLint level)
 {
 	switch(game)
 	{

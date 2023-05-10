@@ -254,11 +254,32 @@ int idNETLizardConverter::ConvertMap(const char *file, int i)
 			const NLint *mesh_vertex = mesh->item_mesh.vertex.data;
 
 			NLint item_type = nlGetItemType(game, mesh->obj_index);
-			if(item_type & (NL_3D_ITEM_TYPE_DOOR_HORIZONTAL | NL_3D_ITEM_TYPE_DOOR_VERTICAL | NL_3D_ITEM_TYPE_SKYBOX | NL_3D_ITEM_TYPE_WEAPON))
+			if(item_type & (NL_3D_ITEM_TYPE_DOOR_HORIZONTAL | NL_3D_ITEM_TYPE_DOOR_VERTICAL | NL_3D_ITEM_TYPE_SKYBOX/* | NL_3D_ITEM_TYPE_WEAPON*/))
 				continue;
 
 			idEntity entity;
-			entity.Classname() = "func_static";
+			if(item_type & NL_3D_ITEM_TYPE_WEAPON)
+			{
+				entity.Classname() = "func_bobbing";
+				entity("height", 10);
+				entity("speed", 0.4f);
+			}
+			else if(item_type & NL_3D_ITEM_TYPE_FAN_Z_AXIS)
+			{
+				entity.Classname() = "func_rotating";
+			}
+			else if(item_type & NL_3D_ITEM_TYPE_FAN_X_AXIS)
+			{
+				entity.Classname() = "func_rotating";
+				entity("x_axis", true);
+			}
+			else if(item_type & NL_3D_ITEM_TYPE_FAN_Y_AXIS)
+			{
+				entity.Classname() = "func_rotating";
+				entity("y_axis", true);
+			}
+			else
+				entity.Classname() = "func_static";
 			entity.Name() = idStr::va("entity%d_%d", mesh->obj_index, i);
 			entity("model", entity.Name());
 			entity("origin", {mesh->position[0] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[1] * NETLIZARD_MAP_TO_IDTECH4, mesh->position[2] * NETLIZARD_MAP_TO_IDTECH4});

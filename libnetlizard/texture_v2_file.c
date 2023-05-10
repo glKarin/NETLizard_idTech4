@@ -49,7 +49,7 @@ NLboolean nlLoadTextureV2Data(const char *data, NLsizei length, NETLizard_Textur
     return NL_TRUE;
 }
 
-NLboolean nlConvertTextureV2FileToImageFile(const char *from, const char *to, int img_type)
+NLboolean nlConvertTextureV2FileToImageFile(const char *from, const char *to, NLenum img_type)
 {
     NETLizard_Texture tex;
     NLboolean res = nlReadTextureV2File(from, &tex);
@@ -60,7 +60,7 @@ NLboolean nlConvertTextureV2FileToImageFile(const char *from, const char *to, in
 	return res;
 }
 
-NLboolean nlSaveTextureV2DataToImageFile(const NETLizard_Texture *tex, const char *to, int img_type)
+NLboolean nlSaveTextureV2DataToImageFile(const NETLizard_Texture *tex, const char *to, NLenum img_type)
 {
     if(tex->type != NL_TEXTURE_3D_ENGINE_V2)
         return NL_FALSE;
@@ -73,7 +73,7 @@ NLboolean nlSaveTextureV2DataToImageFile(const NETLizard_Texture *tex, const cha
     return res;
 }
 
-NLboolean nlSavePixelDataToTextureV2File(const NLuchar *data,  int width, int height, NETLizard_Texture_format format, const char *to)
+NLboolean nlSavePixelDataToTextureV2File(const NLuchar *data, NLint width, NLint height, NETLizard_Texture_format format, const char *to)
 {
     FILE *file;
 
