@@ -445,6 +445,7 @@ typedef struct NETLizard_Level_Teleport_s
     NLbitfield mask; // 1: x translate, 2: y translate, 4: z translate, 8: x rotate, 16: y rotate
     NLint position[3];
     NLint rotation[2];
+	NLboolean end_level;
 } NETLizard_Level_Teleport;
 
 /* NETLizard 3D map elevator config, Clone 3D */

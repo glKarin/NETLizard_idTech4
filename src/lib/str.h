@@ -21,6 +21,7 @@ class idStr : public std::string
 	void RemoveExtension();
 
 	static const char * va(const char *fmt, ...);
+	static const char * va(const char *fmt, va_list va);
 
 	bool GetFilePath(std::string &path) const;
 	bool GetBaseName(std::string &ret) const;

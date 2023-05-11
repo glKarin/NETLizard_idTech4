@@ -35,23 +35,14 @@ ostream & operator<<(ostream &o, const idMap &v)
 void idMap::FillExtras(void)
 {
 	idEntity e;
-	e.Classname() = "info_player_start";
-	e.Name() = "info_player_start_1";
-	e("origin", startPos);
-	e("angle", startAngle);
+	e.info_player_start(startPos, startAngle);
+	e.Name("info_player_start_1");
 	entitys.push_back(e);
 	return;
 
 	idVec3 center = bounds.Center();
 	idVec3 radius = bounds.Size();
-	e.ClearSpawnArgs();
-	e.Classname() = "light";
-	e.Name() = "light_1";
-	e("origin", center);
-	e("light_radius", radius);
-	e("noshadows", true);
-	e("nospecular", true);
-	e("falloff", 0);
-	e("_color", {0.78, 0.78, 0.84});
+	e.light(center, radius, true, true, {0.78, 0.78, 0.84});
+	e.Name("light_1");
 	entitys.push_back(e);
 }

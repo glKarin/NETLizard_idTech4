@@ -11,10 +11,10 @@
 class idEntity
 {
 	public:
-		idStr & Name();
-		idStr & Classname();
+		idEntity & Name(const char *str, ...);
+		idEntity & Classname(const char *str);
 		idDict & SpawnArgs();
-		const idStr & Name() const;
+		idStr Name() const;
 		const idStr & Classname() const;
 		const idDict & SpawnArgs() const;
 		idEntity & operator<<(const idBrushDef3 &brush);
@@ -24,13 +24,36 @@ class idEntity
 		idEntity & operator()(const char *name, bool value);
 		idEntity & operator()(const char *name, const idVec3 &value);
 		idEntity & operator()(const char *name, const idMat3 &value);
-		void ClearSpawnArgs();
+		void ClearSpawnArgs(void);
+		void ClearBrushs(void);
+		idEntity & Origin(const idVec3 &v);
+		void Reset(void);
+
+		idEntity & func_static(void);
+		idEntity & func_rotating(bool xAxis = false, bool yAxis = false);
+		idEntity & func_bobbing(float height = -1, float speed = -1);
+		idEntity & worldspawn(void);
+		idEntity & light(const idVec3 &origin, const idVec3 &radius = {0, 0, 0}, bool noshadows = true, bool nospecular = true, const idVec3 &color = {0, 0, 0});
+		idEntity & info_player_deathmatch(const idVec3 &origin);
+		idEntity & info_player_start(const idVec3 &origin, float angle = 0.0f);
+		idEntity & info_player_teleport(const idVec3 &origin, float angle = 0.0f);
+		idEntity & target_endlevel(const char *nextMap);
 
 		friend std::ostream & operator<<(std::ostream &o, const idEntity &v);
 
+		static const char *CLASSNAME_FUNC_STATIC;
+		static const char *CLASSNAME_FUNC_ROTATING;
+		static const char *CLASSNAME_FUNC_BOBBING;
+		static const char *CLASSNAME_WORLDSPAWN;
+		static const char *CLASSNAME_LIGHT;
+		static const char *CLASSNAME_INFO_PLAYER_DEATHMATCH;
+		static const char *CLASSNAME_INFO_PLAYER_START;
+		static const char *CLASSNAME_INFO_PLAYER_TELEPORT;
+		static const char *CLASSNAME_TARGET_ENDLEVEL;
+
 	private:
 		idStr name;
-		idStr classname;
+		idStr classname = "func_static";
 		idBrushDef3List brushs;
 		idDict spawnArgs;
 };
@@ -42,17 +65,13 @@ inline idEntity & idEntity::operator<<(const idBrushDef3 &brush)
 	return *this;
 }
 
-inline idStr & idEntity::Name()
+inline idEntity & idEntity::Classname(const char *classname)
 {
-	return name;
+	this->classname = classname;
+	return *this;
 }
 
-inline idStr & idEntity::Classname()
-{
-	return classname;
-}
-
-inline const idStr & idEntity::Name() const
+inline idStr idEntity::Name() const
 {
 	return name;
 }
@@ -108,8 +127,19 @@ inline idEntity & idEntity::operator()(const char *name, const idMat3 &value)
 	return *this;
 }
 
-inline void idEntity::ClearSpawnArgs()
+inline void idEntity::ClearSpawnArgs(void)
 {
 	spawnArgs.Clear();
+}
+
+inline void idEntity::ClearBrushs(void)
+{
+	brushs.clear();
+}
+
+inline idEntity & idEntity::Origin(const idVec3 &v)
+{
+	spawnArgs.SetVec3("origin", v);
+	return *this;
 }
 #endif

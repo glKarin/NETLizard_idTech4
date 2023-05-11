@@ -11,6 +11,7 @@
 class idDrawVert;
 class idEntity;
 class idVec3;
+class idBounds;
 
 class idBrushDef3Side
 {
@@ -45,6 +46,7 @@ class idBrushDef3
 	public:
 		idBrushDef3 & operator<<(const idBrushDef3Side &side);
 		friend std::ostream & operator<<(std::ostream &o, const idBrushDef3 &v);
+		static bool FromBounds(idBrushDef3 &brush, const idBounds &bounds, const idStr &material, float texMat = 1.0f);
 
 	private:
 		idBrushDef3SideList sides;

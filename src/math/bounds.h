@@ -15,6 +15,7 @@ class idBounds
 		idBounds & operator+=(const idVec3 &p);
 		idBounds & operator+=(const idBounds &b);
 		void Init(const idVec3 &point);
+		bool IsEmpty(void) const;
 };
 
 inline idVec3 & idBounds::operator[](int i)
@@ -47,5 +48,10 @@ inline idBounds & idBounds::operator+=(const idBounds &b)
 inline void idBounds::Init(const idVec3 &point)
 {
 	b[0] = b[1] = point;
+}
+
+inline bool idBounds::IsEmpty(void) const
+{
+	return b[0] == b[1];
 }
 #endif

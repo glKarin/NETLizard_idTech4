@@ -1,8 +1,32 @@
 #include "entity.h"
 
-using std::ostream;
+#include <stdarg.h>
+#include <stdio.h>
 
-ostream & operator<<(ostream &o, const idEntity &v)
+#define MAX_NAME 1024
+
+const char * idEntity::CLASSNAME_FUNC_STATIC = "func_static";
+const char * idEntity::CLASSNAME_FUNC_ROTATING = "func_rotating";
+const char * idEntity::CLASSNAME_FUNC_BOBBING = "func_bobbing";
+const char * idEntity::CLASSNAME_WORLDSPAWN = "worldspawn";
+const char * idEntity::CLASSNAME_LIGHT = "light";
+const char * idEntity::CLASSNAME_INFO_PLAYER_DEATHMATCH = "info_player_deathmatch";
+const char * idEntity::CLASSNAME_INFO_PLAYER_START = "info_player_start";
+const char * idEntity::CLASSNAME_INFO_PLAYER_TELEPORT = "info_player_teleport";
+const char * idEntity::CLASSNAME_TARGET_ENDLEVEL = "target_endlevel";
+
+idEntity & idEntity::Name(const char *str, ...)
+{
+	va_list va;
+
+	va_start(va, str);
+	name = idStr::va(str, va);
+	va_end(va);
+
+	return *this;
+}
+
+std::ostream & operator<<(std::ostream &o, const idEntity &v)
 {
 	o << "{\n";
 	o << idStr::va("\"classname\" \"%s\"\n", v.classname.c_str());
@@ -23,4 +47,98 @@ ostream & operator<<(ostream &o, const idEntity &v)
 	}
 	o << "}\n";
 	return o;
+}
+
+idEntity & idEntity::worldspawn(void)
+{
+	Reset();
+	classname = CLASSNAME_WORLDSPAWN;
+	name = "";
+	return *this;
+}
+
+idEntity & idEntity::func_static(void)
+{
+	Reset();
+	classname = CLASSNAME_FUNC_STATIC;
+	return *this;
+}
+
+idEntity & idEntity::func_rotating(bool xAxis, bool yAxis)
+{
+	Reset();
+	classname = CLASSNAME_FUNC_ROTATING;
+	spawnArgs.SetBool("x_axis", xAxis);
+	spawnArgs.SetBool("y_axis", yAxis);
+	return *this;
+}
+
+idEntity & idEntity::func_bobbing(float height, float speed)
+{
+	Reset();
+	classname = CLASSNAME_FUNC_BOBBING;
+	if(height > 0)
+		spawnArgs.SetFloat("height", height);
+	if(speed > 0)
+		spawnArgs.SetFloat("speed", speed);
+	return *this;
+}
+
+idEntity & idEntity::info_player_deathmatch(const idVec3 &origin)
+{
+	Reset();
+	classname = CLASSNAME_INFO_PLAYER_DEATHMATCH;
+	Origin(origin);
+	return *this;
+}
+
+idEntity & idEntity::info_player_start(const idVec3 &origin, float angle)
+{
+	Reset();
+	classname = CLASSNAME_INFO_PLAYER_START;
+	Origin(origin);
+	spawnArgs.SetFloat("angle", angle);
+	return *this;
+}
+
+idEntity & idEntity::info_player_teleport(const idVec3 &origin, float angle)
+{
+	Reset();
+	classname = CLASSNAME_INFO_PLAYER_TELEPORT;
+	Origin(origin);
+	spawnArgs.SetFloat("angle", angle);
+	return *this;
+}
+
+idEntity & idEntity::light(const idVec3 &origin, const idVec3 &radius, bool noshadows, bool nospecular, const idVec3 &color)
+{
+	Reset();
+	classname = CLASSNAME_LIGHT;
+	Origin(origin);
+	if(!radius.IsZero())
+		spawnArgs.SetVec3("light_radius", radius);
+	spawnArgs.SetBool("noshadows", noshadows);
+	spawnArgs.SetBool("nospecular", nospecular);
+	if(!color.IsZero())
+		spawnArgs.SetVec3("_color", color);
+
+	spawnArgs.SetInteger("falloff", 0);
+	return *this;
+}
+
+idEntity & idEntity::target_endlevel(const char *nextMap)
+{
+	Reset();
+	classname = CLASSNAME_TARGET_ENDLEVEL;
+	spawnArgs.Set("nextMap", nextMap);
+	spawnArgs.SetBool("noflood", true);
+	return *this;
+}
+
+void idEntity::Reset(void)
+{
+	Name("");
+	classname = CLASSNAME_FUNC_STATIC;
+	ClearSpawnArgs();
+	ClearBrushs();
 }

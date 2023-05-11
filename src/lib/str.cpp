@@ -11,6 +11,17 @@ using std::string;
 const char * idStr::va(const char *fmt, ...)
 {
 	va_list argptr;
+	const char *buf;
+
+	va_start(argptr, fmt);
+	buf = va(fmt, argptr);
+	va_end(argptr);
+
+	return buf;
+}
+
+const char * idStr::va(const char *fmt, va_list argptr)
+{
 	static int index = 0;
 	static char string[VA_MAX][16384];	// in case called by nested functions
 	char *buf;
@@ -18,9 +29,7 @@ const char * idStr::va(const char *fmt, ...)
 	buf = string[index];
 	index = (index + 1) % VA_MAX;
 
-	va_start(argptr, fmt);
 	vsprintf(buf, fmt, argptr);
-	va_end(argptr);
 
 	return buf;
 }
