@@ -3,8 +3,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#define MAX_NAME 1024
-
 const char * idEntity::CLASSNAME_FUNC_STATIC = "func_static";
 const char * idEntity::CLASSNAME_FUNC_ROTATING = "func_rotating";
 const char * idEntity::CLASSNAME_FUNC_BOBBING = "func_bobbing";
@@ -13,7 +11,10 @@ const char * idEntity::CLASSNAME_LIGHT = "light";
 const char * idEntity::CLASSNAME_INFO_PLAYER_DEATHMATCH = "info_player_deathmatch";
 const char * idEntity::CLASSNAME_INFO_PLAYER_START = "info_player_start";
 const char * idEntity::CLASSNAME_INFO_PLAYER_TELEPORT = "info_player_teleport";
-const char * idEntity::CLASSNAME_TARGET_ENDLEVEL = "target_endlevel";
+const char * idEntity::CLASSNAME_TARGET_ENDLEVEL = "target_endLevel";
+const char * idEntity::CLASSNAME_TRIGGER_MULTIPLE = "trigger_multiple";
+const char * idEntity::CLASSNAME_TARGET_WAITFORBUTTON = "func_waitforbutton";
+const char * idEntity::CLASSNAME_FUNC_DOOR = "func_door";
 
 idEntity & idEntity::Name(const char *str, ...)
 {
@@ -21,6 +22,17 @@ idEntity & idEntity::Name(const char *str, ...)
 
 	va_start(va, str);
 	name = idStr::va(str, va);
+	va_end(va);
+
+	return *this;
+}
+
+idEntity & idEntity::NameByClass(const char *str, ...)
+{
+	va_list va;
+
+	va_start(va, str);
+	name = classname + idStr::va(str, va);
 	va_end(va);
 
 	return *this;
@@ -49,11 +61,19 @@ std::ostream & operator<<(std::ostream &o, const idEntity &v)
 	return o;
 }
 
+void idEntity::Reset(void)
+{
+	Name("");
+	classname = CLASSNAME_FUNC_STATIC;
+	ClearSpawnArgs();
+	ClearBrushs();
+}
+
 idEntity & idEntity::worldspawn(void)
 {
 	Reset();
 	classname = CLASSNAME_WORLDSPAWN;
-	name = "";
+	name = "world";
 	return *this;
 }
 
@@ -126,7 +146,7 @@ idEntity & idEntity::light(const idVec3 &origin, const idVec3 &radius, bool nosh
 	return *this;
 }
 
-idEntity & idEntity::target_endlevel(const char *nextMap)
+idEntity & idEntity::target_endLevel(const char *nextMap)
 {
 	Reset();
 	classname = CLASSNAME_TARGET_ENDLEVEL;
@@ -135,10 +155,26 @@ idEntity & idEntity::target_endlevel(const char *nextMap)
 	return *this;
 }
 
-void idEntity::Reset(void)
+idEntity & idEntity::trigger_multiple(const char *target)
 {
-	Name("");
-	classname = CLASSNAME_FUNC_STATIC;
-	ClearSpawnArgs();
-	ClearBrushs();
+	Reset();
+	classname = CLASSNAME_TRIGGER_MULTIPLE;
+	spawnArgs.Set("target", target);
+	return *this;
+}
+
+idEntity & idEntity::func_waitforbutton(const char *target)
+{
+	Reset();
+	classname = CLASSNAME_TARGET_WAITFORBUTTON;
+	spawnArgs.Set("target", target);
+	return *this;
+}
+
+idEntity & idEntity::func_door(int movedir)
+{
+	Reset();
+	classname = CLASSNAME_FUNC_DOOR;
+	spawnArgs.SetInteger("movedir", movedir);
+	return *this;
 }

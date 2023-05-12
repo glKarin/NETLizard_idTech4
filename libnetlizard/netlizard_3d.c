@@ -733,6 +733,8 @@ NLuint nlGetTextureFlag(NETLizard_Game game, NLint index)
                 res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_SPRITE | NL_3D_TEXTURE_FLAG_TOW_SIDED;
             else if(index == 48)
                 res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED;
+			else if(index == 54)
+                res |= NL_3D_TEXTURE_FLAG_ALPHA;
 			break;
 
         case NL_SHADOW_OF_EGYPT_3D:

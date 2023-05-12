@@ -33,6 +33,10 @@ class idNETLizardConverter
         bool GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_Tree_Node *node, bool invert = false) const;
         bool LoadNETLizard3DMapModel(NETLizard_3D_Model &model, const char *file, int level);
         void Log(const char *str, ...) const;
+        template <class T>
+        static T & ConvToIdTech4(T &v);
+        template <class T>
+        static T ConvToIdTech4(const T &v);
 
         static int TEXTURE_FILE_TYPE;
         static float NETLIZARD_MAP_TO_IDTECH4;
@@ -45,4 +49,18 @@ class idNETLizardConverter
         const NETLizard_3D_Model_Config *config;
 };
 
+
+
+template <class T>
+inline T & idNETLizardConverter::ConvToIdTech4(T &v)
+{
+    v *= NETLIZARD_MAP_TO_IDTECH4;
+    return v;
+}
+
+template <class T>
+inline T idNETLizardConverter::ConvToIdTech4(const T &v)
+{
+    return v * NETLIZARD_MAP_TO_IDTECH4;
+}
 #endif

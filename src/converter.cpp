@@ -6,6 +6,7 @@
 
 #include "filesystem.h"
 #include "buffer.h"
+#include "vector.h"
 
 int idNETLizardConverter::TEXTURE_FILE_TYPE = 0; // tga
 

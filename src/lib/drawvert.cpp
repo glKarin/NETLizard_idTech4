@@ -16,5 +16,7 @@ bool idDrawVert::CalculateFromPoints(idVec3 textureMatrix[2], const idVec3 point
     textureMatrix[1][0] = transform(0, 1); // xy
     textureMatrix[1][1] = transform(1, 1); // yy
     textureMatrix[1][2] = transform(2, 1); // zy
+	//textureMatrix[0] = transform(0);
+	//textureMatrix[1] = transform(1);
 	return true;
 }

@@ -17,5 +17,5 @@ NETLizard 3D J2ME game resource file to idTech4 format file converter.
 ## Generate map:  
  1. Open DOOM3 game.
  2. Open console with `~`.
- 3. Type `dmap -noflood <map_file_name>` and enter.
+ 3. Type `dmap -noflood -noopt <map_file_name>` and enter.
  4. Type `map <map_file_name>` and start game.

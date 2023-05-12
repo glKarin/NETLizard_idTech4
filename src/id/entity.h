@@ -12,6 +12,7 @@ class idEntity
 {
 	public:
 		idEntity & Name(const char *str, ...);
+		idEntity & NameByClass(const char *str, ...);
 		idEntity & Classname(const char *str);
 		idDict & SpawnArgs();
 		idStr Name() const;
@@ -28,6 +29,7 @@ class idEntity
 		void ClearBrushs(void);
 		idEntity & Origin(const idVec3 &v);
 		void Reset(void);
+		void Model(void);
 
 		idEntity & func_static(void);
 		idEntity & func_rotating(bool xAxis = false, bool yAxis = false);
@@ -37,7 +39,10 @@ class idEntity
 		idEntity & info_player_deathmatch(const idVec3 &origin);
 		idEntity & info_player_start(const idVec3 &origin, float angle = 0.0f);
 		idEntity & info_player_teleport(const idVec3 &origin, float angle = 0.0f);
-		idEntity & target_endlevel(const char *nextMap);
+		idEntity & target_endLevel(const char *nextMap);
+		idEntity & trigger_multiple(const char *target);
+		idEntity & func_waitforbutton(const char *target);
+		idEntity & func_door(int movedir);
 
 		friend std::ostream & operator<<(std::ostream &o, const idEntity &v);
 
@@ -50,6 +55,9 @@ class idEntity
 		static const char *CLASSNAME_INFO_PLAYER_START;
 		static const char *CLASSNAME_INFO_PLAYER_TELEPORT;
 		static const char *CLASSNAME_TARGET_ENDLEVEL;
+		static const char *CLASSNAME_TRIGGER_MULTIPLE;
+		static const char *CLASSNAME_TARGET_WAITFORBUTTON;
+		static const char *CLASSNAME_FUNC_DOOR;
 
 	private:
 		idStr name;
@@ -141,5 +149,10 @@ inline idEntity & idEntity::Origin(const idVec3 &v)
 {
 	spawnArgs.SetVec3("origin", v);
 	return *this;
+}
+
+inline void idEntity::Model(void)
+{
+	spawnArgs.Set("model", Name());
 }
 #endif
