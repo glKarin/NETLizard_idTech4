@@ -2,9 +2,9 @@
 #define _KARIN_MATERIAL_H
 
 #include <iostream>
-#include <vector>
 
 #include "str.h"
+#include "list.h"
 
 class idMaterialStage
 {
@@ -20,7 +20,7 @@ class idMaterialStage
 		
 		friend class idMaterial;
 };
-using idMaterialStageList = std::vector<idMaterialStage>;
+using idMaterialStageList = idList<idMaterialStage>;
 
 class idMaterial
 {
@@ -50,6 +50,9 @@ class idMaterial
 		bool ladder = false;
 		idMaterialStageList stages;
 };
+using idMaterialList = idList<idMaterial>;
+
+
 
 inline idStr & idMaterial::Name()
 {

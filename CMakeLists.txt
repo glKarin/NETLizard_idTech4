@@ -26,7 +26,8 @@ src/io/filesystem.cpp
 src/id/material.cpp
 src/id/brush.cpp
 src/id/entity.cpp
-src/id/map.cpp
+src/id/mapfile.cpp
+src/id/def.cpp
 src/math/maths.cpp
 src/math/vector.cpp
 src/math/matrix.cpp
@@ -36,6 +37,7 @@ src/converter.cpp
 src/converter_texture.cpp
 src/converter_material.cpp
 src/converter_map.cpp
+src/converter_mapdef.cpp
 )
 
 add_executable(

@@ -1,6 +1,5 @@
 #include "converter.h"
 
-#include <vector>
 #include <fstream>
 #include "material.h"
 
@@ -32,7 +31,7 @@ int idNETLizardConverter::ConvertMaterials()
     const char *format;
     const char *file;
     int res;
-	std::vector<idMaterial> mats;
+	idMaterialList mats;
 	
     res = 0;
 

@@ -1,12 +1,12 @@
 #ifndef _KARIN_ENTITY_H
 #define _KARIN_ENTITY_H
 
-#include <vector>
 #include <iostream>
 
 #include "str.h"
 #include "dict.h"
 #include "brush.h"
+#include "list.h"
 
 class idEntity
 {
@@ -65,7 +65,7 @@ class idEntity
 		idBrushDef3List brushs;
 		idDict spawnArgs;
 };
-using idEntityList = std::vector<idEntity>;
+using idEntityList = idList<idEntity>;
 
 inline idEntity & idEntity::operator<<(const idBrushDef3 &brush)
 {

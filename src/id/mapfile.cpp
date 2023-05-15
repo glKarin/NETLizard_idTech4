@@ -1,8 +1,8 @@
-#include "map.h"
+#include "mapfile.h"
 
 using std::ostream;
 
-idMap & idMap::operator+=(const idBounds &b)
+idMapFile & idMapFile::operator+=(const idBounds &b)
 {
 	if(!boundsInited)
 	{
@@ -14,12 +14,12 @@ idMap & idMap::operator+=(const idBounds &b)
 	return *this;
 }
 
-void idMap::AddAreaBounds(int i, const idBounds &b)
+void idMapFile::AddAreaBounds(int i, const idBounds &b)
 {
 	areas.insert({i, b});
 }
 
-ostream & operator<<(ostream &o, const idMap &v)
+ostream & operator<<(ostream &o, const idMapFile &v)
 {
 	o << idStr::va("\"Version\" \"%s\"\n", v.version.c_str());
 	int i = 0;
@@ -32,7 +32,7 @@ ostream & operator<<(ostream &o, const idMap &v)
 	return o;
 }
 
-void idMap::FillExtras(void)
+void idMapFile::FillExtras(void)
 {
 	idEntity e;
 	e.info_player_start(startPos, startAngle);

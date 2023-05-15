@@ -2,10 +2,9 @@
 
 #include <vector>
 #include <fstream>
-#include <algorithm>
 
 #include "material.h"
-#include "map.h"
+#include "mapfile.h"
 #include "bounds.h"
 #include "drawvert.h"
 #include "matrix.h"
@@ -204,7 +203,7 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 	const char *sky_file;
 	NETLizard_3D_Model m;
 	NETLizard_3D_Model *model = &m;
-	idMap map;
+	idMapFile map;
 
 	if(!LoadNETLizard3DMapModel(m, file, index))
 		return -1;
@@ -273,63 +272,95 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 				{
 					int doori = 0; 
 					int movedir;
-					if(door->orientation == 1)
+					int buddies[1] = {-1};
+					switch(door->orientation)
 					{
-						if(door->mask == 1)
-						{
-							doori = 1;
-							//ConvToIdTech4(fabs(door->item[0].end - door->item[0].start));
-						}
-						else if(door->mask == 2)
-						{
-							doori = 0;
-							//ConvToIdTech4(fabs(door->item[1].end - door->item[1].start));
-						}
-						else
-						{
-							for(; doori < 2; doori++)
+						case 2:
+							if(door->mask == 1)
 							{
-								if(door->item[doori].item == i)
+								doori = 1;
+							}
+							else if(door->mask == 2)
+							{
+								doori = 0;
+							}
+							else
+							{
+								for(int n = 0; n < 2; n++)
 								{
-									//ConvToIdTech4(fabs(door->item[i].end - door->item[i].start));
-									break;
+									int itemid = door->item[n].item;
+									if(itemid == i)
+										doori = n;
+									else
+										buddies[0] = itemid;
 								}
 							}
-						}
-						if(doori == 1)
-							movedir = (int)id::idDoor_movedir::DOWN;
-						else
-							movedir = (int)id::idDoor_movedir::UP;
-					}
-					else
-					{
-						if(door->mask == 1)
-						{
-							doori = 1;
-							//ConvToIdTech4(fabs(door->item[0].end - door->item[0].start));
-						}
-						else if(door->mask == 2)
-						{
-							doori = 0;
-							//ConvToIdTech4(fabs(door->item[1].end - door->item[1].start));
-						}
-						else
-						{
-							for(; doori < 2; doori++)
+							if(doori == 1)
+								movedir = (int)id::idDoor_movedir::RIGHT;
+							else
+								movedir = (int)id::idDoor_movedir::LEFT;
+							break;
+
+						case 3:
+							if(door->mask == 1)
 							{
-								if(door->item[doori].item == i)
+								doori = 1;
+							}
+							else if(door->mask == 2)
+							{
+								doori = 0;
+							}
+							else
+							{
+								for(int n = 0; n < 2; n++)
 								{
-									//ConvToIdTech4(fabs(door->item[i].end - door->item[i].start));
-									break;
+									int itemid = door->item[n].item;
+									if(itemid == i)
+										doori = n;
+									else
+										buddies[0] = itemid;
 								}
 							}
-						}
-						if(doori == 1)
-							movedir = (int)id::idDoor_movedir::BACKWARD;
-						else
-							movedir = (int)id::idDoor_movedir::FORWARD;
+							if(doori == 1)
+								movedir = (int)id::idDoor_movedir::FORWARD;
+							else
+								movedir = (int)id::idDoor_movedir::BACKWARD;
+							break;
+
+						case 1:
+						default:
+							if(door->mask == 1)
+							{
+								doori = 0;
+							}
+							else if(door->mask == 2)
+							{
+								doori = 1;
+							}
+							else
+							{
+								for(int n = 0; n < 2; n++)
+								{
+									int itemid = door->item[n].item;
+									if(itemid == i)
+										doori = n;
+									else
+										buddies[0] = itemid;
+								}
+							}
+							if(doori == 1)
+								movedir = (int)id::idDoor_movedir::DOWN;
+							else
+								movedir = (int)id::idDoor_movedir::UP;
+							break;
 					}
 					entity.func_door(movedir);
+					if(buddies[0] >= 0)
+					{
+						entity.NameByClass("_%d", buddies[0]);
+						entity("buddy", entity.Name());
+						entity.Name("");
+					}
 				}
 			}
 			else if(item_type & NL_3D_ITEM_TYPE_FAN_Z_AXIS)
@@ -342,9 +373,10 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 			}
 			else if(item_type & NL_3D_ITEM_TYPE_FAN_Y_AXIS)
 			{
+				//entity.func_rotating(true);
 				entity.func_rotating(false, true);
 			}
-			entity.NameByClass("_%d_%d", mesh->obj_index, i);
+			entity.NameByClass("_%d", i);
 			entity.Model();
 			entity.Origin(ConvToIdTech4(idVec3(mesh->position[0], mesh->position[1], mesh->position[2])));
 			idMat4 m4;
@@ -358,7 +390,7 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 			{
 				m4.Identity();
 				m4.Rotate(mesh->rotation[0], {1.0f, 0.0f, 0.0f});
-				m4.Rotate(mesh->rotation[1], {0.0f, 0.0f, 1.0f});
+				//m4.Rotate(mesh->rotation[1], {0.0f, 0.0f, 1.0f});
 				m4.Translate(ConvToIdTech4(idVec3(mesh->position[0], mesh->position[1], mesh->position[2])));
 
 				for(int o = 0; o < mesh->item_mesh.primitive.count; o++)
@@ -394,13 +426,13 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 						if(teleport->end_level)
 						{
 							entity.target_endLevel(idStr::va("%s/lvl%d", gamename.c_str(), index + 1));
-							entity.NameByClass("_%d_%d", mesh->obj_index, i);
+							entity.NameByClass("_%d", i);
 							entity.Origin(teleportPos);
 							map << entity;
 
 							target = entity.Name();
 							entity.func_waitforbutton(target);
-							entity.NameByClass("_%d_%d", mesh->obj_index, i);
+							entity.NameByClass("_%d", i);
 							entity.Origin(triggerPos);
 							map << entity;
 							target = entity.Name();
@@ -408,14 +440,14 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 						else
 						{
 							entity.info_player_teleport(teleportPos, teleport->rotation[0]);
-							entity.NameByClass("_%d_%d", mesh->obj_index, i);
+							entity.NameByClass("_%d", i);
 							entity.Origin(teleportPos);
 							map << entity;
 							target = entity.Name();
 						}
 
 						entity.trigger_multiple(target);
-						entity.NameByClass("_%d_%d", mesh->obj_index, i);
+						entity.NameByClass("_%d", i);
 						entity.Model();
 						entity.Origin(triggerPos);
 						entity << brush;
@@ -453,10 +485,13 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 			e.Name("area_light_%d", i);
 			map << e;
 
-			idBrushDef3 brush;
-			if(GenMapBrush(brush, node))
+			if(genPortalBrush)
 			{
-				map[0] << brush;
+				idBrushDef3 brush;
+				if(GenMapBrush(brush, node))
+				{
+					map[0] << brush;
+				}
 			}
 		}
 	}
@@ -567,15 +602,15 @@ int idNETLizardConverter::ConvertMaps()
 	if(game == NL_SHADOW_OF_EGYPT_3D) // has a survise mode(dm1) map and main menu map(lvl0)
 	{
 		{
-			idMap map;
+			idMapFile map;
 			file = idStr::va(format, i);
 			if(ConvertMap("dm1.png", -1) == 0)
 				res++;
 		}
 		format = "lvl%d.png";
-		for(i = 0; i <= config->level_count; i++)
+		for(i = 0; i < config->level_count; i++)
 		{
-			idMap map;
+			idMapFile map;
 			file = idStr::va(format, i);
 			if(ConvertMap(idStr(file), i) == 0)
 				res++;
@@ -588,7 +623,7 @@ int idNETLizardConverter::ConvertMaps()
 		{
 			if(game == NL_CONTR_TERRORISM_3D_EPISODE_3 && (i == 13 || i == 15))
 				continue; // lvl13 15 not supprot in CT3D-Ep3
-			idMap map;
+			idMapFile map;
 			file = idStr::va(format, i);
 			Log("Handle map %d - %s", i, file);
 			if(ConvertMap(idStr(file), i) == 0)

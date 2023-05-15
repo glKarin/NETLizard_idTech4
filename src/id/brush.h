@@ -1,12 +1,12 @@
 #ifndef _KARIN_BRUSH_H
 #define _KARIN_BRUSH_H
 
-#include <vector>
 #include <iostream>
 
 #include "vector.h"
 #include "plane.h"
 #include "str.h"
+#include "list.h"
 
 class idDrawVert;
 class idEntity;
@@ -39,7 +39,7 @@ class idBrushDef3Side
 		};
 		idStr material;
 };
-using idBrushDef3SideList = std::vector<idBrushDef3Side>;
+using idBrushDef3SideList = idList<idBrushDef3Side>;
 
 class idBrushDef3
 {
@@ -52,7 +52,7 @@ class idBrushDef3
 		idBrushDef3SideList sides;
 		friend class idEntity;
 };
-using idBrushDef3List = std::vector<idBrushDef3>;
+using idBrushDef3List = idList<idBrushDef3>;
 
 
 

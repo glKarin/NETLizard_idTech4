@@ -11,6 +11,7 @@ class idBrushDef3;
 class idMap;
 class idMat4;
 class idBuffer;
+class idDef;
 
 class idNETLizardConverter
 {
@@ -20,11 +21,13 @@ class idNETLizardConverter
         int ConvertTextures();
         int ConvertMaterials();
         int ConvertMaps();
+        int ConvertMapDefs();
 
     private:
         int ConvertTextureToTGA(const char *file, int i);
         int ConvertMap(const char *file, int i);
         int ConvertMaterial(idMaterial &mat, const char *file, int i);
+        int ConvertMapDef(idDef &def, const char *name, int i);
         bool ReadFile(idBuffer &buffer, const char *path) const;
         idStr GetDir(const char *path);
         idStr TargetFilePath(const char *path) const;
@@ -46,7 +49,8 @@ class idNETLizardConverter
         idStr sourceDir;
         idStr targetDir;
         idStr gamename;
-        const NETLizard_3D_Model_Config *config;
+        const NETLizard_3D_Model_Config *config = nullptr;
+		bool genPortalBrush = false;
 };
 
 

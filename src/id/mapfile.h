@@ -1,5 +1,5 @@
-#ifndef _KARIN_MAP_H
-#define _KARIN_MAP_H
+#ifndef _KARIN_MAPFILE_H
+#define _KARIN_MAPFILE_H
 
 #include <vector>
 #include <iostream>
@@ -12,7 +12,7 @@
 #define MAP_VERSION_DOOM3 "2"
 #define MAP_VERSION_QUAKE4 "3"
 
-class idMap
+class idMapFile
 {
 	public:
 		idStr & Version();
@@ -21,7 +21,7 @@ class idMap
 		float StartAngle() const;
 		idVec3 & StartPos();
 		const idVec3 & StartPos() const;
-		idMap & operator+=(const idBounds &bounds);
+		idMapFile & operator+=(const idBounds &bounds);
 		void AddAreaBounds(int i, const idBounds &b);
 		idBounds & AreaBounds(int i);
 		idEntity & operator[](int i);
@@ -29,8 +29,8 @@ class idMap
 
 		void FillExtras(void);
 
-		idMap & operator<<(const idEntity &entity);
-		friend std::ostream & operator<<(std::ostream &o, const idMap &v);
+		idMapFile & operator<<(const idEntity &entity);
+		friend std::ostream & operator<<(std::ostream &o, const idMapFile &v);
 		
 	private:
 		idStr version = MAP_VERSION_DOOM3;
@@ -42,53 +42,53 @@ class idMap
 		std::map<int, idBounds> areas;
 };
 
-inline idMap & idMap::operator<<(const idEntity &entity)
+inline idMapFile & idMapFile::operator<<(const idEntity &entity)
 {
 	entitys.push_back(entity);
 	return *this;
 }
 
-inline idStr & idMap::Version()
+inline idStr & idMapFile::Version()
 {
 	return version;
 }
 
-inline const idStr & idMap::Version() const
+inline const idStr & idMapFile::Version() const
 {
 	return version;
 }
 
-inline float & idMap::StartAngle()
+inline float & idMapFile::StartAngle()
 {
 	return startAngle;
 }
 
-inline float idMap::StartAngle() const
+inline float idMapFile::StartAngle() const
 {
 	return startAngle;
 }
 
-inline idVec3 & idMap::StartPos()
+inline idVec3 & idMapFile::StartPos()
 {
 	return startPos;
 }
 
-inline const idVec3 & idMap::StartPos() const
+inline const idVec3 & idMapFile::StartPos() const
 {
 	return startPos;
 }
 
-inline idEntity & idMap::operator[](int i)
+inline idEntity & idMapFile::operator[](int i)
 {
 	return entitys[i];
 }
 
-inline const idEntity & idMap::operator[](int i) const
+inline const idEntity & idMapFile::operator[](int i) const
 {
 	return entitys[i];
 }
 
-inline idBounds & idMap::AreaBounds(int i)
+inline idBounds & idMapFile::AreaBounds(int i)
 {
 	return areas[i];
 }
