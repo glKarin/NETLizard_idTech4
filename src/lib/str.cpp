@@ -140,3 +140,8 @@ idStr & idStr::ToLower()
 	}
 	return *this;
 }
+
+int idStr::Cmp(const char *a, const char *b)
+{
+	return strcmp(a, b);
+}

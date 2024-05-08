@@ -14,12 +14,21 @@ class idMath final
     public:
         static bool IsZero(float f);
         static bool CalcTextureMatrixFromPointsXYZUVNormal(idMat3 &mat, const idVec3 points[3], const idVec2 uvs[3], const idVec3& normal);
+
+		template<class T>
+			static T Max(const T &a, const T &b);
 };
 
 
-inline bool IsZero(float f)
+inline bool idMath::IsZero(float f)
 {
     return fabs(f) < FLOAT_EPSILON;
+}
+
+template<class T>
+inline T idMath::Max(const T &a, const T &b)
+{
+	return a < b ? b : a;
 }
 
 #endif

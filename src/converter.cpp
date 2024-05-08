@@ -7,6 +7,7 @@
 #include "filesystem.h"
 #include "buffer.h"
 #include "vector.h"
+#include "id/mapfile.h"
 
 int idNETLizardConverter::TEXTURE_FILE_TYPE = 0; // tga
 
@@ -14,10 +15,12 @@ idNETLizardConverter::idNETLizardConverter(NETLizard_Game game, const char *sour
     : game(game),
         sourceDir(sourceDir),
         targetDir(targetDir),
-        config(nullptr)
+        config(nullptr),
+		genPortalBrush(false),
+		version(MAP_VERSION_DOOM3)
 {
     config = nlGet3DGameModelConfig(this->game);
-    gamename = idStr(nlGet3DGameName(this->game)).Replace(" ", "").Replace(":", "_").ToLower();
+    gamename = idStr(nlGet3DGameLiteName(this->game)).Replace(" ", "").Replace(":", "_").ToLower();
 }
 
 bool idNETLizardConverter::ReadFile(idBuffer &buffer, const char *path) const

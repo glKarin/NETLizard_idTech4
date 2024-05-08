@@ -3,6 +3,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "math/bounds.h"
+
 const char * idEntity::CLASSNAME_FUNC_STATIC = "func_static";
 const char * idEntity::CLASSNAME_FUNC_ROTATING = "func_rotating";
 const char * idEntity::CLASSNAME_FUNC_BOBBING = "func_bobbing";
@@ -15,6 +17,7 @@ const char * idEntity::CLASSNAME_TARGET_ENDLEVEL = "target_endLevel";
 const char * idEntity::CLASSNAME_TRIGGER_MULTIPLE = "trigger_multiple";
 const char * idEntity::CLASSNAME_TARGET_WAITFORBUTTON = "func_waitforbutton";
 const char * idEntity::CLASSNAME_FUNC_DOOR = "func_door";
+const char * idEntity::CLASSNAME_FUNC_ELEVATOR = "func_elevator";
 
 idEntity & idEntity::Name(const char *str, ...)
 {
@@ -176,5 +179,33 @@ idEntity & idEntity::func_door(int movedir)
 	Reset();
 	classname = CLASSNAME_FUNC_DOOR;
 	spawnArgs.SetInteger("movedir", movedir);
+	return *this;
+}
+
+void idEntity::MinMax(const idBounds &bounds)
+{
+	spawnArgs.SetVec3("mins", bounds[0]);
+	spawnArgs.SetVec3("maxs", bounds[1]);
+}
+
+void idEntity::Size(const idVec3 &size)
+{
+	spawnArgs.SetVec3("size", size);
+}
+
+idEntity & idEntity::func_elevator(float moveSpeed, float moveTime, bool trigger, int numFloor, const idVec3 floors[])
+{
+	Reset();
+	classname = CLASSNAME_FUNC_ELEVATOR;
+	spawnArgs.SetFloat("move_speed", moveSpeed);
+	spawnArgs.SetFloat("move_time", moveTime);
+	spawnArgs.SetBool("trigger", trigger);
+	spawnArgs.SetBool("solid", true);
+	for(int i = 0; i < numFloor; i++)
+	{
+		spawnArgs.SetVec3(idStr::va("floorPos_%d", i + 1), floors[i]);
+	}
+	if(trigger && numFloor > 0)
+		spawnArgs.SetInteger("triggerFloor", numFloor);
 	return *this;
 }

@@ -13,6 +13,15 @@ static const char *Game_Names[] = {
 	"Clone 3D",
     "Contr Terrorism 3D: Episode 3"
 };
+static const char *Game_Lite_Names[] = {
+	"RE3D",
+	"CT3D",
+    "Specnaz3D",
+    "CT3DEp2",
+	"Egypt3D",
+	"Clone3D",
+    "CT3DEp3"
+};
 
 static const char *CT3D_Level[] = {
 	"Complex",
@@ -147,6 +156,101 @@ static const int Game_Level[] = {
     EGYPT3D_LEVEL,
     CLONE3D_LEVEL,
     CT3DEP3_LEVEL
+};
+
+static const NETLizard_Game_Level_Start_End CT3D_Start_End[] = {
+	{ NL_CONTR_TERRORISM_3D, 1, 0, 28, 2 },
+	{ NL_CONTR_TERRORISM_3D, 2, 0, 26, 3 },
+	{ NL_CONTR_TERRORISM_3D, 3, 0, -1, 4 },
+	{ NL_CONTR_TERRORISM_3D, 4, 18, -1, 5 },
+	{ NL_CONTR_TERRORISM_3D, 5, 0, 16, 6 },
+	{ NL_CONTR_TERRORISM_3D, 6, 0, -1, 7 }, // 29
+	{ NL_CONTR_TERRORISM_3D, 7, 22, -1, 8 }, // 0
+	{ NL_CONTR_TERRORISM_3D, 8, 33, 33, 9 },
+	{ NL_CONTR_TERRORISM_3D, 9, 43, 16, 10 },
+	{ NL_CONTR_TERRORISM_3D, 10, 16, 43, -1 },
+};
+
+static const NETLizard_Game_Level_Start_End Specnaz3D_Start_End[] = {
+	{ NL_ARMY_RANGER_3D, 1, 0, 2, 2 },
+	{ NL_ARMY_RANGER_3D, 2, 0, 9, 3 },
+	{ NL_ARMY_RANGER_3D, 3, 16, 33, 4},
+	{ NL_ARMY_RANGER_3D, 4, 1, 41, 5 },
+	{ NL_ARMY_RANGER_3D, 5, 1, 14, 6 },
+	{ NL_ARMY_RANGER_3D, 5, 1, 25, 7 },
+	{ NL_ARMY_RANGER_3D, 5, 1, 49, 8 },
+	{ NL_ARMY_RANGER_3D, 6, 38, 37, 5 }, //24
+	{ NL_ARMY_RANGER_3D, 7, 1, 0, 5 }, // 22
+	{ NL_ARMY_RANGER_3D, 8, 1, 33, 9 },
+	{ NL_ARMY_RANGER_3D, 9, 1, 14, 10 },
+	{ NL_ARMY_RANGER_3D, 10, 0, 2, -1 },
+};
+
+static const NETLizard_Game_Level_Start_End CT3DEp2_Start_End[] = {
+	{ NL_CONTR_TERRORISM_3D_EPISODE_2, 1, 21, 21, 2 }, // 35
+	{ NL_CONTR_TERRORISM_3D_EPISODE_2, 2, 2, -1, 3 }, // -42
+	{ NL_CONTR_TERRORISM_3D_EPISODE_2, 3, 0, 15, 4 }, // -32
+	{ NL_CONTR_TERRORISM_3D_EPISODE_2, 4, 0, 37, 5 },
+	{ NL_CONTR_TERRORISM_3D_EPISODE_2, 5, 0, 0, 6 }, // 41
+	{ NL_CONTR_TERRORISM_3D_EPISODE_2, 6, 0, -1, 7 }, // 65
+	{ NL_CONTR_TERRORISM_3D_EPISODE_2, 7, 0, 0, 8 }, // 35
+	{ NL_CONTR_TERRORISM_3D_EPISODE_2, 8, 0, 38, 9 },
+	{ NL_CONTR_TERRORISM_3D_EPISODE_2, 9, 0, 0, -1 }, // 44
+};
+
+static const NETLizard_Game_Level_Start_End Egypt3D_Start_End[] = {
+	{ NL_SHADOW_OF_EGYPT_3D, 0, 0, 0, 1 },
+	{ NL_SHADOW_OF_EGYPT_3D, 1, 0, 47, 2 },
+	{ NL_SHADOW_OF_EGYPT_3D, 2, 37, 42, 3 },
+	{ NL_SHADOW_OF_EGYPT_3D, 3, 0, 26, 4 },
+	{ NL_SHADOW_OF_EGYPT_3D, 4, 0, 12, 5 },
+	{ NL_SHADOW_OF_EGYPT_3D, 5, 1, 47, 6 },
+	{ NL_SHADOW_OF_EGYPT_3D, 6, 0, 1, 7 },
+	{ NL_SHADOW_OF_EGYPT_3D, 7, 6, 0, 8 },
+	{ NL_SHADOW_OF_EGYPT_3D, 8, 0, 0, 9 },
+	{ NL_SHADOW_OF_EGYPT_3D, 9, 0, 0, 10 },
+	{ NL_SHADOW_OF_EGYPT_3D, 10, 0, 0, 11 },
+	{ NL_SHADOW_OF_EGYPT_3D, 11, 0, 7, 12 },
+	{ NL_SHADOW_OF_EGYPT_3D, 12, 0, 0, 13 },
+	{ NL_SHADOW_OF_EGYPT_3D, 13, 0, 18, 14 },
+	{ NL_SHADOW_OF_EGYPT_3D, 14, 10, 7, 15 },
+	{ NL_SHADOW_OF_EGYPT_3D, 15, 3, 30, 16 },
+	{ NL_SHADOW_OF_EGYPT_3D, 16, 0, 19, 17 },
+	{ NL_SHADOW_OF_EGYPT_3D, 17, 0, 19, -1 },
+	{ NL_SHADOW_OF_EGYPT_3D, 18, 1, -1, -1 },
+};
+
+static const NETLizard_Game_Level_Start_End Clone3D_Start_End[] = {
+	{ NL_CLONE_3D, 1, 8, 2, 2 },
+	{ NL_CLONE_3D, 2, 46, 37, 3 },
+	{ NL_CLONE_3D, 3, 55, 52, 4 },
+	{ NL_CLONE_3D, 4, 7, 49, 5 },
+	{ NL_CLONE_3D, 5, 62, 20, 6 },
+	{ NL_CLONE_3D, 6, 20, 45, 7 },
+	{ NL_CLONE_3D, 7, 46, 0, 8 },
+	{ NL_CLONE_3D, 8, 1, 47, 9 },
+	{ NL_CLONE_3D, 9, 0, 47, 10 },
+	{ NL_CLONE_3D, 10, 0, 44, 11 },
+	{ NL_CLONE_3D, 11, 0, 64, 12, },
+	{ NL_CLONE_3D, 12, 0, 10, -1 },
+};
+static const NETLizard_Game_Level_Start_End *Game3D_Level_Start_End_Area[] = {
+	NULL,
+	CT3D_Start_End,
+	Specnaz3D_Start_End,
+	CT3DEp2_Start_End,
+	Egypt3D_Start_End,
+	Clone3D_Start_End,
+	NULL,
+};
+static const NLsizei Game3D_Level_Start_End_Area_Count[] = {
+	0,
+	COUNTOF(CT3D_Start_End),
+	COUNTOF(Specnaz3D_Start_End),
+	COUNTOF(CT3DEp2_Start_End),
+	COUNTOF(Egypt3D_Start_End),
+	COUNTOF(Clone3D_Start_End),
+	0,
 };
 
 static const NETLizard_3D_Model_Config Game_Config[] = {
@@ -839,6 +943,13 @@ const char * nlGet3DGameName(NETLizard_Game game)
     return Game_Names[game];
 }
 
+const char * nlGet3DGameLiteName(NETLizard_Game game)
+{
+    if(game > NL_CONTR_TERRORISM_3D_EPISODE_3)
+        return NULL;
+    return Game_Lite_Names[game];
+}
+
 const NETLizard_3D_Model_Config * nlGet3DGameModelConfig(NETLizard_Game game)
 {
     if(game > NL_CONTR_TERRORISM_3D_EPISODE_3)
@@ -1162,21 +1273,32 @@ const NETLizard_Level_Elevator * nlGet3DGameElevator(NLenum game, NLint level, N
     NLint len = 0;
     if(objs)
     {
-        ret = objs[level];
-        len = Game3D_Level_Elevator_Count[game][level];
-        if(ret && item_id >= 0)
+        const NETLizard_Level_Elevator *list = objs[level];
+        NLint size = Game3D_Level_Elevator_Count[game][level];
+        if(item_id >= 0)
         {
             int i;
-            for(i = 0; i < len; i++)
+            for(i = 0; i < size; i++)
             {
-                const NETLizard_Level_Elevator *o = ret + i;
+                const NETLizard_Level_Elevator *o = list + i;
                 if(o->switch_item == item_id)
                 {
                     ret = o;
                     len = 1;
                     break;
                 }
+				else if(o->elevator_item == item_id)
+                {
+                    ret = o;
+                    len = 1;
+                    break;
+                }
             }
+            }
+		else
+		{
+			ret = list;
+			len = size;
         }
     }
     if(length)
@@ -1674,3 +1796,70 @@ char * make_resource_file_path(const char *format, int index, const char *resc_p
         name = suffix;
     return name;
 }
+
+const NETLizard_Game_Level_Start_End * nlGet3DGameStartEndArea(NLenum game, NLint level, NLint to, NLint *length)
+{
+    const NETLizard_Game_Level_Start_End *objs = Game3D_Level_Start_End_Area[game];
+    const NETLizard_Game_Level_Start_End *ret = NULL;
+	NLint len = 0;
+    if(objs)
+	{
+		NLint max = Game3D_Level_Start_End_Area_Count[game];
+		if(level >= 0)
+		{
+			int i;
+			for(i = 0; i < max; i++)
+			{
+				const NETLizard_Game_Level_Start_End *o = objs + i;
+				if(o->level == level)
+				{
+					if(to < 0 || o->to == to)
+					{
+						ret = o;
+						len = 1;
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			ret = objs;
+			len = max;
+		}
+	}
+	if(length)
+		*length = len;
+	return ret;
+}
+
+char * nlGet3DGameLevelFileName(NETLizard_Game game, NLuint level)
+{
+    if(game > NL_CONTR_TERRORISM_3D_EPISODE_3)
+        return NULL;
+    int max_level = Game_Level[game];
+    if(level > max_level)
+        return NULL;
+	char name[10] = {0};
+    if(game == NL_SHADOW_OF_EGYPT_3D) // Main menu 3D level only in `3D Egypt`
+    {
+		if(level == 18)
+			return strdup("dm1");
+		else
+		{
+			snprintf(name, sizeof(name), "lvl%d", level);
+			return strdup(name);
+		}
+    }
+    else
+    {
+        if(level == 0)
+            return NULL;
+		else
+		{
+			snprintf(name, sizeof(name), "lvl%d", level);
+			return strdup(name);
+		}
+    }
+}
+

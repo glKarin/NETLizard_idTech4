@@ -2,7 +2,7 @@
 NETLizard 3D J2ME game resource file to idTech4 format file converter. 
 
 ## Usage:
-./netlizard `<game_index>` `<jar_extracted_path>` `<convert_to_path>` 
+./netlizard_conv `<game_index>` `<jar_extracted_path>` `<convert_to_path>` 
 
 ## <game_index>: 
  * 1: Contr Terrorism 3D

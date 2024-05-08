@@ -54,10 +54,11 @@ class idVec3
 
 		friend idVec3 operator+(const idVec3 &a, const idVec3 &b);
 		friend idVec3 operator-(const idVec3 &a, const idVec3 &b);
-		friend float operator*(const idVec3 &a, const idVec3 &b); // dot product
+		friend float operator%(const idVec3 &a, const idVec3 &b); // dot product
 		friend idVec3 operator^(const idVec3 &a, const idVec3 &b); // cross
 		friend idVec3 operator/(const idVec3 &v, float f);
 		friend idVec3 operator*(const idVec3 &v, float f);
+		friend idVec3 operator*(const idVec3 &v, const idVec3 &b);
 		friend idVec3 operator-(const idVec3 &v);
 		friend idVec3 operator>>(const idVec3 &a, const idVec3 &b); // a -> b dir
 		friend idVec3 operator<<(const idVec3 &a, const idVec3 &b); // a <- b dir
@@ -218,7 +219,7 @@ inline idVec3 operator+(const idVec3 &a, const idVec3 &b)
 	float x = a[0] + b[0];
 	float y = a[1] + b[1];
 	float z = a[2] + b[2];
-	return idVec3(x, y, z);
+	return {x, y, z};
 }
 
 inline idVec3 operator-(const idVec3 &a, const idVec3 &b)
@@ -226,10 +227,10 @@ inline idVec3 operator-(const idVec3 &a, const idVec3 &b)
 	float x = a[0] - b[0];
 	float y = a[1] - b[1];
 	float z = a[2] - b[2];
-	return idVec3(x, y, z);
+	return {x, y, z};
 }
 
-inline float operator*(const idVec3 &a, const idVec3 &b)
+inline float operator%(const idVec3 &a, const idVec3 &b)
 {
 	float x = a[0] * b[0];
 	float y = a[1] * b[1];
@@ -242,7 +243,7 @@ inline idVec3 operator^(const idVec3 &a, const idVec3 &b)
 	float x = a[1] * b[2] - a[2] * b[1];
 	float y = a[2] * b[0] - a[0] * b[2];
 	float z = a[0] * b[1] - a[1] * b[0];
-	return idVec3(x, y, z);
+	return {x, y, z};
 }
 
 inline idVec3 & idVec3::operator*=(float n)
@@ -258,7 +259,7 @@ inline idVec3 operator-(const idVec3 &v)
 	float x = -v.v[0];
 	float y = -v.v[1];
 	float z = -v.v[2];
-	return idVec3(x, y, z);
+	return {x, y, z};
 }
 
 inline idVec3 operator/(const idVec3 &v, float f)
@@ -266,7 +267,15 @@ inline idVec3 operator/(const idVec3 &v, float f)
 	float x = v.v[0] / f;
 	float y = v.v[1] / f;
 	float z = v.v[2] / f;
-	return idVec3(x, y, z);
+	return {x, y, z};
+}
+
+inline idVec3 operator*(const idVec3 &v, const idVec3 &b)
+{
+	float x = v.v[0] * b.v[0];
+	float y = v.v[1] * b.v[1];
+	float z = v.v[2] * b.v[2];
+	return {x, y, z};
 }
 
 inline idVec3 operator*(const idVec3 &v, float f)
@@ -274,7 +283,7 @@ inline idVec3 operator*(const idVec3 &v, float f)
 	float x = v.v[0] * f;
 	float y = v.v[1] * f;
 	float z = v.v[2] * f;
-	return idVec3(x, y, z);
+	return {x, y, z};
 }
 
 inline float idVec3::Length(void) const

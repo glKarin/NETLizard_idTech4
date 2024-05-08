@@ -12,16 +12,19 @@
 #include "matrix.h"
 #include "precompiled.h"
 
+#define THIN_ELEVATOR_WIDTH 1.0
+#define ELEVATOR_MOVE_SPEED 100
+
 float idNETLizardConverter::NETLIZARD_MAP_TO_IDTECH4 = 0.35;
 
-bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, const idMat4 *mat, bool isItem) const
+bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, const idMat4 *mat, bool isItem, float width) const
 {
 	int invert_texcoord_y = isItem ? config->item_invert_texcoord_y : config->invert_texcoord_y;
 	int index_factory = isItem ? config->item_index_factory : config->index_factory;
 	int texIndex = p->tex_index;
 	idStr material = gamename / idStr::va(config->tex_path_format, texIndex);
 	material.RemoveExtension();
-	idStr invisibleMaterial = idMaterial::CAULK_MATERIAL;
+	idStr invisibleMaterial = width > 0.0f ? material : idStr(idMaterial::CAULK_MATERIAL);
 	float w = config->tex_width;
 
 	idDrawVert vertex[3];
@@ -120,9 +123,18 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	side.Material() = invisibleMaterial;
 	idVec3 normal_ = -v_normal;
 	idVec3 points_[3];
+	if(width > 0.0f)
+	{
+		points_[0] = points[0] + normal_ * width;
+		points_[1] = points[1] + normal_ * width;
+		points_[2] = points[2] + normal_ * width;
+	}
+	else
+	{
 	points_[0] = points[0] + normal_;
 	points_[1] = points[1] + normal_;
 	points_[2] = points[2] + normal_;
+	}
 	if(!side.PlaneFromPoints(points_[2], points_[1], points_[0]))
 	{
 		return false;
@@ -203,12 +215,13 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 	const char *sky_file;
 	NETLizard_3D_Model m;
 	NETLizard_3D_Model *model = &m;
-	idMapFile map;
+	idMapFile map(version);
 
 	if(!LoadNETLizard3DMapModel(m, file, index))
 		return -1;
 
 	sky_file = config->sky_file;
+	map << idEntity();
 	idEntity worldspawn;
 	worldspawn.worldspawn();
 
@@ -243,8 +256,10 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 			idBounds b = {min, max};
 			map.AddAreaBounds(i, b);
 #endif
+
+			ID_INVOKE_CALLBACK(convertMapAreaCallback, (this, map, i, b));
 		}
-		map << worldspawn;
+		map[0] = worldspawn;
 	}
 
 	if(model->item_data.data)
@@ -261,6 +276,10 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 				continue;
 
 			idEntity entity;
+			idBounds itemBv = {
+				ConvToIdTech4(idVec3(mesh->item_mesh.box.min[0], mesh->item_mesh.box.min[1], mesh->item_mesh.box.min[2])), 
+				ConvToIdTech4(idVec3(mesh->item_mesh.box.max[0], mesh->item_mesh.box.max[1], mesh->item_mesh.box.max[2]))
+			};
 			if(item_type & NL_3D_ITEM_TYPE_WEAPON)
 			{
 				entity.func_bobbing(10, 0.4f);
@@ -376,6 +395,42 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 				//entity.func_rotating(true);
 				entity.func_rotating(false, true);
 			}
+			else if(item_type & NL_3D_ITEM_TYPE_ELEVATOR)
+			{
+				const NETLizard_Level_Elevator *elevator = nlGet3DGameElevator(game, index, i, nullptr);
+				if(elevator && elevator->elevator_item == i)
+				{
+					idVec3 floor1 = ConvToIdTech4(idVec3(mesh->position[0], mesh->position[1], elevator->min));
+					floor1[2] += 1.0;
+					idVec3 floor2 = ConvToIdTech4(idVec3(mesh->position[0], mesh->position[1], elevator->max));
+					floor2[2] += 1.0;
+					idVec3 floors[] = {
+						floor1, floor2,
+					};
+					entity.func_elevator(ELEVATOR_MOVE_SPEED, 0, true, 2, floors);
+					//entity("trigger", true);
+					//entity("triggerFloor", 2);
+					idBounds bv(itemBv);
+					bv[0][2] -= 1.0;
+					bv[1][2] += 1.0;
+					entity.MinMax(bv);
+				}
+			}
+			else if(item_type & NL_3D_ITEM_TYPE_SWITCH)
+			{
+				const NETLizard_Level_Elevator *elevator = nlGet3DGameElevator(game, index, i, nullptr);
+				if(elevator && elevator->switch_item == i)
+				{
+					entity.Reset();
+					entity.func_waitforbutton(idStr::va("func_elevator_%d", elevator->elevator_item));
+					entity.NameByClass("_%d", i);
+					entity.Origin(ConvToIdTech4(idVec3(mesh->position[0], mesh->position[1], mesh->position[2])));
+					map << entity;
+					idStr target = entity.Name();
+					entity.Reset();
+					entity.trigger_multiple(target);
+				}
+			}
 			entity.NameByClass("_%d", i);
 			entity.Model();
 			entity.Origin(ConvToIdTech4(idVec3(mesh->position[0], mesh->position[1], mesh->position[2])));
@@ -397,7 +452,10 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 				{
 					idBrushDef3 brush;
 					idBounds b;
-					if(GenMapBrush(brush, b, mesh->item_mesh.primitive.data + o, mesh_vertex, &m4, true))
+					float width = -1.0;
+					if(item_type & (NL_3D_ITEM_TYPE_ELEVATOR | NL_3D_ITEM_TYPE_THIN))
+						width = THIN_ELEVATOR_WIDTH;
+					if(GenMapBrush(brush, b, mesh->item_mesh.primitive.data + o, mesh_vertex, &m4, true, width))
 					{
 						entity << brush;
 					}
@@ -405,10 +463,6 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 				map << entity;
 			}
 
-			idBounds itemBv = {
-				ConvToIdTech4(idVec3(mesh->item_mesh.box.min[0], mesh->item_mesh.box.min[1], mesh->item_mesh.box.min[2])), 
-				ConvToIdTech4(idVec3(mesh->item_mesh.box.max[0], mesh->item_mesh.box.max[1], mesh->item_mesh.box.max[2]))
-			};
 			if(item_type & NL_3D_ITEM_TYPE_PORTAL)
 			{
 				const NETLizard_Level_Teleport *teleport = nlGet3DGameTeleport(game, index, i, nullptr);
@@ -465,7 +519,6 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 	{
 		for(int i = 0; i < model->bsp_data.count; i++)
 		{
-			idEntity e;
 			const NETLizard_BSP_Tree_Node *node = model->bsp_data.data + i;
 			idVec3 v(node->plane[0][0], node->plane[0][1], node->plane[0][2]);
 			ConvToIdTech4(v);
@@ -473,17 +526,8 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 			bv += ConvToIdTech4(idVec3(node->plane[1][0], node->plane[1][1], node->plane[1][2]));
 			bv += ConvToIdTech4(idVec3(node->plane[2][0], node->plane[2][1], node->plane[2][2]));
 			bv += ConvToIdTech4(idVec3(node->plane[3][0], node->plane[3][1], node->plane[3][2]));
-			idVec3 center = bv.Center();
-			e.info_player_deathmatch({center[0], center[1], bv[0][2] + 1.0f});
-			e.NameByClass("_%d", i);
-			map << e;
 
-			bv = map.AreaBounds(node->prev_scene);
-			bv += map.AreaBounds(node->next_scene);
-			idVec3 radius = bv.Size();
-			e.light(center, radius, true, true, {0.78, 0.78, 0.84});
-			e.Name("area_light_%d", i);
-			map << e;
+			ID_INVOKE_CALLBACK(convertMapAreaPortalCallback, (this, map, i, node->prev_scene, node->next_scene, bv));
 
 			if(genPortalBrush)
 			{
@@ -497,6 +541,8 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 	}
 		
 	map.FillExtras();
+
+	ID_INVOKE_CALLBACK(convertMapCallback, (this, map, index));
 
 	idStr fname("maps");
 	fname /= gamename;
@@ -602,15 +648,12 @@ int idNETLizardConverter::ConvertMaps()
 	if(game == NL_SHADOW_OF_EGYPT_3D) // has a survise mode(dm1) map and main menu map(lvl0)
 	{
 		{
-			idMapFile map;
-			file = idStr::va(format, i);
 			if(ConvertMap("dm1.png", -1) == 0)
 				res++;
 		}
 		format = "lvl%d.png";
 		for(i = 0; i < config->level_count; i++)
 		{
-			idMapFile map;
 			file = idStr::va(format, i);
 			if(ConvertMap(idStr(file), i) == 0)
 				res++;
@@ -623,7 +666,6 @@ int idNETLizardConverter::ConvertMaps()
 		{
 			if(game == NL_CONTR_TERRORISM_3D_EPISODE_3 && (i == 13 || i == 15))
 				continue; // lvl13 15 not supprot in CT3D-Ep3
-			idMapFile map;
 			file = idStr::va(format, i);
 			Log("Handle map %d - %s", i, file);
 			if(ConvertMap(idStr(file), i) == 0)

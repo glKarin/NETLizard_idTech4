@@ -20,6 +20,8 @@ class idStr : public std::string
 	idStr & ToLower();
 	void RemoveExtension();
 
+	static int Cmp(const char *a, const char *b);
+
 	static const char * va(const char *fmt, ...);
 	static const char * va(const char *fmt, va_list va);
 

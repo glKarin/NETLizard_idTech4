@@ -38,17 +38,18 @@ src/converter_texture.cpp
 src/converter_material.cpp
 src/converter_map.cpp
 src/converter_mapdef.cpp
+	src/converter_command.cpp
 )
 
 add_executable(
-	netlizard
+	netlizard_conv
 
 	${SRC_LIST}
 	)
-add_library(libnetlizard STATIC IMPORTED)
-set_target_properties(libnetlizard PROPERTIES IMPORTED_LOCATION libnetlizard/libnetlizard.a)
 target_link_libraries(
-	netlizard
+	netlizard_conv
 	PUBLIC
-	libnetlizard
+	netlizard
 	)
+add_dependencies(netlizard_conv netlizard)
+

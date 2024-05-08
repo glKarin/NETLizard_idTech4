@@ -479,6 +479,16 @@ typedef struct NETLizard_Level_Door_s
     } box;
 } NETLizard_Level_Door;
 
+/* NETLizard 3D map start/end area */
+typedef struct NETLizard_Game_Level_Start_End_s
+{
+	NLenum game;
+	NLint level;
+	NLint start;
+	NLint end;
+	NLint to;
+} NETLizard_Game_Level_Start_End;
+
 ////////// function //////////
 /* PNG util */
 NLAPI NLboolean nlIsPNGFile(const char *name); // check file is normal png
@@ -536,12 +546,15 @@ NLAPI NLboolean nlCheck3DGameLevelIsAvailable(NETLizard_Game game, NLint level);
 NLAPI NLuint nlGetItemType(NETLizard_Game game, NLint index); // get 3D game item type
 NLAPI const NETLizard_3D_Frame_Animation * nlGet3DModelFrameAnimationConfig(NETLizard_Game game, NLuint index); // get 3D Egypt/3D Clone player character animation index start and end
 NLAPI NL_RET_PTR_CONST(char *) const char * nlGet3DGameLevelName(NETLizard_Game game, NLuint level);
+NLAPI NL_RET_PTR_ALLOC(char *) char * nlGet3DGameLevelFileName(NETLizard_Game game, NLuint level);
 NLAPI NLboolean nlGet3DGameLevelRange(NETLizard_Game game, NLint *start, NLint *count);
 NLAPI NL_RET_PTR_CONST(char *) const char * nlGet3DGameName(NETLizard_Game game);
+NLAPI NL_RET_PTR_CONST(char *) const char * nlGet3DGameLiteName(NETLizard_Game game);
 NLAPI const NETLizard_3D_Model_Config * nlGet3DGameModelConfig(NETLizard_Game game);
 NLAPI const NETLizard_Level_Teleport * nlGet3DGameTeleport(NLenum game, NLint level, NLint item_id, NLint *length);
 NLAPI const NETLizard_Level_Elevator * nlGet3DGameElevator(NLenum game, NLint level, NLint item_id, NLint *length);
 NLAPI const NETLizard_Level_Door * nlGet3DGameDoor(NLenum game, NLint level, NLint item_id, NLint *length);
+NLAPI const NETLizard_Game_Level_Start_End * nlGet3DGameStartEndArea(NLenum game, NLint level, NLint to, NLint *length);
 NLAPI NLuint nlGetTextureFlag(NETLizard_Game game, NLint index); // get 3D game texture flags
 
 // Contr Terrisiem 3D

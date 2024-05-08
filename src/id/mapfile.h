@@ -15,6 +15,7 @@
 class idMapFile
 {
 	public:
+		idMapFile(const char *version = MAP_VERSION_DOOM3);
 		idStr & Version();
 		const idStr & Version() const;
 		float & StartAngle();

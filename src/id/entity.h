@@ -8,6 +8,9 @@
 #include "brush.h"
 #include "list.h"
 
+class idBounds;
+class idVec3;
+
 class idEntity
 {
 	public:
@@ -30,12 +33,14 @@ class idEntity
 		idEntity & Origin(const idVec3 &v);
 		void Reset(void);
 		void Model(void);
+		void MinMax(const idBounds &bounds);
+		void Size(const idVec3 &size);
 
 		idEntity & func_static(void);
 		idEntity & func_rotating(bool xAxis = false, bool yAxis = false);
 		idEntity & func_bobbing(float height = -1, float speed = -1);
 		idEntity & worldspawn(void);
-		idEntity & light(const idVec3 &origin, const idVec3 &radius = {0, 0, 0}, bool noshadows = true, bool nospecular = true, const idVec3 &color = {0, 0, 0});
+		idEntity & light(const idVec3 &origin, const idVec3 &radius = {400, 400, 400}, bool noshadows = true, bool nospecular = true, const idVec3 &color = {1, 1, 1});
 		idEntity & info_player_deathmatch(const idVec3 &origin);
 		idEntity & info_player_start(const idVec3 &origin, float angle = 0.0f);
 		idEntity & info_player_teleport(const idVec3 &origin, float angle = 0.0f);
@@ -43,6 +48,7 @@ class idEntity
 		idEntity & trigger_multiple(const char *target);
 		idEntity & func_waitforbutton(const char *target);
 		idEntity & func_door(int movedir);
+		idEntity & func_elevator(float moveSpeed, float moveTime, bool trigger, int numFloor, const idVec3 floors[]);
 
 		friend std::ostream & operator<<(std::ostream &o, const idEntity &v);
 
@@ -58,6 +64,7 @@ class idEntity
 		static const char *CLASSNAME_TRIGGER_MULTIPLE;
 		static const char *CLASSNAME_TARGET_WAITFORBUTTON;
 		static const char *CLASSNAME_FUNC_DOOR;
+		static const char *CLASSNAME_FUNC_ELEVATOR;
 
 	private:
 		idStr name;

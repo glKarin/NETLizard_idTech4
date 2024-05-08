@@ -2,6 +2,11 @@
 
 using std::ostream;
 
+idMapFile::idMapFile(const char *version)
+	: version(version)
+{
+}
+
 idMapFile & idMapFile::operator+=(const idBounds &b)
 {
 	if(!boundsInited)
