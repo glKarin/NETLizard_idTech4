@@ -37,6 +37,7 @@ ostream & operator<<(ostream &o, const idMapFile &v)
 	return o;
 }
 
+#if 0
 void idMapFile::FillExtras(void)
 {
 	idEntity e;
@@ -51,3 +52,4 @@ void idMapFile::FillExtras(void)
 	e.Name("light_1");
 	entitys.push_back(e);
 }
+#endif

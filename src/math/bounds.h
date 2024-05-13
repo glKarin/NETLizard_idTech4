@@ -3,6 +3,8 @@
 
 #include "vector.h"
 
+class idStr;
+
 class idBounds
 {
 	public:
@@ -16,6 +18,8 @@ class idBounds
 		idBounds & operator+=(const idBounds &b);
 		void Init(const idVec3 &point);
 		bool IsEmpty(void) const;
+		idStr ToString(const char *bc = " ", const char *c = " ") const;
+		void ToPoints(idVec3 points[8]) const;
 };
 
 inline idVec3 & idBounds::operator[](int i)

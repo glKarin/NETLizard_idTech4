@@ -14,7 +14,7 @@ using std::endl;
 static idVec3 ENV_LIGHT_COLOR = { 0.6, 0.6, 0.6 };
 static bool noshadows = false;
 
-static void N_ConvertMapAreaPortalFunc(const idNETLizardConverter *converter, idMapFile &map, int i, int prev_scene, int next_scene, const idBounds &bv)
+static void N_ConvertMapAreaPortalFunc(const idNETLizardConverter *converter, idMapFile &map, int level, int i, int prev_scene, int next_scene, const idBounds &bv)
 {
 	idEntity e;
 	idVec3 center = bv.Center();
@@ -32,7 +32,7 @@ static void N_ConvertMapAreaPortalFunc(const idNETLizardConverter *converter, id
 #endif
 }
 
-static void N_ConvertMapAreaFunc(const idNETLizardConverter *converter, idMapFile &map, int i, const idBounds &bv)
+static void N_ConvertMapAreaFunc(const idNETLizardConverter *converter, idMapFile &map, int index, int i, const idBounds &bv)
 {
 	idEntity e;
 	idVec3 center = bv.Center();
@@ -43,10 +43,17 @@ static void N_ConvertMapAreaFunc(const idNETLizardConverter *converter, idMapFil
 #endif
 
 	idVec3 radius = bv.Size();// * idVec3{0.5f, 0.5f, 1.0f};
+	bool noshadow = true;
+	if(converter->Game() == NL_SHADOW_OF_EGYPT_3D && (index == 8 || index == 9 || index == 12 || (index == 10 && i == 0)))
+	{
+		center[2] = bv[1][2];
+		radius/*[2]*/ *= 2.0f;
+		noshadow = false;
+	}
 	e.light(
 			//{center[0], center[1], idMath::Max(bv[1][2] - LIGHT_POS_Z_OFFSET, center[2])}
 			center
-			, radius, true, true, ENV_LIGHT_COLOR);
+			, radius, noshadow, true, ENV_LIGHT_COLOR);
 	e.Name("area_light_%d", i);
 	map << e;
 }
@@ -107,6 +114,18 @@ static void N_ConvertMapFunc(const idNETLizardConverter *converter, idMapFile &m
 		}
 	};
 
+	idEntity e;
+	idVec3 startpos = map.StartPos();
+	if(converter->Game() == NL_SHADOW_OF_EGYPT_3D && (level == 8 || level == 9 || level == 12 || level == 10))
+	{
+		startpos[2] += 20;
+	}
+	e.info_player_start(startpos, map.StartAngle());
+	e.Name("info_player_start_1");
+	map << e;
+
+	if(converter->Game() == NL_SHADOW_OF_EGYPT_3D && (level == 2 || level == 4 || level == 6 || level == 7 || level == 8 || level == 9 || /*level == 10 ||*/ level == 11 || level == 12 || level == 13 || level == 14 || level == 15))
+		return;
 	NLint length;
 	const NETLizard_Game_Level_Start_End *area = nlGet3DGameStartEndArea(converter->Game(), -1, -1, &length);
 	if(area)

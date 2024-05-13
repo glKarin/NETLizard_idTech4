@@ -13,11 +13,12 @@ class idMat4;
 class idBuffer;
 class idDef;
 class idMapFile;
+class idVec3;
 
 class idNETLizardConverter;
 
-typedef void (* idConvertMapAreaPortalCallback_f)(const idNETLizardConverter *converter, idMapFile &map, int index, int prev_scene, int next_scene, const idBounds &bounds);
-typedef void (* idConvertMapAreaCallback_f)(const idNETLizardConverter *converter, idMapFile &map, int index, const idBounds &bounds);
+typedef void (* idConvertMapAreaPortalCallback_f)(const idNETLizardConverter *converter, idMapFile &map, int level, int index, int prev_scene, int next_scene, const idBounds &bounds);
+typedef void (* idConvertMapAreaCallback_f)(const idNETLizardConverter *converter, idMapFile &map, int level, int index, const idBounds &bounds);
 typedef void (* idConvertMapCallback_f)(const idNETLizardConverter *converter, idMapFile &map, int index);
 
 #define ID_INVOKE_CALLBACK(func, args) \
@@ -55,6 +56,7 @@ class idNETLizardConverter
         idStr SourceFilePath(const char *path) const;
         bool GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, const idMat4 *mat = nullptr, bool isItem = false, float width = -1.0f) const;
         bool GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_Tree_Node *node, bool invert = false) const;
+        bool GenMapBrush(idBrushDef3 &brush, const idVec3 points[4], const char *material, bool invert = false) const;
         bool LoadNETLizard3DMapModel(NETLizard_3D_Model &model, const char *file, int level);
         void Log(const char *str, ...) const;
         template <class T>

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <fstream>
+#include <iostream>
 
 #include "material.h"
 #include "mapfile.h"
@@ -12,8 +13,12 @@
 #include "matrix.h"
 #include "precompiled.h"
 
+using std::cout;
+using std::endl;
+
 #define THIN_ELEVATOR_WIDTH 1.0
 #define ELEVATOR_MOVE_SPEED 100
+#define DEFAULT_CLIP_SIZE 20
 
 float idNETLizardConverter::NETLIZARD_MAP_TO_IDTECH4 = 0.35;
 
@@ -226,6 +231,8 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 	worldspawn.worldspawn();
 
 	map.StartPos() = ConvToIdTech4(idVec3(model->start_position[0], model->start_position[1], model->start_position[2] - 150));
+	if(game == NL_CONTR_TERRORISM_3D)
+		map.StartPos()[2] += DEFAULT_CLIP_SIZE;
 	map.StartAngle() = model->start_rotation[0];
 	if(model->data.data)
 	{
@@ -248,6 +255,51 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 				}
 			}
 
+			if(game == NL_SHADOW_OF_EGYPT_3D && (index == 8 || index == 9 || index == 12 || index == 10))
+			{
+				if(model->item_data.data)
+				{
+					for(int m = mesh->item_index_range[0]; m <= mesh->item_index_range[1]; m++)
+					{
+						const NETLizard_3D_Item_Mesh *itemmesh = model->item_data.data + m;
+						const NLint *itemmesh_vertex = itemmesh->item_mesh.vertex.data;
+
+						NLint item_type = nlGetItemType(game, itemmesh->obj_index);
+						if(!(item_type & (NL_3D_ITEM_TYPE_SKYLINE)))
+							continue;
+
+						if(itemmesh->item_mesh.vertex.count && itemmesh->item_mesh.primitive.count)
+						{
+							idMat4 m4;
+							m4.Identity();
+							m4.Rotate(itemmesh->rotation[0], {1.0f, 0.0f, 0.0f});
+							//m4.Rotate(itemmesh->rotation[1], {0.0f, 0.0f, 1.0f});
+							m4.Translate(idVec3(itemmesh->position[0], itemmesh->position[1], itemmesh->position[2]));
+
+							NLint *nvd = (NLint *)malloc(sizeof(NLint) * itemmesh->item_mesh.vertex.count);
+							for(int k = 0; k < itemmesh->item_mesh.vertex.count / 3; k++)
+							{
+								idVec3 ov(itemmesh_vertex[k * 3], itemmesh_vertex[k * 3 + 1], itemmesh_vertex[k * 3 + 2]);
+								ov = m4 * ov;
+								nvd[k * 3] = ov[0];
+								nvd[k * 3 + 1] = ov[1];
+								nvd[k * 3 + 2] = ov[2];
+							}
+
+							for(int o = 0; o < itemmesh->item_mesh.primitive.count; o++)
+							{
+								idBrushDef3 brush;
+								idBounds b;
+								if(GenMapBrush(brush, b, itemmesh->item_mesh.primitive.data + o, nvd, nullptr, true, -1))
+								{
+									worldspawn << brush;
+								}
+							}
+						}
+					}
+				}
+			}
+
 #if 1
 			idVec3 min(mesh->box.min[0], mesh->box.min[1], mesh->box.min[2]);
 			idVec3 max(mesh->box.max[0], mesh->box.max[1], mesh->box.max[2]);
@@ -257,7 +309,7 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 			map.AddAreaBounds(i, b);
 #endif
 
-			ID_INVOKE_CALLBACK(convertMapAreaCallback, (this, map, i, b));
+			ID_INVOKE_CALLBACK(convertMapAreaCallback, (this, map, index, i, b));
 		}
 		map[0] = worldspawn;
 	}
@@ -273,6 +325,8 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 			if(item_type & (NL_3D_ITEM_TYPE_SKYBOX))
 				continue;
 			if(game == NL_CLONE_3D && (item_type & (NL_3D_ITEM_TYPE_WEAPON | NL_3D_ITEM_TYPE_PARTICLE)))
+				continue;
+			if(game == NL_SHADOW_OF_EGYPT_3D && (index == 8 || index == 9 || index == 12 || index == 10) && (item_type & NL_3D_ITEM_TYPE_SKYLINE))
 				continue;
 
 			idEntity entity;
@@ -527,7 +581,7 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 			bv += ConvToIdTech4(idVec3(node->plane[2][0], node->plane[2][1], node->plane[2][2]));
 			bv += ConvToIdTech4(idVec3(node->plane[3][0], node->plane[3][1], node->plane[3][2]));
 
-			ID_INVOKE_CALLBACK(convertMapAreaPortalCallback, (this, map, i, node->prev_scene, node->next_scene, bv));
+			ID_INVOKE_CALLBACK(convertMapAreaPortalCallback, (this, map, index, i, node->prev_scene, node->next_scene, bv));
 
 			if(genPortalBrush)
 			{
@@ -540,8 +594,6 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 		}
 	}
 		
-	map.FillExtras();
-
 	ID_INVOKE_CALLBACK(convertMapCallback, (this, map, index));
 
 	idStr fname("maps");
@@ -555,16 +607,14 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 	return res > 0 ? 0 : -2;
 }
 
-bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_Tree_Node *node, bool invert) const
+bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, const idVec3 _points[4], const char *material, bool invert) const
 {
-	idStr material = idMaterial::AREA_PORTAL_MATERIAL;
 	idStr invisibleMaterial = idMaterial::NODRAW_MATERIAL;
 
 	idVec3 points[4];
 	for(int i = 0; i < 4; i++)
 	{
-		for(int m = 0; m < 3; m++)
-			points[i][m] = ConvToIdTech4((float)node->plane[i][m]);
+		points[i] = ConvToIdTech4(_points[i]);
 	}
 	if(invert)
 	{
@@ -635,6 +685,17 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_T
 	brush << side;
 
 	return true;
+}
+
+bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_Tree_Node *node, bool invert) const
+{
+	idVec3 points[4];
+	for(int i = 0; i < 4; i++)
+	{
+		for(int m = 0; m < 3; m++)
+			points[i][m] = (float)node->plane[i][m];
+	}
+	return GenMapBrush(brush, points, idMaterial::AREA_PORTAL_MATERIAL, invert);
 }
 
 int idNETLizardConverter::ConvertMaps()

@@ -35,6 +35,7 @@ class idEntity
 		void Model(void);
 		void MinMax(const idBounds &bounds);
 		void Size(const idVec3 &size);
+		void NoClipModel(bool b);
 
 		idEntity & func_static(void);
 		idEntity & func_rotating(bool xAxis = false, bool yAxis = false);
@@ -161,5 +162,10 @@ inline idEntity & idEntity::Origin(const idVec3 &v)
 inline void idEntity::Model(void)
 {
 	spawnArgs.Set("model", Name());
+}
+
+inline void idEntity::NoClipModel(bool b)
+{
+	spawnArgs.SetBool("noclipmodel", b);
 }
 #endif

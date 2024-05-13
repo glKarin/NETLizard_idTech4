@@ -28,8 +28,6 @@ class idMapFile
 		idEntity & operator[](int i);
 		const idEntity & operator[](int i) const;
 
-		void FillExtras(void);
-
 		idMapFile & operator<<(const idEntity &entity);
 		friend std::ostream & operator<<(std::ostream &o, const idMapFile &v);
 		

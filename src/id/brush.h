@@ -47,6 +47,7 @@ class idBrushDef3
 		idBrushDef3 & operator<<(const idBrushDef3Side &side);
 		friend std::ostream & operator<<(std::ostream &o, const idBrushDef3 &v);
 		static bool FromBounds(idBrushDef3 &brush, const idBounds &bounds, const idStr &material, float texMat = 1.0f);
+		void Clear(void);
 
 	private:
 		idBrushDef3SideList sides;
@@ -100,5 +101,10 @@ inline const idVec3 & idBrushDef3Side::TextureMatrix(int i) const
 inline idVec3 & idBrushDef3Side::TextureMatrix(int i)
 {
 	return textureMatrix[i];
+}
+
+inline void idBrushDef3::Clear(void)
+{
+	sides.clear();
 }
 #endif
