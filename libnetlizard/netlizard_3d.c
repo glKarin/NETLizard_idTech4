@@ -799,7 +799,7 @@ NLuint nlGetItemType(NETLizard_Game game, NLint index)
 			else if(index == 34 || index == 49)
                 res |= NL_3D_ITEM_TYPE_FAN_Z_AXIS | NL_3D_ITEM_TYPE_THIN;
 			else if(index == 35)
-                res |= NL_3D_ITEM_TYPE_FAN_Y_AXIS | NL_3D_ITEM_TYPE_THIN;
+                res |= NL_3D_ITEM_TYPE_FAN_X_AXIS | NL_3D_ITEM_TYPE_THIN;
             else if(index == 44)
                 res |= NL_3D_ITEM_TYPE_ELEVATOR | NL_3D_ITEM_TYPE_SWITCH | NL_3D_ITEM_TYPE_THIN;
             else if(index == 39)
