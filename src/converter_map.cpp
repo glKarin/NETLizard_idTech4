@@ -464,10 +464,13 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 					entity.func_elevator(ELEVATOR_MOVE_SPEED, 0, true, 2, floors);
 					//entity("trigger", true);
 					//entity("triggerFloor", 2);
-					idBounds bv(itemBv);
-					bv[0][2] -= 1.0;
-					bv[1][2] += 1.0;
-					entity.MinMax(bv);
+					if((item_type & NL_3D_ITEM_TYPE_SCENE) == 0)
+					{
+						idBounds bv(itemBv);
+						bv[0][2] -= 1.0;
+						bv[1][2] += 1.0;
+						entity.MinMax(bv);
+					}
 				}
 			}
 			else if(item_type & NL_3D_ITEM_TYPE_SWITCH)
@@ -507,7 +510,7 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 					idBrushDef3 brush;
 					idBounds b;
 					float width = -1.0;
-					if(item_type & (NL_3D_ITEM_TYPE_ELEVATOR | NL_3D_ITEM_TYPE_THIN))
+					if((item_type & (NL_3D_ITEM_TYPE_ELEVATOR | NL_3D_ITEM_TYPE_THIN)) == (NL_3D_ITEM_TYPE_ELEVATOR | NL_3D_ITEM_TYPE_THIN))
 						width = THIN_ELEVATOR_WIDTH;
 					if(GenMapBrush(brush, b, mesh->item_mesh.primitive.data + o, mesh_vertex, &m4, true, width))
 					{
