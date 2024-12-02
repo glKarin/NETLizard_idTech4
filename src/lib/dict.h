@@ -30,6 +30,7 @@ class idDict
 		const char * operator[](const char *name) const;
 		const char * operator[](int i) const;
 
+		void NoQuota(bool NoQuota = true);
 		bool Contains(const char *name) const;
 		const char * GetString(const char *name, const char *def = "") const;
 		friend std::ostream & operator<<(std::ostream &o, const idDict &v);
@@ -38,6 +39,7 @@ class idDict
 		using hash_table = std::unordered_map<idStr, idStr, std::hash<std::string>>;
 		hash_table hash;
 		std::vector<idStr> sequence;
+		bool noQuota = false;
 };
 
 inline int idDict::Num() const
@@ -78,6 +80,11 @@ inline const char * idDict::operator[](const char *name) const
 inline const char * idDict::operator[](int i) const
 {
 	return hash.at(sequence[i]);
+}
+
+inline void idDict::NoQuota(bool b)
+{
+	noQuota = b;
 }
 
 #endif

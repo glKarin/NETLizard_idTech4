@@ -642,6 +642,7 @@ NLAPI NL_RET_PTR_ALLOC(NLuchar *) NLuchar * nlMakePixelDataRGBACompress(const NE
 NLAPI NL_RET_PTR_ALLOC(NLuchar *) NLuchar * nlMakePixelDataRGB(const NETLizard_Texture *tex, NLint *rlen);
 NLAPI NL_RET_PTR_ALLOC(NLuchar *) NLuchar * nlMakePixelDataRGBA(const NETLizard_Texture *tex, NLint *rlen);
 NLAPI NL_RET_PTR_ALLOC(NLuchar *) NLuchar * nlMakePixelData(const NETLizard_Texture *tex, NLint *rlen);
+NLboolean nlSavePixelDataToImageFile(const NLuchar *data, NLint width, NLint height, NETLizard_Texture_format format, NLenum img_type, const char *to);
 
 /* misc */
 NLAPI void nlEnable(NLenum e);

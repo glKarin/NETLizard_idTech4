@@ -42,3 +42,14 @@ void idBounds::ToPoints(idVec3 points[8]) const
 	}
 }
 
+void idBounds::Expand(float f)
+{
+	b[0] -= f;
+	b[1] += f;
+}
+
+void idBounds::Translate(const idVec3 &v)
+{
+	b[0] += v;
+	b[1] += v;
+}

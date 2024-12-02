@@ -31,6 +31,7 @@ class idEntity
 		void ClearSpawnArgs(void);
 		void ClearBrushs(void);
 		idEntity & Origin(const idVec3 &v);
+		idEntity & Rotation(const idMat3 &m);
 		void Reset(void);
 		void Model(void);
 		void MinMax(const idBounds &bounds);
@@ -50,6 +51,7 @@ class idEntity
 		idEntity & func_waitforbutton(const char *target);
 		idEntity & func_door(int movedir);
 		idEntity & func_elevator(float moveSpeed, float moveTime, bool trigger, int numFloor, const idVec3 floors[]);
+		idEntity & text(const char *str, bool face = true);
 
 		friend std::ostream & operator<<(std::ostream &o, const idEntity &v);
 
@@ -66,6 +68,7 @@ class idEntity
 		static const char *CLASSNAME_TARGET_WAITFORBUTTON;
 		static const char *CLASSNAME_FUNC_DOOR;
 		static const char *CLASSNAME_FUNC_ELEVATOR;
+		static const char *CLASSNAME_TEXT;
 
 	private:
 		idStr name;
@@ -156,6 +159,12 @@ inline void idEntity::ClearBrushs(void)
 inline idEntity & idEntity::Origin(const idVec3 &v)
 {
 	spawnArgs.SetVec3("origin", v);
+	return *this;
+}
+
+inline idEntity & idEntity::Rotation(const idMat3 &m)
+{
+	spawnArgs.SetMat3("rotation", m);
 	return *this;
 }
 

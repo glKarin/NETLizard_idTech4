@@ -4,10 +4,12 @@
 #include "libnetlizard/netlizard.h"
 
 #include "str.h"
+#include "list.h"
 
 class idMaterial;
 class idBounds;
 class idBrushDef3;
+typedef idList<idBrushDef3> idBrushDef3List;
 class idMap;
 class idMat4;
 class idBuffer;
@@ -46,8 +48,13 @@ class idNETLizardConverter
 
     private:
         int ConvertTextureToTGA(const char *file, int i);
+		int ConvertSkyTextureToTGA(const char *name);
+		bool WriteEnvTextureSide(const void *data, int width, int format, const char *path, const char *what);
+		bool WriteEnvTexture(const NETLizard_Texture *tex, const char *name);
         int ConvertMap(const char *file, int i);
         int ConvertMaterial(idMaterial &mat, const char *file, int i);
+		int ConvertSkyMaterial(idMaterial &mat, const char *file);
+		int ConvertSkyEnvMaterial(idMaterial &mat, const char *file);
         int ConvertMapDef(idDef &def, const char *name, int i);
 		idStr GenDmap(const char *map);
         bool ReadFile(idBuffer &buffer, const char *path) const;
@@ -56,7 +63,8 @@ class idNETLizardConverter
         idStr SourceFilePath(const char *path) const;
         bool GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, const idMat4 *mat = nullptr, bool isItem = false, float width = -1.0f) const;
         bool GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_Tree_Node *node, bool invert = false) const;
-        bool GenMapBrush(idBrushDef3 &brush, const idVec3 points[4], const char *material, bool invert = false) const;
+        bool GenMapBrush(idBrushDef3 &brushes, const idVec3 points[4], const char *material, bool invert = false) const;
+		bool GenMapBrush(idBrushDef3List &brush, const idBounds &bv, const char *material, bool invert) const;
         bool LoadNETLizard3DMapModel(NETLizard_3D_Model &model, const char *file, int level);
         void Log(const char *str, ...) const;
         template <class T>

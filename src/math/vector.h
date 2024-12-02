@@ -36,6 +36,7 @@ class idVec3
 		idVec3() = default;
 		idVec3(const float a[3]);
 		idVec3(float x, float y, float z);
+		idVec3(float a);
 		void Set(float x, float y, float z);
 		bool IsZero() const;
 		void Zero(void);
@@ -57,12 +58,16 @@ class idVec3
 		friend float operator%(const idVec3 &a, const idVec3 &b); // dot product
 		friend idVec3 operator^(const idVec3 &a, const idVec3 &b); // cross
 		friend idVec3 operator/(const idVec3 &v, float f);
+		friend idVec3 operator/(const idVec3 &a, const idVec3 &b);
 		friend idVec3 operator*(const idVec3 &v, float f);
 		friend idVec3 operator*(const idVec3 &v, const idVec3 &b);
 		friend idVec3 operator-(const idVec3 &v);
 		friend idVec3 operator>>(const idVec3 &a, const idVec3 &b); // a -> b dir
 		friend idVec3 operator<<(const idVec3 &a, const idVec3 &b); // a <- b dir
 		idVec3 & operator*=(float n);
+		idVec3 & operator+=(float n);
+		idVec3 & operator-=(float n);
+		idVec3 & operator+=(const idVec3 &v);
 		float Length(void) const;
 		void Normalized(void);
 		bool FixDegenerateNormal(void);
@@ -72,6 +77,7 @@ class idVec3
 
 		static bool IsNear(const idVec3& v1, const idVec3& v2, float epsilon);
 		static idVec3 TriangleCaleNormal(const idVec3 &a, const idVec3 &b, const idVec3 &c);
+		float GetMaxAxisLength(void) const;
 };
 
 
@@ -143,6 +149,10 @@ inline float idVec2::operator()(int i) const
 }
 
 
+inline idVec3::idVec3(float a)
+{
+	Set(a, a, a);
+}
 
 inline idVec3::idVec3(const float a[3])
 {
@@ -270,6 +280,14 @@ inline idVec3 operator/(const idVec3 &v, float f)
 	return {x, y, z};
 }
 
+inline idVec3 operator/(const idVec3 &a, const idVec3 &b)
+{
+	float x = a.v[0] / b.v[0];
+	float y = a.v[1] / b.v[1];
+	float z = a.v[2] / b.v[2];
+	return {x, y, z};
+}
+
 inline idVec3 operator*(const idVec3 &v, const idVec3 &b)
 {
 	float x = v.v[0] * b.v[0];
@@ -337,4 +355,29 @@ inline idVec3 operator<<(const idVec3 &a, const idVec3 &b)
 	v.Normalized();
 	return v;
 }
+
+inline idVec3 & idVec3::operator+=(const idVec3 &a)
+{
+	v[0] += a[0];
+	v[1] += a[1];
+	v[2] += a[2];
+	return *this;
+}
+
+inline idVec3 & idVec3::operator+=(float n)
+{
+	v[0] += n;
+	v[1] += n;
+	v[2] += n;
+	return *this;
+}
+
+inline idVec3 & idVec3::operator-=(float n)
+{
+	v[0] -= n;
+	v[1] -= n;
+	v[2] -= n;
+	return *this;
+}
+
 #endif

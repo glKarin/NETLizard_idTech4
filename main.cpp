@@ -80,17 +80,24 @@ static void N_ConvertMapFunc(const idNETLizardConverter *converter, idMapFile &m
 			size = {50, 50, bv.Center()[2] - bv[0][2]};
 			if(area->to >= 0)
 				to = nlGet3DGameLevelFileName(converter->Game(), area->to);
+			end = area->to;
 		}
 		else
 		{
 			pos = map.StartPos();
 			size = {50, 50, 100};
 			to = strdup(idStr::va("lvl%d", level + 1));
+			end = level + 1;
 		}
 
 		if(to)
 		{
 			idEntity entity;
+			entity.text(idStr::va("End level: %d. %s", end, to));
+			entity.NameByClass("_endlevel_%d", index);
+			entity.Origin(pos + idVec3{0.0, 0.0, size[2]});
+			map << entity;
+
 			entity.target_endLevel(idStr::va("%s/%s", converter->Gamename(), to));
 			entity.NameByClass("_endlevel_%d", index);
 			entity.Origin(pos);

@@ -18,6 +18,7 @@ const char * idEntity::CLASSNAME_TRIGGER_MULTIPLE = "trigger_multiple";
 const char * idEntity::CLASSNAME_TARGET_WAITFORBUTTON = "func_waitforbutton";
 const char * idEntity::CLASSNAME_FUNC_DOOR = "func_door";
 const char * idEntity::CLASSNAME_FUNC_ELEVATOR = "func_elevator";
+const char * idEntity::CLASSNAME_TEXT = "text";
 
 idEntity & idEntity::Name(const char *str, ...)
 {
@@ -205,7 +206,20 @@ idEntity & idEntity::func_elevator(float moveSpeed, float moveTime, bool trigger
 	{
 		spawnArgs.SetVec3(idStr::va("floorPos_%d", i + 1), floors[i]);
 	}
-	if(trigger && numFloor > 0)
+	if(/*trigger && */numFloor > 0)
+	{
 		spawnArgs.SetInteger("triggerFloor", numFloor);
+		spawnArgs.SetInteger("returnFloor", 1);
+	}
+	return *this;
+}
+
+idEntity & idEntity::text(const char *str, bool face)
+{
+	Reset();
+	classname = CLASSNAME_TEXT;
+	spawnArgs.Set("text", str);
+	spawnArgs.SetBool("force", true);
+	spawnArgs.SetBool("playerOriented", face);
 	return *this;
 }

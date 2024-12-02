@@ -7,10 +7,19 @@ const char *idMaterial::CAULK_MATERIAL = "common/caulk";
 std::ostream & operator<<(std::ostream &o, const idMaterialStage &v)
 {
 	o << "\t{\n";
-	o << "\t\tblend\t\tdiffusemap\n";
-	o << "\t\tmap\t\t" << v.diffusemap << "\n";
+	if(!v.blend.empty())
+		o << "\t\tblend\t\t" << v.blend << "\n";
+	idStr mapName = v.texgen == "skybox" ? "cameraCubeMap" : "map";
+	o << "\t\t" + mapName + "\t\t" << v.diffusemap << "\n";
 	if(v.alphaTest > 0.0)
 		o << "\t\talphaTest\t\t" << v.alphaTest << "\n";
+
+	if(!v.texgen.empty())
+		o << "\t\ttexgen\t\t" << v.texgen << "\n";
+
+	if(!v.parms.IsEmpty())
+		o << v.parms;
+
 	o << "\t}\n";
 
 	return o;
@@ -31,10 +40,19 @@ std::ostream & operator<<(std::ostream &o, const idMaterial &v)
 
 	if(v.twoSided)
 		o << "\ttwoSided\n";
-	if(v.noCollision)
-		o << "\tnonsolid\n";
 	if(v.ladder)
 		o << "\tladder\n";
+	if(v.noShadows)
+		o << "\tnoShadows\n";
+	if(v.noSelfShadow)
+		o << "\tnoSelfShadow\n";
+	if(v.ambientLight)
+		o << "\tambientLight\n";
+	if(v.nonsolid)
+		o << "\tnonsolid\n";
+
+	if(!v.parms.IsEmpty())
+		o << v.parms;
 
 	if(hasStage)
 		o << "\n";

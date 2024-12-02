@@ -71,6 +71,8 @@ class idMat4
 		};
 		
 		void Translate(const idVec3 &v);
+		void Scale(const idVec3 &v);
+		void Scale(float f);
 		void Rotate(float angle, const idVec3 &normal);
 		void Identity(void);
       	void Transposed(void);

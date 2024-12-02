@@ -13,6 +13,9 @@ std::ostream & operator<<(std::ostream &o, const idDict &v)
 {
 	for(const auto &name : v.sequence)
 	{
+		if(v.noQuota)
+			o << idStr::va("%s %s\n", name.c_str(), v.hash.at(name).c_str());
+		else
 		o << idStr::va("\"%s\" \"%s\"\n", name.c_str(), v.hash.at(name).c_str());
 	}
 	return o;

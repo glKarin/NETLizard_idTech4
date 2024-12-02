@@ -338,3 +338,24 @@ idVec3 operator*(const idMat4 &m, const idVec3 &v)
     u[2] / u[3]
    };
 }
+
+void idMat4::Scale(const idVec3 &v)
+{
+	float x = v[0];
+	float y = v[1];
+	float z = v[2];
+   m[0] *= x;   m[4] *= y;   m[8]  *= z;
+   m[1] *= x;   m[5] *= y;   m[9]  *= z;
+   m[2] *= x;   m[6] *= y;   m[10] *= z;
+   m[3] *= x;   m[7] *= y;   m[11] *= z;
+}
+
+void idMat4::Scale(float f)
+{
+   m[0] *= f;   m[4] *= f;   m[8]  *= f;
+   m[1] *= f;   m[5] *= f;   m[9]  *= f;
+   m[2] *= f;   m[6] *= f;   m[10] *= f;
+   m[3] *= f;   m[7] *= f;   m[11] *= f;
+}
+
+

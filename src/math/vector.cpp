@@ -180,3 +180,11 @@ idMat4 idVec3::GetBasisTransformForNormal(void) const
 	basis.Transposed();
     return basis; 
 }
+
+float idVec3::GetMaxAxisLength(void) const
+{
+	float x = fabs(v[0]);
+	float y = fabs(v[1]);
+	float z = fabs(v[2]);
+	return idMath::Max(x, idMath::Max(y, z));
+}
