@@ -73,63 +73,111 @@ bool idNETLizardConverter::WriteEnvTexture(const NETLizard_Texture *tex, const c
     GetDir(fname);
 	const char *cameraSides[] = {
 		"forward",
-		"back",
 		"left",
+		"back",
 		"right",
 		"up",
 		"down",
 	};
 	const char *cubeSides[] = {
+		"py",
 		"nx",
 		"ny",
-		"nz",
 		"px",
-		"py",
 		"pz",
+		"nz",
 	};
-	bool same = tex->width == tex->height;
 	NLuchar *data;
+	NLuchar *dataMirror = NULL;
 	int width;
 	int len;
 	NLuchar *rawData = nlMakePixelData(tex, &len);
 	if(!rawData)
 		return false;
-	if(same)
+	if(tex->height > tex->width)
 	{
-		data = rawData;
 		width = tex->width;
-	}
-	else
-	{
-		width = tex->width > tex->height ? tex->height : tex->width;
 		int channel = tex->format != NL_RGB ? 4 : 3;
 		data = (NLuchar *)malloc(width * width * channel);
-		for(int i = 0; i < width; i++)
+		dataMirror = (NLuchar *)malloc(width * width * channel);
+		for(int i = 0; i < tex->width; i++)
 		{
-			for(int m = 0; m < width; m++)
+			for(int m = 0; m < tex->width; m++)
 			{
 				NLuchar *src = rawData + i * tex->width * channel + m * channel;
 				NLuchar *dst = data + i * width * channel + m * channel;
+				NLuchar *dstMirror = data + i * width * channel + (width - 1 - m) * channel;
 				memcpy(dst, src, sizeof(NLuchar) * channel);
+				memcpy(dstMirror, src, sizeof(NLuchar) * channel);
+	}
+		}
+		free(rawData);
+	}
+	else if(tex->width > tex->height)
+	{
+		width = tex->width;
+		int channel = tex->format != NL_RGB ? 4 : 3;
+		data = (NLuchar *)malloc(width * width * channel);
+		dataMirror = (NLuchar *)malloc(width * width * channel);
+		for(int i = 0; i < tex->height; i++)
+		{
+			for(int m = 0; m < tex->width; m++)
+			{
+				NLuchar *src = rawData + i * tex->width * channel + m * channel;
+				NLuchar *dst = data + i * width * channel + m * channel;
+				NLuchar *dstMirror = dataMirror + i * width * channel + (width - 1 - m) * channel;
+				memcpy(dst, src, sizeof(NLuchar) * channel);
+				memcpy(dstMirror, src, sizeof(NLuchar) * channel);
+			}
+		}
+		for(int i = tex->height; i < tex->width; i++)
+		{
+			for(int m = 0; m < tex->width; m++)
+			{
+				NLuchar *src = rawData + (tex->height - 1 - (i % tex->height)) * tex->width * channel + m * channel;
+				NLuchar *dst = data + i * width * channel + m * channel;
+				NLuchar *dstMirror = dataMirror + i * width * channel + (width - 1 - m) * channel;
+				memcpy(dst, src, sizeof(NLuchar) * channel);
+				memcpy(dstMirror, src, sizeof(NLuchar) * channel);
 			}
 		}
 		free(rawData);
+	}
+	else
+	{
+		data = rawData;
+		width = tex->width;
 	}
 
 	auto deletor = [](NLuchar *x) {
 		free(x);
 	};
 	std::unique_ptr<NLuchar, std::function<void(NLuchar *)> > ptr(data, deletor);
+	std::unique_ptr<NLuchar, std::function<void(NLuchar *)> > ptrMirror(dataMirror, deletor);
+	NLuchar *datas[] = {
+		data,
+		dataMirror,
+	};
 
+	int i = 0;
 	for(const auto &n : cameraSides)
 	{
-		if(!idNETLizardConverter::WriteEnvTextureSide(data, width, tex->format, fname.c_str(), n))
+		NLuchar *d = datas[i % 2];
+		if(!d)
+			d = datas[0];
+		if(!idNETLizardConverter::WriteEnvTextureSide(d, width, tex->format, fname.c_str(), n))
 			return false;
+		i++;
 	}
+	i = 0;
 	for(const auto &n : cubeSides)
 	{
-		if(!idNETLizardConverter::WriteEnvTextureSide(data, width, tex->format, fname.c_str(), n))
+		NLuchar *d = datas[i % 2];
+		if(!d)
+			d = datas[0];
+		if(!idNETLizardConverter::WriteEnvTextureSide(d, width, tex->format, fname.c_str(), n))
 			return false;
+		i++;
 	}
 	return true;
 }

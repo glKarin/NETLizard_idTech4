@@ -166,7 +166,8 @@ typedef enum NETLizard_3D_Item_Type_e
     NL_3D_ITEM_TYPE_EMPTY = 1 << 15, // maybe ignore when collision testing. exam tower in Egypt 3D level 0, 10
     NL_3D_ITEM_TYPE_PARTICLE = 1 << 16, // it is a particle item. exam debris of bodys and box, bloods,
     NL_3D_ITEM_TYPE_SCENE = 1 << 17, // exam scene. exam elevator in Specnaz 3D level 4
-    NL_3D_ITEM_TYPE_FAN_X_AXIS = 1 << 18 // can rotate on z-axis. exam fan on wall, top fan in helicopter
+    NL_3D_ITEM_TYPE_FAN_X_AXIS = 1 << 18, // can rotate on z-axis. exam fan on wall, top fan in helicopter
+    NL_3D_ITEM_TYPE_BOX = 1 << 19, // scene box, e.g. tower of egypt 3d
 } NETLizard_3D_Item_Type;
 
 /* NETLizard 3D game character animation category */

@@ -509,6 +509,7 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 			};
 			idVec3 itemSize = itemBv.Size();
 			int sizeScalar = 0;
+			bool nonSolid = false;
 			idMat4 m4;
 			m4.Rotate(mesh->rotation[0], {1.0f, 0.0f, 0.0f});
 			m4.Rotate(mesh->rotation[1], {0.0f, 0.0f, 1.0f});
@@ -719,8 +720,12 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 					sizeScalar = 2;
 				}
 			}
+			else if(item_type & NL_3D_ITEM_TYPE_BOX)
+				nonSolid = true;
 
 			entity.NameByClass("_%d", i);
+			if(nonSolid)
+				entity.NoClipModel(true);
 			entity.Model();
 			entity.Origin(itemPos);
 			entity.Rotation(m3);

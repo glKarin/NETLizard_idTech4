@@ -750,7 +750,7 @@ NLuint nlGetItemType(NETLizard_Game game, NLint index)
 			else if(index == 8)
                 res |= NL_3D_ITEM_TYPE_FAN_Z_AXIS;
             else if(index == 22) // tower
-                res |= NL_3D_ITEM_TYPE_EMPTY;
+                res |= NL_3D_ITEM_TYPE_BOX;
             else if(index == 9 || index == 14)
                 res |= NL_3D_ITEM_TYPE_SWITCH;
             else if(index == 2 || index == 3 || index == 1)
