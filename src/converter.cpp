@@ -61,3 +61,8 @@ void idNETLizardConverter::Log(const char *str, ...) const
     va_end(va);
     printf("\n");
 }
+
+idVec3 idNETLizardConverter::Int3ToVec3(int a, int b, int c) const
+{
+    return { IntToFloat(a), IntToFloat(b), IntToFloat(c) };
+}

@@ -1,5 +1,8 @@
 #include "matrix.h"
 
+#define _USE_MATH_DEFINES // for M_PI
+#include <math.h>
+
 #include "vector.h"
 #include "str.h"
 

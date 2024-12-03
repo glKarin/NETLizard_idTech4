@@ -1,6 +1,8 @@
 #ifndef _KARIN_CONVERTER_H
 #define _KARIN_CONVERTER_H
 
+#include <string.h>
+
 #include "libnetlizard/netlizard.h"
 
 #include "str.h"
@@ -65,15 +67,18 @@ class idNETLizardConverter
         bool GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_Tree_Node *node, bool invert = false) const;
         bool GenMapBrush(idBrushDef3 &brushes, const idVec3 points[4], const char *material, bool invert = false) const;
 		bool GenMapBrush(idBrushDef3List &brush, const idBounds &bv, const char *material, bool invert) const;
-        bool LoadNETLizard3DMapModel(NETLizard_3D_Model &model, const char *file, int level);
+        bool LoadNETLizard3DMapModel(NETLizard_3D_Model &model, NETLizard_RE3D_Model &remodel, const char *file, int level);
         void Log(const char *str, ...) const;
         template <class T>
-        static T & ConvToIdTech4(T &v);
+        T & ConvToIdTech4(T &v) const;
         template <class T>
-        static T ConvToIdTech4(const T &v);
+        T ConvToIdTech4(const T &v) const;
+        float IntToFloat(int i) const;
+        idVec3 Int3ToVec3(int a, int b, int c) const;
 
         static int TEXTURE_FILE_TYPE;
         static float NETLIZARD_MAP_TO_IDTECH4;
+        static float NETLIZARD_RE_MAP_TO_IDTECH4;
 
     private:
         NETLizard_Game game;
@@ -92,16 +97,16 @@ class idNETLizardConverter
 
 
 template <class T>
-inline T & idNETLizardConverter::ConvToIdTech4(T &v)
+inline T & idNETLizardConverter::ConvToIdTech4(T &v) const
 {
-    v *= NETLIZARD_MAP_TO_IDTECH4;
+    v *= (game == NL_RACING_EVOLUTION_3D ? NETLIZARD_RE_MAP_TO_IDTECH4 : NETLIZARD_MAP_TO_IDTECH4);
     return v;
 }
 
 template <class T>
-inline T idNETLizardConverter::ConvToIdTech4(const T &v)
+inline T idNETLizardConverter::ConvToIdTech4(const T &v) const
 {
-    return v * NETLIZARD_MAP_TO_IDTECH4;
+    return v * (game == NL_RACING_EVOLUTION_3D ? NETLIZARD_RE_MAP_TO_IDTECH4 : NETLIZARD_MAP_TO_IDTECH4);
 }
 
 inline void idNETLizardConverter::SetConvertMapAreaCallback(idConvertMapAreaCallback_f func)
@@ -132,5 +137,24 @@ inline NETLizard_Game idNETLizardConverter::Game() const
 inline void idNETLizardConverter::Version(const char *version)
 {
 	this->version = version;
+}
+
+inline float idNETLizardConverter::IntToFloat(int i) const
+{
+    if(game == NL_RACING_EVOLUTION_3D)
+    {
+        union bit
+        {
+            int i;
+            float f;
+        } u;
+        memset(&u, 0, sizeof(union bit));
+        u.i = i;
+        return u.f;
+    }
+    else
+    {
+        return float(i);
+    }
 }
 #endif

@@ -22,6 +22,7 @@ extern "C" {
 #define SPECNAZ3D_TEX_COUNT 56 // 39
 #define CT3DEP2_TEX_COUNT 52 // 55
 #define CT3DEP3_TEX_COUNT 52 // 55
+#define RE3D_LVL_TEX_COUNT 4
 
 #define CLONE3D_TEX_SUBFIX "w/w%d.png"
 #define CT3D_TEX_SUBFIX "tex/l%d.png"
@@ -29,6 +30,8 @@ extern "C" {
 #define SPECNAZ3D_TEX_SUBFIX "w/w%d.png"
 #define EGYPT3D_TEX_SUBFIX "w/w%d.png"
 #define CT3DEP3_TEX_SUBFIX "w/l%d.png"
+#define RE3D_LVL_TEX_SUBFIX "map%s.png"
+#define RE3D_CAR_TEX_SUBFIX "car%d_tex.png"
 
 #define CT3D_SKY_FILE "sky_0.png"
 #define CT3DEP2_SKY_FILE "s.png"
@@ -40,7 +43,7 @@ extern "C" {
 #define V3_FP_FILE_SUBFIX "fp%d.png"
 #define LEVEL_FILE_SUBFIX "lvl%d.png"
 #define RE3D_CAR_FILE_SUBFIX "car%d.png"
-#define RE3D_LEVEL_FILE_SUBFIX "track0%d.png"
+#define RE3D_LEVEL_FILE_SUBFIX "track%02d.png"
 
 #define SKYFILE_LENGTH 10
 #define OBJ_SUBFIX_LENGTH 14

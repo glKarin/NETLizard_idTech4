@@ -1,7 +1,7 @@
 project(libnetlizard)
 
 include_directories(soil)
-file(GLOB_RECURSE SRC_MAIN_LIST "*.c")
+file(GLOB_RECURSE SRC_MAIN_LIST "*.c" CONFIGURE)
 
 aux_source_directory (soil SRC_SOIL_LIST)
 include_directories(soil)

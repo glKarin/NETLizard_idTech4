@@ -14,6 +14,18 @@ jfloat int_bits_to_float(jint i)
 	return u.f;
 }
 
+jint float_bits_to_int(jfloat f)
+{
+	union bit
+	{
+        jint i;
+        jfloat f;
+	} u;
+	memset(&u, 0, sizeof(union bit));
+	u.f = f;
+	return u.i;
+}
+
 // 3D map general function
 // ct3d h.a(int, int)
 // clone3d h.b(int, int)

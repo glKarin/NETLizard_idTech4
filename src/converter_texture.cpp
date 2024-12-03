@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <memory>
+#include <functional>
 
 #include "filesystem.h"
 #include "buffer.h"
@@ -29,9 +30,10 @@ int idNETLizardConverter::ConvertTextureToTGA(const char *name, int i)
                 break;
         case NL_TEXTURE_ENCODE_PNG:
         case NL_TEXTURE_NORMAL_PNG:
-        default:
-        return -2;
+            ok = nlLoadAndMakePNGRGBAData(buffer.Data(), buffer.Size(), &tex);
             break;
+        default:
+            return -2;
     }
 	if(!ok)
 		return -2;
@@ -55,6 +57,8 @@ int idNETLizardConverter::ConvertTextureToTGA(const char *name, int i)
                 break;
         case NL_TEXTURE_ENCODE_PNG:
         case NL_TEXTURE_NORMAL_PNG:
+            ok = nlSavePNGRGBADataToImageFile(&tex, target, TEXTURE_FILE_TYPE);
+            break;
         default:
             ok = NL_FALSE;
             break;
@@ -88,10 +92,22 @@ bool idNETLizardConverter::WriteEnvTexture(const NETLizard_Texture *tex, const c
 		"nz",
 	};
 	NLuchar *data;
-	NLuchar *dataMirror = NULL;
+	NLuchar *dataMirror = nullptr;
 	int width;
 	int len;
-	NLuchar *rawData = nlMakePixelData(tex, &len);
+	NLuchar *rawData;
+    bool delRawData;
+
+    if(game == NL_RACING_EVOLUTION_3D)
+    {
+        rawData = tex->color_index.data;
+        delRawData = false;
+    }
+    else
+    {
+        rawData = nlMakePixelData(tex, &len);
+        delRawData = true;
+    }
 	if(!rawData)
 		return false;
 	if(tex->height > tex->width)
@@ -109,9 +125,10 @@ bool idNETLizardConverter::WriteEnvTexture(const NETLizard_Texture *tex, const c
 				NLuchar *dstMirror = data + i * width * channel + (width - 1 - m) * channel;
 				memcpy(dst, src, sizeof(NLuchar) * channel);
 				memcpy(dstMirror, src, sizeof(NLuchar) * channel);
-	}
+	        }
 		}
-		free(rawData);
+        if(delRawData)
+		    free(rawData);
 	}
 	else if(tex->width > tex->height)
 	{
@@ -141,7 +158,8 @@ bool idNETLizardConverter::WriteEnvTexture(const NETLizard_Texture *tex, const c
 				memcpy(dstMirror, src, sizeof(NLuchar) * channel);
 			}
 		}
-		free(rawData);
+        if(delRawData)
+		    free(rawData);
 	}
 	else
 	{
@@ -196,16 +214,31 @@ int idNETLizardConverter::ConvertTextures()
 {
     int i;
     const char *format;
-    const char *file;
+    idStr file;
     int res;
 
     res = 0;
     format = config->tex_path_format;
-    for(i = 1; i <= config->tex_count; i++)
+
+    if(game == NL_RACING_EVOLUTION_3D)
     {
-        file = idStr::va(format, i);
-        if(ConvertTextureToTGA(file, i) == 0)
-            res++;
+        NLint len;
+        const char **texes = nlGetRE3DMapTexes(&len);
+        for(i = 0; i < len; i++)
+        {
+            file = idStr::va(format, texes[i]);
+            if(ConvertTextureToTGA(file.c_str(), i) == 0)
+                res++;
+        }
+    }
+    else
+    {
+        for(i = 1; i <= config->tex_count; i++)
+        {
+            file = idStr::va(format, i);
+            if(ConvertTextureToTGA(file.c_str(), i) == 0)
+                res++;
+        }
     }
 
 	if(config->sky_file && config->sky_file[0])
@@ -239,9 +272,10 @@ int idNETLizardConverter::ConvertSkyTextureToTGA(const char *name)
                 break;
         case NL_TEXTURE_ENCODE_PNG:
         case NL_TEXTURE_NORMAL_PNG:
-        default:
-        return -2;
+            ok = nlLoadAndMakePNGRGBAData(buffer.Data(), buffer.Size(), &tex);
             break;
+        default:
+            return -2;
     }
 	if(!ok)
 		return -2;
@@ -265,6 +299,8 @@ int idNETLizardConverter::ConvertSkyTextureToTGA(const char *name)
                 break;
         case NL_TEXTURE_ENCODE_PNG:
         case NL_TEXTURE_NORMAL_PNG:
+            ok = nlSavePNGRGBADataToImageFile(&tex, target, TEXTURE_FILE_TYPE);
+            break;
         default:
             ok = NL_FALSE;
             break;

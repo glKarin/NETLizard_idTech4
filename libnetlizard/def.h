@@ -33,7 +33,11 @@ extern "C" {
 #define BITS_FALSE(b, t) (((b) & (t)) == 0)
 #define BITS_TRUE(b, t) (((b) & (t)) != 0)
 
+#ifdef _MSC_VER
+#define printfln(fmt, ...) printf(fmt"\n", __VA_ARGS__)
+#else
 #define printfln(fmt, args...) printf(fmt"\n", ##args)
+#endif
 
 #define PUSH_BACK(T, arr, count, t) \
 { \

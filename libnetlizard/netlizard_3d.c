@@ -256,17 +256,18 @@ static const NLsizei Game3D_Level_Start_End_Area_Count[] = {
 static const NETLizard_3D_Model_Config Game_Config[] = {
     {
         NL_RACING_EVOLUTION_3D,
-        0,
+		RE3D_LVL_TEX_COUNT,
         NL_TEXTURE_ENCODE_PNG,
         1,
         1,
         NL_FALSE,
         NL_FALSE,
         RE3D_SKY_FILE,
-        "",
+        RE3D_LVL_TEX_SUBFIX,
         "",
         RE3D_LEVEL,
-        0
+        256, // map1 = 256; map1_a = 64; map2 = 256; map3 = 256
+		RE3D_LEVEL_FILE_SUBFIX
     },
     {
         NL_CONTR_TERRORISM_3D,
@@ -280,7 +281,8 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         CT3D_TEX_SUBFIX,
         CT3D_OBJ_SUBFIX,
         CT3D_LEVEL,
-        64
+        64,
+		LEVEL_FILE_SUBFIX
     },
     {
         NL_ARMY_RANGER_3D,
@@ -294,11 +296,12 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         SPECNAZ3D_TEX_SUBFIX,
         SPECNAZ3D_OBJ_SUBFIX,
         SPECNAZ3D_LEVEL,
-        64
+        64,
+		LEVEL_FILE_SUBFIX
     },
     {
         NL_CONTR_TERRORISM_3D_EPISODE_2,
-        SPECNAZ3D_TEX_COUNT,
+		CT3DEP2_TEX_COUNT,
         NL_TEXTURE_3D_ENGINE_V2,
         3,
         1,
@@ -308,7 +311,8 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         CT3DEP2_TEX_SUBFIX,
         CT3DEP2_OBJ_SUBFIX,
         CT3DEP2_LEVEL,
-        64
+        64,
+		LEVEL_FILE_SUBFIX
     },
     {
         NL_SHADOW_OF_EGYPT_3D,
@@ -322,7 +326,8 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         EGYPT3D_TEX_SUBFIX,
         EGYPT3D_OBJ_SUBFIX,
         EGYPT3D_LEVEL,
-        128
+        128,
+		LEVEL_FILE_SUBFIX
     },
     {
         NL_CLONE_3D,
@@ -336,7 +341,8 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         CLONE3D_TEX_SUBFIX,
         CLONE3D_OBJ_SUBFIX,
         CLONE3D_LEVEL,
-        128
+        128,
+		LEVEL_FILE_SUBFIX
     },
     {
         NL_CONTR_TERRORISM_3D_EPISODE_3,
@@ -350,7 +356,8 @@ static const NETLizard_3D_Model_Config Game_Config[] = {
         CT3DEP3_TEX_SUBFIX,
         CT3DEP3_OBJ_SUBFIX,
         CT3DEP3_LEVEL,
-        64
+        64,
+		LEVEL_FILE_SUBFIX
     },
 };
 
@@ -522,6 +529,13 @@ static const char *Frame_Animation_Name[NL_FRAME_ANIMATION_TOTAL] = {
     "Dead-2"
 };
 
+static const char *RE3D_Texes[] = {
+		"1",
+		"1_a",
+		"2",
+		"3",
+};
+
 void nlDeleteNETLizard3DMesh(NETLizard_3D_Mesh *mesh)
 {
     free(mesh->vertex.data);
@@ -540,11 +554,13 @@ void nlDeleteNETLizard3DModel(NETLizard_3D_Model *model)
     int i;
 
     for(i = 0; i < model->data.count; i++)
-        nlDeleteNETLizard3DMesh(((NETLizard_3D_Mesh *)(model->data.data)) + i);
+	{
+		nlDeleteNETLizard3DMesh(model->data.data + i);
+	}
     free(model->data.data);
 
     for(i = 0; i < model->item_data.count; i++)
-        nlDeleteNETLizard3DItemMesh(((NETLizard_3D_Item_Mesh *)(model->item_data.data)) + i);
+        nlDeleteNETLizard3DItemMesh(model->item_data.data + i);
     free(model->item_data.data);
 
     free(model->bsp_data.data);
@@ -874,6 +890,11 @@ NLuint nlGetTextureFlag(NETLizard_Game game, NLint index)
                 res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED;
             else if(index == 51)
                 res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED | NL_3D_TEXTURE_FLAG_LADDER;
+			break;
+
+		case NL_RACING_EVOLUTION_3D:
+			if(index == 1)
+				res |= NL_3D_TEXTURE_FLAG_ALPHA | NL_3D_TEXTURE_FLAG_TOW_SIDED;
 			break;
 
 		default:
@@ -1861,5 +1882,12 @@ char * nlGet3DGameLevelFileName(NETLizard_Game game, NLuint level)
 			return strdup(name);
 		}
     }
+}
+
+const char ** nlGetRE3DMapTexes(NLint *length)
+{
+	if(length)
+		*length = sizeof(RE3D_Texes) / sizeof(RE3D_Texes[0]);
+	return RE3D_Texes;
 }
 

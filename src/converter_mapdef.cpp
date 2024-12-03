@@ -20,8 +20,8 @@ int idNETLizardConverter::ConvertMapDef(idDef &def, const char *name, int index)
 int idNETLizardConverter::ConvertMapDefs()
 {
     int i;
-    const char *format;
-    const char *file;
+    const char *format = config->lvl_path_format;
+    idStr file;
 	idDefList defs;
 	
 	idStr path("def");
@@ -33,15 +33,14 @@ int idNETLizardConverter::ConvertMapDefs()
 	{
 		{
 			idDef map;
-			file = idStr::va(format, i);
 			if(ConvertMapDef(map, "dm1", config->level_count - 1) == 0)
 				defs.push_back(map);
 		}
-		format = "lvl%d";
 		for(i = 0; i < config->level_count - 1; i++)
 		{
 			idDef map;
-			file = idStr::va(format, i);
+			file = idStr::va(config->lvl_path_format, i);
+            file.RemoveExtension();
 			if(ConvertMapDef(map, idStr(file), i) == 0)
 			{
 				defs.push_back(map);
@@ -50,13 +49,13 @@ int idNETLizardConverter::ConvertMapDefs()
 	}
 	else
 	{
-		format = "lvl%d";
 		for(i = 1; i <= config->level_count; i++)
 		{
 			if(game == NL_CONTR_TERRORISM_3D_EPISODE_3 && (i == 13 || i == 15))
 				continue; // lvl13 15 not supprot in CT3D-Ep3
 			idDef map;
 			file = idStr::va(format, i);
+            file.RemoveExtension();
 			if(ConvertMapDef(map, idStr(file), i) == 0)
 			{
 				defs.push_back(map);
@@ -69,6 +68,6 @@ int idNETLizardConverter::ConvertMapDefs()
 		os << map << "\n";
 	os.flush();
 	os.close();
-	return defs.size();
+	return (int)defs.size();
 }
 

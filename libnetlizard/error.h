@@ -14,12 +14,21 @@ extern "C" {
 #define E_STACK_UNDERFLOW set_errno(NL_STACK_UNDERFLOW);
 #define E_OUT_OF_MEMORY set_errno(NL_OUT_OF_MEMORY);
 
+#ifdef _MSC_VER
+#define ES_INVALID_VALUE(x, ...) set_errno_string(NL_INVALID_VALUE, x, __VA_ARGS__);
+#define ES_INVALID_ENUM(x, ...) set_errno_string(NL_INVALID_ENUM, x, __VA_ARGS__);
+#define ES_INVALID_OPERATION(x, ...) set_errno_string(NL_INVALID_OPERATION, x, __VA_ARGS__);
+#define ES_STACK_OVERFLOW(x, ...) set_errno_string(NL_STACK_OVERFLOW, x, __VA_ARGS__);
+#define ES_STACK_UNDERFLOW(x, ...) set_errno_string(NL_STACK_UNDERFLOW, x, __VA_ARGS__);
+#define ES_OUT_OF_MEMORY(x, ...) set_errno_string(NL_OUT_OF_MEMORY, x, __VA_ARGS__);
+#else
 #define ES_INVALID_VALUE(x, args...) set_errno_string(NL_INVALID_VALUE, x, ##args);
 #define ES_INVALID_ENUM(x, args...) set_errno_string(NL_INVALID_ENUM, x, ##args);
 #define ES_INVALID_OPERATION(x, args...) set_errno_string(NL_INVALID_OPERATION, x, ##args);
 #define ES_STACK_OVERFLOW(x, args...) set_errno_string(NL_STACK_OVERFLOW, x, ##args);
 #define ES_STACK_UNDERFLOW(x, args...) set_errno_string(NL_STACK_UNDERFLOW, x, ##args);
 #define ES_OUT_OF_MEMORY(x, args...) set_errno_string(NL_OUT_OF_MEMORY, x, ##args);
+#endif
 
 int set_errno(int err);
 int set_errno_string(int err, const char *str, ...);

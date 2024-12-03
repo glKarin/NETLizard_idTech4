@@ -17,6 +17,7 @@
 #include "util.h"
 #include "error.h"
 #include "state.h"
+#include "mathalgo.h"
 
 #ifdef __cplusplus
 extern "C" {

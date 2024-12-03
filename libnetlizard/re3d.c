@@ -1,6 +1,7 @@
 ﻿#include "netlizard.h"
 
 #include "priv_local.h"
+#include "netlizard_3d.h"
 
 #define dprintfsi(s, d) nllogfln("RE 3D : "#s"->%d", d)
 #define dprintfsii(s, d, d2) nllogfln("RE 3D : ""%d - "#s"->%d", d, d2)
@@ -133,6 +134,181 @@ jint class_b__function_a__1byte_2byte(byte paramByte1, byte paramByte2)
     jint i = paramByte1 & 0xFF;
     jint j;
     return (((j = paramByte2 & 0xFF) & 0xFF) << 8) + (i & 0xFF);
+}
+
+static void gl_to_nl_vec3(NLvec3 *v)
+{
+    float x = NL_VEC3_X(*v);
+    float y = NL_VEC3_Y(*v);
+    float z = NL_VEC3_Z(*v);
+
+    NL_VEC3_X(*v) = x;
+    NL_VEC3_Y(*v) = -z;
+    NL_VEC3_Z(*v) = y;
+}
+
+void nlRE3DToNETLizardModel(const NETLizard_RE3D_Model *model, NETLizard_3D_Model *nlmodel)
+{
+    int i;
+    int k;
+
+    int texLen;
+    const char **allTexes = nlGetRE3DMapTexes(&texLen);
+
+    const NLuint mesh_count = model->meshes.count;
+    NETLizard_3D_Mesh *meshes = calloc(model->meshes.count, sizeof(NETLizard_3D_Mesh));
+    for(i = 0; i < model->meshes.count; i++)
+	{
+        NETLizard_3D_Mesh *m = meshes + i;
+        const NETLizard_RE3D_Mesh *mesh = model->meshes.data + i;
+        const NLfloat *vertexes = mesh->vertex.data;
+        const NLfloat *texcoords = mesh->texcoord.data;
+        const NLuint *indexes = mesh->index.data;
+        int j;
+
+        // position
+        NLvec3 position = NL_VEC3V(mesh->translation);
+
+        // vertex
+        m->vertex.count = mesh->vertex_count * 3;
+        m->vertex.data = calloc(m->vertex.count, sizeof(NLint));
+        for(j = 0; j < mesh->vertex_count; j++)
+        {
+            NLint *vertex = m->vertex.data + j * 3;
+            NLvec3 pos = NL_VEC3(vertexes[j * 3], vertexes[j * 3 + 1], vertexes[j * 3 + 2]);
+            NLvec3 trans;
+            vector3_addv(&trans, &pos, &position);
+            gl_to_nl_vec3(&trans);
+            vertex[0] = float_bits_to_int(NL_VEC3_X(trans));
+            vertex[1] = float_bits_to_int(NL_VEC3_Y(trans));
+            vertex[2] = float_bits_to_int(NL_VEC3_Z(trans));
+            //vertex->texcoord[0] = mesh->texcoord.data[j * 2];
+            //vertex->texcoord[1] = mesh->texcoord.data[j * 2 + 1];
+            // normal
+        }
+
+        NLbound bound;
+        // primitive
+        NLuint l = 0;
+        for(j = 0; j < mesh->primitive.count; j++)
+        {
+            NLuint s = mesh->primitive.data[j];
+            if(s == 0)
+                continue;
+            l += (s - 2);
+        }
+        m->primitive.count = l;
+        m->primitive.data = calloc(m->primitive.count, sizeof(NETLizard_3D_Primitive));
+        int c = 0;
+        int s = 0;
+        for(k = 0; k < mesh->primitive.count; k++)
+        {
+            NLuint index_count = mesh->primitive.data[k];
+            if(index_count == 0)
+                continue;
+
+            NLuint index, index_1, index_2;
+            for(j = 2; j < index_count; j++)
+            {
+                NETLizard_3D_Primitive *primitive = m->primitive.data + c;
+                primitive->tex_index = mesh->tex_index;
+
+                const char *rawTexIndex = model->texes.data[mesh->tex_index];
+                char texFile[256];
+                for(int o = 0; o < texLen; o++)
+                {
+                    snprintf(texFile, sizeof(texFile), RE3D_LVL_TEX_SUBFIX, allTexes[o]);
+                    if(!strcmp(rawTexIndex, texFile))
+                    {
+                        primitive->tex_index = o;
+                        break;
+                    }
+                }
+
+                NLuint ia, ib, ic;
+
+                // odd: n-1, n-2, n 奇数
+                // even: n-2, n-1, n 偶数
+                index = indexes[s + j];
+                index_1 = indexes[s + j - 1];
+                index_2 = indexes[s + j - 2];
+                if(j % 2) // odd
+                {
+                    ia = index_1;
+                    ib = index_2;
+                    ic = index;
+                }
+                else // even
+                {
+                    ia = index_2;
+                    ib = index_1;
+                    ic = index;
+                }
+
+                primitive->index[0] = ia;
+                primitive->index[1] = ib;
+                primitive->index[2] = ic;
+
+                NLvec3 v_normal = NL_VEC3(0.0f, 0.0f, 0.0f);
+
+                NLvec3 vatmp = NL_VEC3(vertexes[ia * 3], vertexes[ia * 3 + 1], vertexes[ia * 3 + 2]);
+                NLvec3 vbtmp = NL_VEC3(vertexes[ib * 3], vertexes[ib * 3 + 1], vertexes[ib * 3 + 2]);
+                NLvec3 vctmp = NL_VEC3(vertexes[ic * 3], vertexes[ic * 3 + 1], vertexes[ic * 3 + 2]);
+
+                NLvec3 va;
+                NLvec3 vb;
+                NLvec3 vc;
+                vector3_addv(&va, &vatmp, &position);
+                vector3_addv(&vb, &vbtmp, &position);
+                vector3_addv(&vc, &vctmp, &position);
+                gl_to_nl_vec3(&va);
+                gl_to_nl_vec3(&vb);
+                gl_to_nl_vec3(&vc);
+
+                NLtri tri = NL_TRI(va, vb, vc);
+                triangle_cale_normal(&tri, &v_normal);
+
+                primitive->plane.normal[0] = float_bits_to_int(NL_VEC3_X(v_normal));
+                primitive->plane.normal[1] = float_bits_to_int(NL_VEC3_Y(v_normal));
+                primitive->plane.normal[2] = float_bits_to_int(NL_VEC3_Z(v_normal));
+
+                primitive->plane.position[0] = float_bits_to_int(NL_VEC3_X(NL_TRI_A(tri)));
+                primitive->plane.position[1] = float_bits_to_int(NL_VEC3_Y(NL_TRI_A(tri)));
+                primitive->plane.position[2] = float_bits_to_int(NL_VEC3_Z(NL_TRI_A(tri)));
+
+                primitive->texcoord[0] = float_bits_to_int(texcoords[ia * 2]);
+                primitive->texcoord[1] = float_bits_to_int(texcoords[ia * 2 + 1]);
+                primitive->texcoord[2] = float_bits_to_int(texcoords[ib * 2]);
+                primitive->texcoord[3] = float_bits_to_int(texcoords[ib * 2 + 1]);
+                primitive->texcoord[4] = float_bits_to_int(texcoords[ic * 2]);
+                primitive->texcoord[5] = float_bits_to_int(texcoords[ic * 2 + 1]);
+
+                bound_add_vec3(&bound, &va);
+                bound_add_vec3(&bound, &vb);
+                bound_add_vec3(&bound, &vc);
+
+                c++;
+            }
+            s += index_count;
+        }
+
+        m->box.min[0] = float_bits_to_int(NL_VEC3_X(NL_BOUND_MIN(bound)));
+        m->box.min[1] = float_bits_to_int(NL_VEC3_Y(NL_BOUND_MIN(bound)));
+        m->box.min[2] = float_bits_to_int(NL_VEC3_Z(NL_BOUND_MIN(bound)));
+        m->box.max[0] = float_bits_to_int(NL_VEC3_X(NL_BOUND_MAX(bound)));
+        m->box.max[1] = float_bits_to_int(NL_VEC3_Y(NL_BOUND_MAX(bound)));
+        m->box.max[2] = float_bits_to_int(NL_VEC3_Z(NL_BOUND_MAX(bound)));
+	}
+
+    nlmodel->game = model->game;
+    nlmodel->type = model->type;
+    nlmodel->data.count = mesh_count;
+    nlmodel->data.data = meshes;
+    nlmodel->item_data.count = 0;
+    nlmodel->item_data.data = NULL;
+    nlmodel->has_sky = NL_TRUE;
+    nlmodel->bsp_data.count = 0;
+    nlmodel->bsp_data.data = NULL;
 }
 
 jint class_e__function_a__1Appearance_2int_3byte_array_4int(char **name, jint paramInt1, const byte paramArrayOfByte[], jint paramInt2)

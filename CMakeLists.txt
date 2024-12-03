@@ -1,5 +1,9 @@
 project(netlizard)
 
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE RelWithDebInfo)
+endif()
+
 add_definitions(-D_NL_STATIC)
 set(CMAKE_CXX_STANDARD 17)
 

@@ -339,7 +339,7 @@ typedef struct NETLizard_RE3D_Mesh_s
         NLuint count;
     } index; // index
     struct {
-        NLuint *data;
+        NLuint *data; // strip vertex count in `index`.`data`
         NLuint count;
     } primitive; // triangle strip's count
     NLfloat translation[3]; // position
@@ -435,6 +435,7 @@ typedef struct NETLizard_3D_Model_Config_s
     char obj_path_format[14];
     NLuint level_count;
     NLuint tex_width;
+    char lvl_path_format[14];
 } NETLizard_3D_Model_Config;
 
 /* NETLizard 3D map teleport config, Egypt 3D */
@@ -557,6 +558,7 @@ NLAPI const NETLizard_Level_Elevator * nlGet3DGameElevator(NLenum game, NLint le
 NLAPI const NETLizard_Level_Door * nlGet3DGameDoor(NLenum game, NLint level, NLint item_id, NLint *length);
 NLAPI const NETLizard_Game_Level_Start_End * nlGet3DGameStartEndArea(NLenum game, NLint level, NLint to, NLint *length);
 NLAPI NLuint nlGetTextureFlag(NETLizard_Game game, NLint index); // get 3D game texture flags
+NLAPI const char ** nlGetRE3DMapTexes(NLint *length);
 
 // Contr Terrisiem 3D
 NLAPI NLboolean nlReadCT3DModelFile(const char* name, NLint level, const char *resc_path, NETLizard_3D_Model *model);
@@ -605,6 +607,7 @@ NLAPI void nlDeleteNETLizardRE3DMesh(NETLizard_RE3D_Mesh *mesh);
 NLAPI void nlDeleteNETLizardRE3DModel(NETLizard_RE3D_Model *model);
 NLAPI NLboolean nlReadRE3DMeshFile(const char *name, NETLizard_RE3D_Model *model);
 NLAPI NLboolean nlLoadRE3DMeshData(const char *data,  NLsizei size,  NETLizard_RE3D_Model *model);
+NLAPI void nlRE3DToNETLizardModel(const NETLizard_RE3D_Model *model, NETLizard_3D_Model *nlmodel);
 
 /* Texture util */
 NLAPI NETLizard_Texture_Type nlGetPNGType(const char *data, NLsizei length); // check png image/texture file type
@@ -616,6 +619,8 @@ NLAPI NL_RET_PTR_ALLOC(char *) char * nlReadAndHandlePNGFile(const char *name, N
 NLAPI NL_RET_PTR_ALLOC(char *) char * nlLoadAndHandlePNGData(const char *data, NLint len); // encode/decode png data to data
 NLAPI NLboolean nlConvertAndHandlePNGFile(const char *from, const char *to); // encode/decode png file to file
 NLAPI NLboolean nlSaveAndHandlePNGData(const char *data, NLint len, const char *to); // encode/decode png data to file
+NLAPI NLboolean nlLoadAndMakePNGRGBAData(const char *arr, NLint len, NETLizard_Texture *tex);
+NLboolean nlSavePNGRGBADataToImageFile(const NETLizard_Texture *tex, const char *to, NLenum img_type);
 
 /* Texture v2 */
 NLAPI NLboolean nlReadTextureV2File(const char *name, NETLizard_Texture *tex); // load 3D texture v2 file

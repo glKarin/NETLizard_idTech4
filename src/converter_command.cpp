@@ -15,8 +15,8 @@ idStr idNETLizardConverter::GenDmap(const char *map)
 idStr idNETLizardConverter::GenDmapCommand()
 {
     int i;
-    const char *file;
-	const char *format;
+    idStr file;
+	const char *format = config->lvl_path_format;
 	std::ostringstream os;
 
 	if(game == NL_SHADOW_OF_EGYPT_3D) // has a survise mode(dm1) map and main menu map(lvl0)
@@ -24,21 +24,21 @@ idStr idNETLizardConverter::GenDmapCommand()
 		{
 			os << GenDmap("dm1") << " ";
 		}
-		format = "lvl%d";
 		for(i = 0; i < config->level_count - 1; i++)
 		{
 			file = idStr::va(format, i);
+            file.RemoveExtension();
 			os << GenDmap(file) << " ";
 		}
 	}
 	else
 	{
-		format = "lvl%d";
 		for(i = 1; i <= config->level_count; i++)
 		{
 			if(game == NL_CONTR_TERRORISM_3D_EPISODE_3 && (i == 13 || i == 15))
 				continue; // lvl13 15 not supprot in CT3D-Ep3
 			file = idStr::va(format, i);
+            file.RemoveExtension();
 			os << GenDmap(file) << " ";
 		}
 	}

@@ -5,7 +5,7 @@
 
 int idNETLizardConverter::ConvertMaterial(idMaterial &mat, const char *file, int index)
 {
-	NLuint flags = NL_3D_TEXTURE_FLAG_NORMAL;
+	NLuint flags;
 
 	idStr fname("textures");
 	fname /= gamename / file;
@@ -14,9 +14,9 @@ int idNETLizardConverter::ConvertMaterial(idMaterial &mat, const char *file, int
 	fname += ".tga";
 	mat.Diffusemap() = fname;
 	flags = nlGetTextureFlag(game, index);
-	mat.SetLadder(flags & NL_3D_TEXTURE_FLAG_LADDER ? true : false);
-	mat.NonSolid(flags & NL_3D_TEXTURE_FLAG_NON_SOLID ? true : false);
-	mat.SetTwoSided(flags & NL_3D_TEXTURE_FLAG_TOW_SIDED ? true : false);
+	mat.SetLadder((flags & NL_3D_TEXTURE_FLAG_LADDER) != 0);
+	mat.NonSolid((flags & NL_3D_TEXTURE_FLAG_NON_SOLID) != 0);
+	mat.SetTwoSided((flags & NL_3D_TEXTURE_FLAG_TOW_SIDED) != 0);
 
 	idMaterialStage stage;
 	stage.Diffusemap() = fname;
@@ -49,15 +49,33 @@ int idNETLizardConverter::ConvertMaterials()
 	GetDir(path);
 	idStr mtrFile = TargetFilePath(path);
 	format = config->tex_path_format;
-    for(i = 1; i <= config->tex_count; i++)
-	{
-		idMaterial mat;
-        file = idStr::va(format, i);
-		if(ConvertMaterial(mat, file, i) == 0)
-		{
-			mats.push_back(mat);
-		}
-	}
+
+    if(game == NL_RACING_EVOLUTION_3D)
+    {
+        NLint len;
+        const char **texes = nlGetRE3DMapTexes(&len);
+        for(i = 0; i < config->tex_count; i++)
+        {
+            idMaterial mat;
+            file = idStr::va(format, texes[i]);
+            if(ConvertMaterial(mat, file, i) == 0)
+            {
+                mats.push_back(mat);
+            }
+        }
+    }
+    else
+    {
+        for(i = 1; i <= config->tex_count; i++)
+        {
+            idMaterial mat;
+            file = idStr::va(format, i);
+            if(ConvertMaterial(mat, file, i) == 0)
+            {
+                mats.push_back(mat);
+            }
+        }
+    }
 
 	if(config->sky_file && config->sky_file[0])
 	{
@@ -78,7 +96,7 @@ int idNETLizardConverter::ConvertMaterials()
 		os << mat << "\n";
 	os.flush();
 	os.close();
-	return mats.size();
+	return (int)mats.size();
 }
 
 int idNETLizardConverter::ConvertSkyMaterial(idMaterial &mat, const char *file)
