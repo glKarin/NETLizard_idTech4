@@ -8,6 +8,7 @@
 #include "buffer.h"
 #include "vector.h"
 #include "id/mapfile.h"
+#include "math/maths.h"
 
 int idNETLizardConverter::TEXTURE_FILE_TYPE = 0; // tga
 
@@ -65,4 +66,16 @@ void idNETLizardConverter::Log(const char *str, ...) const
 idVec3 idNETLizardConverter::Int3ToVec3(int a, int b, int c) const
 {
     return { IntToFloat(a), IntToFloat(b), IntToFloat(c) };
+}
+
+float idNETLizardConverter::IntToFloat(int i) const
+{
+    if(game == NL_RACING_EVOLUTION_3D)
+    {
+        return idMath::IntBitsToFloat(i);
+    }
+    else
+    {
+        return float(i);
+    }
 }

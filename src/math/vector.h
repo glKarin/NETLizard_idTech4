@@ -2,6 +2,7 @@
 #define _KARIN_VERTOR_H
 
 #include <math.h>
+#include "maths.h"
 
 class idMat4;
 class idStr;
@@ -378,6 +379,13 @@ inline idVec3 & idVec3::operator-=(float n)
 	v[1] -= n;
 	v[2] -= n;
 	return *this;
+}
+
+inline void remove_fraction(idVec3 &v)
+{
+	remove_fraction(v[0]);
+	remove_fraction(v[1]);
+	remove_fraction(v[2]);
 }
 
 #endif

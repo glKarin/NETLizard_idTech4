@@ -21,7 +21,7 @@ using std::endl;
 #define DEFAULT_CLIP_SIZE 20
 
 float idNETLizardConverter::NETLIZARD_MAP_TO_IDTECH4 = 0.35f;
-float idNETLizardConverter::NETLIZARD_RE_MAP_TO_IDTECH4 = 20.0f;
+float idNETLizardConverter::NETLIZARD_RE_MAP_TO_IDTECH4 = 35.0f;
 
 bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, const idMat4 *mat, bool isItem, float width) const
 {

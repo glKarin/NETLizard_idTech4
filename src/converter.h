@@ -96,17 +96,23 @@ class idNETLizardConverter
 
 
 
+void remove_fraction(float &f);
+void remove_fraction(idVec3 &v);
+
 template <class T>
 inline T & idNETLizardConverter::ConvToIdTech4(T &v) const
 {
     v *= (game == NL_RACING_EVOLUTION_3D ? NETLIZARD_RE_MAP_TO_IDTECH4 : NETLIZARD_MAP_TO_IDTECH4);
+    remove_fraction(v); // remove fraction and make integer as float
     return v;
 }
 
 template <class T>
 inline T idNETLizardConverter::ConvToIdTech4(const T &v) const
 {
-    return v * (game == NL_RACING_EVOLUTION_3D ? NETLIZARD_RE_MAP_TO_IDTECH4 : NETLIZARD_MAP_TO_IDTECH4);
+    T r = v * (game == NL_RACING_EVOLUTION_3D ? NETLIZARD_RE_MAP_TO_IDTECH4 : NETLIZARD_MAP_TO_IDTECH4);
+    remove_fraction(r); // remove fraction and make integer as float
+    return r;
 }
 
 inline void idNETLizardConverter::SetConvertMapAreaCallback(idConvertMapAreaCallback_f func)
@@ -137,24 +143,5 @@ inline NETLizard_Game idNETLizardConverter::Game() const
 inline void idNETLizardConverter::Version(const char *version)
 {
 	this->version = version;
-}
-
-inline float idNETLizardConverter::IntToFloat(int i) const
-{
-    if(game == NL_RACING_EVOLUTION_3D)
-    {
-        union bit
-        {
-            int i;
-            float f;
-        } u;
-        memset(&u, 0, sizeof(union bit));
-        u.i = i;
-        return u.f;
-    }
-    else
-    {
-        return float(i);
-    }
 }
 #endif
