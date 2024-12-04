@@ -70,9 +70,9 @@ void bound_invalid(NLbound *bv)
     NL_VEC3_Y(NL_BOUND_MIN(*bv)) = FLT_MAX;
     NL_VEC3_Z(NL_BOUND_MIN(*bv)) = FLT_MAX;
 
-    NL_VEC3_X(NL_BOUND_MAX(*bv)) = FLT_MIN;
-    NL_VEC3_Y(NL_BOUND_MAX(*bv)) = FLT_MIN;
-    NL_VEC3_Z(NL_BOUND_MAX(*bv)) = FLT_MIN;
+    NL_VEC3_X(NL_BOUND_MAX(*bv)) = -FLT_MAX;
+    NL_VEC3_Y(NL_BOUND_MAX(*bv)) = -FLT_MAX;
+    NL_VEC3_Z(NL_BOUND_MAX(*bv)) = -FLT_MAX;
 }
 
 #define IF_LESS_ASSIGN(a, b) \

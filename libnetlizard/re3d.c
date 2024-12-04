@@ -182,12 +182,10 @@ void nlRE3DToNETLizardModel(const NETLizard_RE3D_Model *model, NETLizard_3D_Mode
             vertex[0] = float_bits_to_int(NL_VEC3_X(trans));
             vertex[1] = float_bits_to_int(NL_VEC3_Y(trans));
             vertex[2] = float_bits_to_int(NL_VEC3_Z(trans));
-            //vertex->texcoord[0] = mesh->texcoord.data[j * 2];
-            //vertex->texcoord[1] = mesh->texcoord.data[j * 2 + 1];
-            // normal
         }
 
         NLbound bound;
+		bound_invalid(&bound);
         // primitive
         NLuint l = 0;
         for(j = 0; j < mesh->primitive.count; j++)
@@ -298,6 +296,14 @@ void nlRE3DToNETLizardModel(const NETLizard_RE3D_Model *model, NETLizard_3D_Mode
         m->box.max[0] = float_bits_to_int(NL_VEC3_X(NL_BOUND_MAX(bound)));
         m->box.max[1] = float_bits_to_int(NL_VEC3_Y(NL_BOUND_MAX(bound)));
         m->box.max[2] = float_bits_to_int(NL_VEC3_Z(NL_BOUND_MAX(bound)));
+
+		if(i == 0)
+		{
+            gl_to_nl_vec3(&position);
+			nlmodel->start_position[0] = float_bits_to_int(NL_VEC3_X(position));
+			nlmodel->start_position[1] = float_bits_to_int(NL_VEC3_Y(position));
+			nlmodel->start_position[2] = float_bits_to_int(NL_VEC3_Z(position));
+		}
 	}
 
     nlmodel->game = model->game;
