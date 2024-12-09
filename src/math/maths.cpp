@@ -5,6 +5,7 @@
 #include "vector.h"
 #include "matrix.h"
 #include "str.h"
+#include "decimal.h"
 
 bool idMath::CalcTextureMatrixFromPointsXYZUVNormal(idMat3 &mat, const idVec3 points[3], const idVec2 uvs[3], const idVec3& normal)
 {
@@ -70,3 +71,38 @@ bool idMath::CalcTextureMatrixFromPointsXYZUVNormal(idMat3 &mat, const idVec3 po
 		return false;
     }
 }
+
+void remove_fraction(float &f, int prec)
+{
+	if(prec <= 0)
+		f = float(int(f));
+	else
+	{
+		std::string str = idStr::va("%f", f);
+#define _DECIMAL_CASE(x) \
+			case x: {\
+				dec::decimal<x, dec::half_up_round_policy> d##x(str); \
+				f = (float)d##x.getAsDouble(); \
+		break; \
+					}
+
+		switch(prec)
+		{
+			_DECIMAL_CASE(1);
+			_DECIMAL_CASE(2);
+			_DECIMAL_CASE(3);
+			_DECIMAL_CASE(4);
+			_DECIMAL_CASE(5);
+			_DECIMAL_CASE(6);
+		};
+	}
+}
+#if 0
+#define _DECIMAL_CASE(x) \
+			case x: {\
+				dec::decimal<x, dec::half_up_round_policy> d##x(str); d##x *= pow(10, x); \
+						int i = d##x.getAsInteger(); idStr n = idStr::va("%06d", i); n.insert(n.length() - x, ".");  sscanf(n, "%f", &f); printf("%s\n", n.c_str());\
+				 \
+		break; \
+					}
+#endif

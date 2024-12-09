@@ -2,6 +2,7 @@
 #define _KARIN_STR_H
 
 #include <string>
+#include "list.h"
 
 class idStr : public std::string
 {
@@ -30,6 +31,8 @@ class idStr : public std::string
 	bool GetFileName(std::string &ret) const;
 	operator const char *() const;
 };
+
+typedef idList<idStr> idStrList;
 
 inline idStr::operator const char *() const
 {

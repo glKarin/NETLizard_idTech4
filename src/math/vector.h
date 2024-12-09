@@ -381,11 +381,11 @@ inline idVec3 & idVec3::operator-=(float n)
 	return *this;
 }
 
-inline void remove_fraction(idVec3 &v)
+inline void remove_fraction(idVec3 &v, int prec = 0)
 {
-	remove_fraction(v[0]);
-	remove_fraction(v[1]);
-	remove_fraction(v[2]);
+	remove_fraction(v[0], prec);
+	remove_fraction(v[1], prec);
+	remove_fraction(v[2], prec);
 }
 
 #endif

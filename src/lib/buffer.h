@@ -11,6 +11,7 @@ class idBuffer
 		void Alloc(int size, const char *data = nullptr);
 		void Free();
 		int file_get_contents(const char *name);
+		int file_put_contents(const char *name) const;
 		operator const char *() const;
 		char & operator[](int i);
 		char operator[](int i) const;

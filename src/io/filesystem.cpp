@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "str.h"
+#include "buffer.h"
 
 long idFileSystem::FileSize(const char *name)
 {
@@ -39,4 +41,20 @@ bool idFileSystem::FileExists(const char *path)
 		return false;
 	fclose(file);
 	return true;
+}
+
+int idFileSystem::cp(const char *from, const char *to)
+{
+	FILE *file;
+
+	idBuffer buf;
+	if(buf.file_get_contents(from) < 0)
+		return -1;
+
+	//printf("%s >> %s\n", from, to);
+	if(buf.file_put_contents(to) < 0)
+		return -2;
+
+
+	return buf.Size();
 }

@@ -131,6 +131,22 @@ static void N_ConvertMapFunc(const idNETLizardConverter *converter, idMapFile &m
 	e.Name("info_player_start_1");
 	map << e;
 
+    char menuMusic[8];
+    bool hasMenuMusic = nullptr != nlGet3DGameMenuMusicFileName(converter->Game(), menuMusic);
+
+    char levelMusic[8];
+    bool hasLevelMusic = nullptr != nlGet3DGameLevelMusicFileName(converter->Game(), level, levelMusic);
+    if(hasMenuMusic || hasLevelMusic)
+    {
+        const char *mf = hasLevelMusic ? levelMusic : menuMusic;
+		idStr music(converter->Gamename());
+		music += "_";
+		music += mf;
+        e.speaker(music, true, true, false);
+        e.Name("global_background_music_1");
+        map << e;
+    }
+
 	if(converter->Game() == NL_SHADOW_OF_EGYPT_3D && (level == 2 || level == 4 || level == 6 || level == 7 || level == 8 || level == 9 || /*level == 10 ||*/ level == 11 || level == 12 || level == 13 || level == 14 || level == 15))
 		return;
 	NLint length;
@@ -237,17 +253,20 @@ int main(int argc, char *argv[])
 {
 	using namespace std;
 
-#if 0
+#if 1
 	const char *game = argv[1];
 	const char *source_path = argv[2];
 	const char *target_path = argv[3];
 #else
-	const char *game = "0";
+	const char *game = "4";
 #ifdef _MSC_VER
 	const char *source_path = R"(D:/project/harmattan/NETLizard_idTech4/resource/re3d)";
 	const char *target_path = R"(F:/pak/test/doom3/base)";
+#elif defined(__MINGW32__) || defined(__MINGW64__)
+	const char *source_path = R"(D:/project/harmattan/NETLizard_idTech4/resource/egypt3d)";
+	const char *target_path = R"(F:/pak/test/doom3/base)";
 #else
-	const char *source_path = "./egypt3d";
+	const char *source_path = "./re3d";
 	const char *target_path = "/sdcard/diii4a/base";
 #endif
 #endif
@@ -269,6 +288,7 @@ int main(int argc, char *argv[])
 	converter.ConvertTextures();
 	converter.ConvertMaps();
 	converter.ConvertMapDefs();
+    converter.ConvertSounds();
 	idStr cmd = converter.GenDmapCommand();
 	std::cout << cmd.c_str() << std::endl;
 	std::cout << "done" << std::endl;

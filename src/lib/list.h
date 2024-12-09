@@ -43,14 +43,14 @@ idList<T> & idList<T>::operator<<(T &&t)
 template <class T>
 int idList<T>::Append(const T &t)
 {
-	push_back(t);
+	this->push_back(t);
 	return this->size() - 1;
 }
 
 template <class T>
 int idList<T>::Append(T &&t)
 {
-	emplace_back(t);
+	this->emplace_back(t);
 	return this->size() - 1;
 }
 

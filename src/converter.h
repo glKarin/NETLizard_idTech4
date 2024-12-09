@@ -18,6 +18,7 @@ class idBuffer;
 class idDef;
 class idMapFile;
 class idVec3;
+class idSndShader;
 
 class idNETLizardConverter;
 
@@ -39,6 +40,7 @@ class idNETLizardConverter
         int ConvertMaterials();
         int ConvertMaps();
         int ConvertMapDefs();
+        int ConvertSounds();
         idStr GenDmapCommand();
 		void Version(const char *version);
 
@@ -58,6 +60,7 @@ class idNETLizardConverter
 		int ConvertSkyMaterial(idMaterial &mat, const char *file);
 		int ConvertSkyEnvMaterial(idMaterial &mat, const char *file);
         int ConvertMapDef(idDef &def, const char *name, int i);
+        int ConvertSound(idSndShader &snd, const char *name);
 		idStr GenDmap(const char *map);
         bool ReadFile(idBuffer &buffer, const char *path) const;
         idStr GetDir(const char *path);
@@ -88,6 +91,7 @@ class idNETLizardConverter
         const NETLizard_3D_Model_Config *config = nullptr;
 		bool genPortalBrush = false;
 		idStr version;
+		int removeFraction = 2;
 
 		idConvertMapAreaCallback_f convertMapAreaCallback = nullptr;
 		idConvertMapAreaPortalCallback_f convertMapAreaPortalCallback = nullptr;
@@ -96,14 +100,15 @@ class idNETLizardConverter
 
 
 
-void remove_fraction(float &f);
-void remove_fraction(idVec3 &v);
+void remove_fraction(float &f, int prec);
+void remove_fraction(idVec3 &v, int prec);
 
 template <class T>
 inline T & idNETLizardConverter::ConvToIdTech4(T &v) const
 {
     v *= (game == NL_RACING_EVOLUTION_3D ? NETLIZARD_RE_MAP_TO_IDTECH4 : NETLIZARD_MAP_TO_IDTECH4);
-    remove_fraction(v); // remove fraction and make integer as float
+	if(removeFraction >= 0)
+    remove_fraction(v, removeFraction); // remove fraction and make integer as float
     return v;
 }
 
@@ -111,7 +116,8 @@ template <class T>
 inline T idNETLizardConverter::ConvToIdTech4(const T &v) const
 {
     T r = v * (game == NL_RACING_EVOLUTION_3D ? NETLIZARD_RE_MAP_TO_IDTECH4 : NETLIZARD_MAP_TO_IDTECH4);
-    remove_fraction(r); // remove fraction and make integer as float
+	if(removeFraction >= 0)
+    remove_fraction(r, removeFraction); // remove fraction and make integer as float
     return r;
 }
 

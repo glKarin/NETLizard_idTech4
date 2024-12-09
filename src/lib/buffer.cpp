@@ -60,6 +60,22 @@ int idBuffer::file_get_contents(const char *name)
 	return ret;
 }
 
+int idBuffer::file_put_contents(const char *name) const
+{
+	FILE *file;
+	long l;
+	size_t ret;
+
+	file = fopen(name, "wb");
+	if(!file)
+		return -1;
+	ret = fwrite(data, 1, size, file);
+	fflush(file);
+	fclose(file);
+
+	return ret;
+}
+
 idBuffer & idBuffer::operator=(const idBuffer &other)
 {
 	size = other.size;

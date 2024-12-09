@@ -19,6 +19,7 @@ const char * idEntity::CLASSNAME_TARGET_WAITFORBUTTON = "func_waitforbutton";
 const char * idEntity::CLASSNAME_FUNC_DOOR = "func_door";
 const char * idEntity::CLASSNAME_FUNC_ELEVATOR = "func_elevator";
 const char * idEntity::CLASSNAME_TEXT = "text";
+const char * idEntity::CLASSNAME_SPEAKER = "speaker";
 
 idEntity & idEntity::Name(const char *str, ...)
 {
@@ -222,4 +223,15 @@ idEntity & idEntity::text(const char *str, bool face)
 	spawnArgs.SetBool("force", true);
 	spawnArgs.SetBool("playerOriented", face);
 	return *this;
+}
+
+idEntity & idEntity::speaker(const char *shader, bool looping, bool global, bool trigger)
+{
+    Reset();
+    classname = CLASSNAME_SPEAKER;
+    spawnArgs.Set("s_shader", shader);
+    spawnArgs.SetBool("s_global", global);
+    spawnArgs.SetBool("s_looping", looping);
+    spawnArgs.SetBool("s_waitfortrigger", trigger);
+    return *this;
 }

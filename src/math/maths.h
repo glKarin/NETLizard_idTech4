@@ -21,6 +21,8 @@ class idMath final
 			static T Max(const T &a, const T &b);
 };
 
+void remove_fraction(float &f, int prec = 0);
+
 
 inline bool idMath::IsZero(float f)
 {
@@ -31,11 +33,6 @@ template<class T>
 inline T idMath::Max(const T &a, const T &b)
 {
 	return a < b ? b : a;
-}
-
-inline void remove_fraction(float &f)
-{
-    f = float(int(f));
 }
 
 inline float idMath::IntBitsToFloat(int i)

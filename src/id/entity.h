@@ -39,9 +39,9 @@ class idEntity
 		void NoClipModel(bool b);
 
 		idEntity & func_static(void);
+        idEntity & worldspawn(void);
 		idEntity & func_rotating(bool xAxis = false, bool yAxis = false);
 		idEntity & func_bobbing(float height = -1, float speed = -1);
-		idEntity & worldspawn(void);
 		idEntity & light(const idVec3 &origin, const idVec3 &radius = {400, 400, 400}, bool noshadows = true, bool nospecular = true, const idVec3 &color = {1, 1, 1});
 		idEntity & info_player_deathmatch(const idVec3 &origin);
 		idEntity & info_player_start(const idVec3 &origin, float angle = 0.0f);
@@ -52,6 +52,7 @@ class idEntity
 		idEntity & func_door(int movedir);
 		idEntity & func_elevator(float moveSpeed, float moveTime, bool trigger, int numFloor, const idVec3 floors[]);
 		idEntity & text(const char *str, bool face = true);
+        idEntity & speaker(const char *shader, bool looping = false, bool global = true, bool trigger = true);
 
 		friend std::ostream & operator<<(std::ostream &o, const idEntity &v);
 
@@ -69,6 +70,7 @@ class idEntity
 		static const char *CLASSNAME_FUNC_DOOR;
 		static const char *CLASSNAME_FUNC_ELEVATOR;
 		static const char *CLASSNAME_TEXT;
+        static const char *CLASSNAME_SPEAKER;
 
 	private:
 		idStr name;

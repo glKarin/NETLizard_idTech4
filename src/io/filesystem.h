@@ -13,6 +13,7 @@ class idFileSystem
 		static bool FileExists(const char *path);
 		template <class T>
 		static int Output(const char *path, const T &object);
+        static int cp(const char *from, const char *to);
 };
 
 
