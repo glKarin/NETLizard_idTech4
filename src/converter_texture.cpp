@@ -9,32 +9,43 @@
 
 int idNETLizardConverter::ConvertTextureToTGA(const char *name, int i)
 {
-	idBuffer buffer;
-    idStr srcPath = SourceFilePath(name);
-	if(!ReadFile(buffer, srcPath))
-        return -1;
-
 	NETLizard_Texture tex;
 	memset(&tex, 0, sizeof(NETLizard_Texture));
 	NLboolean ok = NL_FALSE;
-    switch (config->texture_type)
+    NLuchar color[4];
+
+    if(nlGetTextureColor(game, i, color))
     {
-        case NL_TEXTURE_3D_ENGINE_V2:
-            ok = nlLoadTextureV2Data(buffer.Data(), buffer.Size(), &tex);
-                break;
-        case NL_TEXTURE_3D_ENGINE_V3:
-            ok = nlLoadTextureV3Data(buffer.Data(), buffer.Size(), game == NL_CONTR_TERRORISM_3D_EPISODE_3 ? -1 : i, &tex);
-                break;
-        case NL_TEXTURE_3D_ENGINE_V3_COMPRESS:
-            ok = nlLoadCompressTextureV3Data(buffer.Data(), buffer.Size(), &tex);
-                break;
-        case NL_TEXTURE_ENCODE_PNG:
-        case NL_TEXTURE_NORMAL_PNG:
-            ok = nlLoadAndMakePNGRGBAData(buffer.Data(), buffer.Size(), &tex);
-            break;
-        default:
-            return -2;
+        nlMakeColorTextureRGBA(&tex, color, config->tex_width, config->tex_width);
+        ok = NL_TRUE;
     }
+    else
+    {
+        idBuffer buffer;
+        idStr srcPath = SourceFilePath(name);
+        if(!ReadFile(buffer, srcPath))
+            return -1;
+
+        switch (config->texture_type)
+        {
+            case NL_TEXTURE_3D_ENGINE_V2:
+                ok = nlLoadTextureV2Data(buffer.Data(), buffer.Size(), &tex);
+                break;
+            case NL_TEXTURE_3D_ENGINE_V3:
+                ok = nlLoadTextureV3Data(buffer.Data(), buffer.Size(), game == NL_CONTR_TERRORISM_3D_EPISODE_3 ? -1 : i, &tex);
+                break;
+            case NL_TEXTURE_3D_ENGINE_V3_COMPRESS:
+                ok = nlLoadCompressTextureV3Data(buffer.Data(), buffer.Size(), &tex);
+                break;
+            case NL_TEXTURE_ENCODE_PNG:
+            case NL_TEXTURE_NORMAL_PNG:
+                ok = nlLoadAndMakePNGRGBAData(buffer.Data(), buffer.Size(), &tex);
+                break;
+            default:
+                return -2;
+        }
+    }
+
 	if(!ok)
 		return -2;
 
@@ -44,7 +55,7 @@ int idNETLizardConverter::ConvertTextureToTGA(const char *name, int i)
     GetDir(fname);
 	idStr target = TargetFilePath(fname);
 	target.ReplaceExtension("tga");
-    switch (config->texture_type)
+    switch (tex.type /* config->texture_type */)
     {
         case NL_TEXTURE_3D_ENGINE_V2:
             ok = nlSaveTextureV2DataToImageFile(&tex, target, TEXTURE_FILE_TYPE);
@@ -57,6 +68,7 @@ int idNETLizardConverter::ConvertTextureToTGA(const char *name, int i)
                 break;
         case NL_TEXTURE_ENCODE_PNG:
         case NL_TEXTURE_NORMAL_PNG:
+        case NL_TEXTURE_RAW:
             ok = nlSavePNGRGBADataToImageFile(&tex, target, TEXTURE_FILE_TYPE);
             break;
         default:

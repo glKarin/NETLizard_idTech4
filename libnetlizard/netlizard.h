@@ -104,8 +104,13 @@ typedef uint32_t NLbitfield;
 typedef float NLclamp;
 typedef uint32_t NLsize;
 typedef void * NLdata;
-typedef void * NLfunc;
+typedef void * NLfunction;
 typedef NLboolean NLbool;
+
+#define NL_PACK_RGB(r, g, b) ((NLint)(((NLuchar)(r) & 0xFF) << 16 | ((NLuchar)(g) & 0xFF) << 8 | ((NLuchar)(b) & 0xFF)))
+#define NL_PACK_ARGB(r, g, b, a) ((NLuint)(((NLuchar)(a) & 0xFF) << 24 | ((NLuchar)(r) & 0xFF) << 16 | ((NLuchar)(g) & 0xFF) << 8 | ((NLuchar)(b) & 0xFF)))
+#define NL_UNPACK_RGB(rgb, arr) do { ((NLuchar *)arr)[0] = ((rgb) & 0xFF0000) >> 16; ((NLuchar *)arr)[1] = ((rgb) & 0xFF00) >> 8; ((NLuchar *)arr)[2] = ((rgb) & 0xFF); } while(0);
+#define NL_UNPACK_ARGB(rgb, arr) do { ((NLuchar *)arr)[0] = (((NLuint)rgb) & 0xFF0000) >> 16; ((NLuchar *)arr)[1] = (((NLuint)rgb) & 0xFF00) >> 8; ((NLuchar *)arr)[2] = (((NLuint)rgb) & 0xFF); ((NLuchar *)arr)[0] = (((NLuint)rgb) & 0xFF000000) >> 24; } while(0);
 
 //typedef char byte; // unsigned
 
@@ -141,6 +146,7 @@ typedef enum NETLizard_Texture_Type_e
     NL_TEXTURE_3D_ENGINE_V2, // 3D texture v2: 3D CT, 3D CT2, 3D Spacnaz
     NL_TEXTURE_3D_ENGINE_V3, // 3D texture v3: 3D Egypt, 3D Clone
     NL_TEXTURE_3D_ENGINE_V3_COMPRESS, // 3D texture v3 compressed: first-person weapon in 3D Egypt, 3D Clone
+    NL_TEXTURE_RAW, // raw rgba data
     NL_TEXTURE_UNKNOWN
 } NETLizard_Texture_Type;
 
@@ -559,6 +565,7 @@ NLAPI const NETLizard_Level_Door * nlGet3DGameDoor(NLenum game, NLint level, NLi
 NLAPI const NETLizard_Game_Level_Start_End * nlGet3DGameStartEndArea(NLenum game, NLint level, NLint to, NLint *length);
 NLAPI NLuint nlGetTextureFlag(NETLizard_Game game, NLint index); // get 3D game texture flags
 NLAPI const char ** nlGetRE3DMapTexes(NLint *length);
+NLAPI NLboolean nlGetTextureColor(NETLizard_Game game, NLint index, NLuchar *color NL_ARG_MIN_LEN(4)); // check a texture is file or single color
 
 // Contr Terrisiem 3D
 NLAPI NLboolean nlReadCT3DModelFile(const char* name, NLint level, const char *resc_path, NETLizard_3D_Model *model);
@@ -613,6 +620,8 @@ NLAPI void nlRE3DToNETLizardModel(const NETLizard_RE3D_Model *model, NETLizard_3
 NLAPI NETLizard_Texture_Type nlGetPNGType(const char *data, NLsizei length); // check png image/texture file type
 NLAPI NETLizard_Texture_Type nlGetPNGFileType(const char *file); // check png image/texture data type
 NLAPI void nlDeleteNETLizardTexture(NETLizard_Texture *tex); // free texture
+void nlMakeColorTextureRGBA(NETLizard_Texture *tex, const NLuchar *rgba NL_ARG_MIN_LEN(4), int width, int height); // fill color as a texture with alpha
+void nlMakeColorTextureRGB(NETLizard_Texture *tex, const NLuchar *rgba NL_ARG_MIN_LEN(3), int width, int height); // fill color as a texture
 
 /* PNG */
 NLAPI NL_RET_PTR_ALLOC(char *) char * nlReadAndHandlePNGFile(const char *name, NLint *len); // encode/decode png file to data

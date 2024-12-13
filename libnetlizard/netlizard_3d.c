@@ -1891,3 +1891,38 @@ const char ** nlGetRE3DMapTexes(NLint *length)
 	return RE3D_Texes;
 }
 
+NLboolean nlGetTextureColor(NETLizard_Game game, NLint index, NLuchar *color)
+{
+    if(game == NL_SHADOW_OF_EGYPT_3D)
+    {
+        if(index == 50)
+        {
+            if(color)
+            {
+                color[0] = color[1] = color[2] = 0;
+                color[3] = 0xFF;
+            }
+            return NL_TRUE;
+        }
+        else if(index == 51)
+        {
+            if(color)
+            {
+                color[0] = color[1] = color[2] = color[3] = 0xFF;
+            }
+            return NL_TRUE;
+        }
+    }
+    else if(game == NL_ARMY_RANGER_3D)
+    {
+        if(index == 45)
+        {
+            if(color)
+            {
+                color[0] = color[1] = color[2] = color[3] = 0xFF;
+            }
+            return NL_TRUE;
+        }
+    }
+    return NL_FALSE;
+}

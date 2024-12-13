@@ -174,6 +174,43 @@ void nlDeleteNETLizardTexture(NETLizard_Texture *tex)
     tex->color_map.count = 0;
 }
 
+void nlMakeColorTextureRGBA(NETLizard_Texture *tex, const NLuchar *rgba, int width, int height)
+{
+    tex->type = NL_TEXTURE_RAW;
+    tex->format = NL_RGBA;
+    tex->width = width;
+    tex->height = height;
+    tex->depth = 1;
+    tex->color_index.count = width * height * 4;
+    tex->color_index.data = (NLuchar *)malloc(tex->color_index.count);
+    for(int i = 0; i < width * height; i++)
+    {
+        NLuchar *data = tex->color_index.data + i * 4;
+        data[0] = rgba[0];
+        data[1] = rgba[1];
+        data[2] = rgba[2];
+        data[3] = rgba[3];
+    }
+}
+
+void nlMakeColorTextureRGB(NETLizard_Texture *tex, const NLuchar *rgb, int width, int height)
+{
+    tex->type = NL_TEXTURE_RAW;
+    tex->format = NL_RGB;
+    tex->width = width;
+    tex->height = height;
+    tex->depth = 1;
+    tex->color_index.count = width * height * 3;
+    tex->color_index.data = (NLuchar *)malloc(tex->color_index.count);
+    for(int i = 0; i < width * height; i++)
+    {
+        NLuchar *data = tex->color_index.data + i * 3;
+        data[0] = rgb[0];
+        data[1] = rgb[1];
+        data[2] = rgb[2];
+    }
+}
+
 /*
 int nlCompareColor(unsigned int a, unsigned int b)
 {
