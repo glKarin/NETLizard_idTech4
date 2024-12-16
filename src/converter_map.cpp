@@ -19,6 +19,7 @@ using std::endl;
 #define THIN_ELEVATOR_WIDTH 1.0
 #define ELEVATOR_MOVE_SPEED 100
 #define DEFAULT_CLIP_SIZE 20
+#define DEFAULT_BRUSH_WIDTH 1.1f
 
 float idNETLizardConverter::NETLIZARD_MAP_TO_IDTECH4 = 0.35f;
 float idNETLizardConverter::NETLIZARD_RE_MAP_TO_IDTECH4 = 35.0f;
@@ -156,16 +157,15 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 	idVec3 points_[3];
 	if(width > 0.0f)
 	{
-		points_[0] = points[0] + normal_ * width;
-		points_[1] = points[1] + normal_ * width;
-		points_[2] = points[2] + normal_ * width;
+		normal_ *= width;
 	}
-	else
+	else if(!isItem)
 	{
+		normal_ *= DEFAULT_BRUSH_WIDTH;
+	}
 	points_[0] = points[0] + normal_;
 	points_[1] = points[1] + normal_;
 	points_[2] = points[2] + normal_;
-	}
 	if(!side.PlaneFromPoints(points_[2], points_[1], points_[0]))
 	{
 		return false;

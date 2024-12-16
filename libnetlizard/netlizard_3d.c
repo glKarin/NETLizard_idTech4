@@ -860,6 +860,8 @@ NLuint nlGetTextureFlag(NETLizard_Game game, NLint index)
         case NL_SHADOW_OF_EGYPT_3D:
 			if(index == 36 || index == 37 || index == 49)
                 res |= NL_3D_TEXTURE_FLAG_CUBE_MAP;
+			else if(index >= 53 && index <= 56)
+                res |= NL_3D_TEXTURE_FLAG_CUBE_MAP;
 			break;
 
         case NL_CONTR_TERRORISM_3D:
@@ -1912,10 +1914,41 @@ NLboolean nlGetTextureColor(NETLizard_Game game, NLint index, NLuchar *color)
             }
             return NL_TRUE;
         }
+        else if(index == 53)
+        {
+            if(color)
+            {
+				color[0] = 0xFF;
+                color[1] = color[2] = 0;
+                color[3] = 0xFF;
+            }
+            return NL_TRUE;
+        }
+        else if(index == 54)
+        {
+            if(color)
+            {
+                color[0] = 0xFF;
+				color[1] = 0;
+				color[2] = 0xFF;
+                color[3] = 0xFF;
+            }
+            return NL_TRUE;
+        }
+        else if(index == 55 || index == 56)
+        {
+            if(color)
+            {
+                color[0] = color[1] = 0;
+				color[2] = 0xFF;
+                color[3] = 0xFF;
+            }
+            return NL_TRUE;
+        }
     }
     else if(game == NL_ARMY_RANGER_3D)
     {
-        if(index == 45)
+        if(index >= 39 && index <= 53)
         {
             if(color)
             {

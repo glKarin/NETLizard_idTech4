@@ -271,7 +271,8 @@ int idNETLizardConverter::ConvertSkyTextureToTGA(const char *name)
 	NETLizard_Texture tex;
 	memset(&tex, 0, sizeof(NETLizard_Texture));
 	NLboolean ok = NL_FALSE;
-    switch (config->texture_type)
+	NETLizard_Texture_Type texture_type = game == NL_CONTR_TERRORISM_3D_EPISODE_3 ? NL_TEXTURE_3D_ENGINE_V2 : config->texture_type;
+    switch (texture_type)
     {
         case NL_TEXTURE_3D_ENGINE_V2:
             ok = nlLoadTextureV2Data(buffer.Data(), buffer.Size(), &tex);
@@ -298,7 +299,7 @@ int idNETLizardConverter::ConvertSkyTextureToTGA(const char *name)
     GetDir(fname);
 	idStr target = TargetFilePath(fname);
 	target.ReplaceExtension("tga");
-    switch (config->texture_type)
+    switch (tex.type /* config->texture_type */)
     {
         case NL_TEXTURE_3D_ENGINE_V2:
             ok = nlSaveTextureV2DataToImageFile(&tex, target, TEXTURE_FILE_TYPE);
