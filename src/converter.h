@@ -19,10 +19,11 @@ class idDef;
 class idMapFile;
 class idVec3;
 class idSndShader;
+class idPlane;
 
 class idNETLizardConverter;
 
-typedef void (* idConvertMapAreaPortalCallback_f)(const idNETLizardConverter *converter, idMapFile &map, int level, int index, int prev_scene, int next_scene, const idBounds &bounds);
+typedef void (* idConvertMapAreaPortalCallback_f)(const idNETLizardConverter *converter, idMapFile &map, int level, int index, int prev_scene, int next_scene, const idVec3 bounds[4]);
 typedef void (* idConvertMapAreaCallback_f)(const idNETLizardConverter *converter, idMapFile &map, int level, int index, const idBounds &bounds);
 typedef void (* idConvertMapCallback_f)(const idNETLizardConverter *converter, idMapFile &map, int index);
 
@@ -62,15 +63,17 @@ class idNETLizardConverter
         int ConvertMapDef(idDef &def, const char *name, int i);
         int ConvertSound(idSndShader &snd, const char *name);
 		idStr GenDmap(const char *map);
+		idStr GenDmap_init(const char *map);
         bool ReadFile(idBuffer &buffer, const char *path) const;
         idStr GetDir(const char *path);
         idStr TargetFilePath(const char *path) const;
         idStr SourceFilePath(const char *path) const;
-        bool GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, const idMat4 *mat = nullptr, bool isItem = false, float width = -1.0f) const;
+        bool GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, const idMat4 *mat = nullptr, bool isItem = false, float width = -1.0f, idPlane *ret = nullptr) const;
         bool GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_Tree_Node *node, bool invert = false) const;
         bool GenMapBrush(idBrushDef3 &brushes, const idVec3 points[4], const char *material, bool invert = false) const;
-		bool GenMapBrush(idBrushDef3List &brush, const idBounds &bv, const char *material, bool invert) const;
+		bool GenMapBrush(idBrushDef3List &brush, const idBounds &bv, const char *material, bool invert, bool relative = false) const;
         bool LoadNETLizard3DMapModel(NETLizard_3D_Model &model, NETLizard_RE3D_Model &remodel, const char *file, int level);
+		int RemoveLinkedPlane(idList<int> &res, const NETLizard_BSP_Tree_Node *data, int count) const;
         void Log(const char *str, ...) const;
         template <class T>
         T & ConvToIdTech4(T &v) const;
@@ -89,7 +92,7 @@ class idNETLizardConverter
         idStr targetDir;
         idStr gamename;
         const NETLizard_3D_Model_Config *config = nullptr;
-		bool genPortalBrush = false;
+		bool genPortalBrush = true;
 		idStr version;
 		int removeFraction = 2;
 
@@ -102,6 +105,7 @@ class idNETLizardConverter
 
 void remove_fraction(float &f, int prec);
 void remove_fraction(idVec3 &v, int prec);
+void remove_fraction(idBounds &v, int prec);
 
 template <class T>
 inline T & idNETLizardConverter::ConvToIdTech4(T &v) const

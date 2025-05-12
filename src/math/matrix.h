@@ -51,6 +51,9 @@ class idMat3
 		idVec3Ref & operator()(int col);
 		idStr ToString(const char *s = " ") const;
       	void Transposed(void);
+		idVec3 operator*(const idVec3 &vec) const;
+
+		friend idVec3 operator*(const idVec3 &vec, const idMat3 &mat);
 
 	private:
 		idVec3Ref cols[3] = {

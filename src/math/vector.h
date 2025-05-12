@@ -79,6 +79,7 @@ class idVec3
 		static bool IsNear(const idVec3& v1, const idVec3& v2, float epsilon);
 		static idVec3 TriangleCaleNormal(const idVec3 &a, const idVec3 &b, const idVec3 &c);
 		float GetMaxAxisLength(void) const;
+		static idVec3 MadSat(const idVec3 &a, const idVec3 &b, float len);
 };
 
 

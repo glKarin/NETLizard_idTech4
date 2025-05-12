@@ -148,6 +148,7 @@ idEntity & idEntity::light(const idVec3 &origin, const idVec3 &radius, bool nosh
 		spawnArgs.SetVec3("_color", color);
 
 	spawnArgs.SetInteger("falloff", 0);
+	//spawnArgs.SetInteger("levels", 1);
 	return *this;
 }
 
@@ -155,7 +156,10 @@ idEntity & idEntity::target_endLevel(const char *nextMap)
 {
 	Reset();
 	classname = CLASSNAME_TARGET_ENDLEVEL;
-	spawnArgs.Set("nextMap", nextMap);
+	if(nextMap && nextMap[0])
+		spawnArgs.Set("nextMap", nextMap);
+	else
+		spawnArgs.SetBool("endOfGame", 1);
 	spawnArgs.SetBool("noflood", true);
 	return *this;
 }

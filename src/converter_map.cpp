@@ -3,6 +3,8 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <unordered_set>
+#include <set>
 
 #include "material.h"
 #include "mapfile.h"
@@ -24,7 +26,7 @@ using std::endl;
 float idNETLizardConverter::NETLIZARD_MAP_TO_IDTECH4 = 0.35f;
 float idNETLizardConverter::NETLIZARD_RE_MAP_TO_IDTECH4 = 35.0f;
 
-bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, const idMat4 *mat, bool isItem, float width) const
+bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, const NETLizard_3D_Primitive *p, const NLint *mesh_vertex, const idMat4 *mat, bool isItem, float width, idPlane *ret) const
 {
 	int invert_texcoord_y = isItem ? config->item_invert_texcoord_y : config->invert_texcoord_y;
 	NLuint index_factory = isItem ? config->item_index_factory : config->index_factory;
@@ -72,6 +74,12 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, idBounds &bounds, con
 		Log("Point(%s, %s, %s) all in one line", vertex[0].xyz.ToString().c_str(), vertex[1].xyz.ToString().c_str(), vertex[2].xyz.ToString().c_str());
 		return false;
 	}
+
+	if(ret)
+	{
+		ret->FromPoints(vertex[0].xyz, vertex[1].xyz, vertex[2].xyz );
+	}
+
 	vertex[0].normal[0] = v_normal[0];
 	vertex[0].normal[1] = v_normal[1];
 	vertex[0].normal[2] = v_normal[2];
@@ -293,7 +301,7 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 			const NLint *mesh_vertex = mesh->vertex.data;
 			idVec3 min = Int3ToVec3(mesh->box.min[0], mesh->box.min[1], mesh->box.min[2]);
 			idVec3 max = Int3ToVec3(mesh->box.max[0], mesh->box.max[1], mesh->box.max[2]);
-			idBounds originBv = {min, max};
+			idBounds originBv = {min, max}; // absolute
 
 			if(mesh->primitive.data)
 			{
@@ -301,10 +309,12 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 				{
 					idBrushDef3 brush;
 					idBounds b;
-					if(GenMapBrush(brush, b, mesh->primitive.data + n, mesh_vertex))
+					idPlane areaPlane;
+					if(GenMapBrush(brush, b, mesh->primitive.data + n, mesh_vertex, nullptr, false, -1.0f, &areaPlane))
 					{
 						map += b;
 						worldspawn << brush;
+						map.AddAreaPlane(i, areaPlane);
 					}
 				}
 			}
@@ -321,6 +331,8 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 
 						NLuint item_type = nlGetItemType(game, (NLint)itemmesh->obj_index);
 						if(!(item_type & (NL_3D_ITEM_TYPE_SKYLINE)))
+							continue;
+						if(index == 10 && (n == 13 || n == 14))
 							continue;
 
 						if(itemmesh->item_mesh.vertex.count && itemmesh->item_mesh.primitive.count)
@@ -498,6 +510,7 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 		idBounds ob{-v, v};
 		ob.Translate(allBv.Center());
 		ob.Expand(10);
+		ConvToIdTech4(ob);
 		idStr material = gamename / idStr::va("env_%s", sky_file);
 		//material = "skies/sky1";
 		material.RemoveExtension();
@@ -532,8 +545,13 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 				continue;
 			if(game == NL_CLONE_3D && (item_type & (NL_3D_ITEM_TYPE_WEAPON | NL_3D_ITEM_TYPE_PARTICLE)))
 				continue;
-			if(game == NL_SHADOW_OF_EGYPT_3D && (index == 8 || index == 9 || index == 12 || index == 10) && (item_type & NL_3D_ITEM_TYPE_SKYLINE))
-				continue;
+			if(game == NL_SHADOW_OF_EGYPT_3D && (item_type & NL_3D_ITEM_TYPE_SKYLINE))
+			{
+				if(index == 8 || index == 9 || index == 12)
+					continue;
+				if(index == 10 && (i != 13 && i != 14))
+					continue;
+			}
 
 			idVec3 itemPos = ConvToIdTech4(Int3ToVec3(mesh->position[0], mesh->position[1], mesh->position[2]));
 			idEntity entity;
@@ -541,7 +559,7 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 				ConvToIdTech4(Int3ToVec3(mesh->item_mesh.box.min[0], mesh->item_mesh.box.min[1], mesh->item_mesh.box.min[2])),
 				ConvToIdTech4(Int3ToVec3(mesh->item_mesh.box.max[0], mesh->item_mesh.box.max[1], mesh->item_mesh.box.max[2]))
 			};
-			idVec3 itemSize = itemBv.Size();
+			idVec3 itemSize = itemBv.Size(); // relative
 			int sizeScalar = 0;
 			bool nonSolid = false;
 			idMat4 m4;
@@ -550,11 +568,20 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 			idMat3 m3 = m4;
 			m3.Transposed();
 
+			idBounds bvAbs = itemBv;
+			bvAbs.Rotate(m3);
+			bvAbs.Translate(itemPos);
+			map.AddItemBounds(i, bvAbs);
+
 			if(item_type & NL_3D_ITEM_TYPE_WEAPON)
 			{
 				entity.func_bobbing(10, 0.4f);
 			}
-			else if(item_type & (NL_3D_ITEM_TYPE_DOOR_VERTICAL | NL_3D_ITEM_TYPE_DOOR_HORIZONTAL))
+			else if((item_type & (NL_3D_ITEM_TYPE_DOOR_VERTICAL | NL_3D_ITEM_TYPE_DOOR_HORIZONTAL))
+					|| (game == NL_CONTR_TERRORISM_3D_EPISODE_2 && index == 2 && (i == 0 || i == 1))
+					|| (game == NL_CONTR_TERRORISM_3D_EPISODE_2 && index == 4 && (i == 11 || i == 12))
+					|| (game == NL_CONTR_TERRORISM_3D && index == 3 && (i == 21 || i == 22))
+					)
 			{
 				const NETLizard_Level_Door *door = nlGet3DGameDoor(game, index, i, nullptr);
 				if(door)
@@ -650,6 +677,9 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 						entity("buddy", entity.Name());
 						entity.Name("");
 					}
+
+					if(item_type & NL_3D_ITEM_TYPE_THIN)
+						sizeScalar = 1;
 				}
 			}
 			else if(item_type & NL_3D_ITEM_TYPE_FAN_Z_AXIS)
@@ -665,7 +695,9 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 				//entity.func_rotating(true);
 				entity.func_rotating(false, true);
 			}
-			else if(item_type & NL_3D_ITEM_TYPE_ELEVATOR)
+			else if((item_type & NL_3D_ITEM_TYPE_ELEVATOR)
+					|| (game == NL_SHADOW_OF_EGYPT_3D && index == 10 && (i == 13 || i == 14))
+					)
 			{
 				const NETLizard_Level_Elevator *elevator = nlGet3DGameElevator(game, index, i, nullptr);
 				if(elevator && elevator->elevator_item == i)
@@ -677,7 +709,13 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 					idVec3 floors[] = {
 						floor1, floor2,
 					};
-					entity.func_elevator(ELEVATOR_MOVE_SPEED, 0, game != NL_CLONE_3D, 2, floors);
+					entity.func_elevator(ELEVATOR_MOVE_SPEED, 0, game == NL_ARMY_RANGER_3D, 2, floors);
+					if(elevator->mask == 2)
+					{
+						entity("floor", 2);
+						entity("triggerFloor", 1);
+						entity("returnFloor", 2);
+					}
 					if((item_type & NL_3D_ITEM_TYPE_SCENE) == 0)
 					{
 						idBounds bv(itemBv);
@@ -852,22 +890,98 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 		for(int i = 0; i < model->bsp_data.count; i++)
 		{
 			const NETLizard_BSP_Tree_Node *node = model->bsp_data.data + i;
-			idVec3 v = Int3ToVec3(node->plane[0][0], node->plane[0][1], node->plane[0][2]);
-			ConvToIdTech4(v);
-			idBounds bv({v, v});
-			bv += ConvToIdTech4(Int3ToVec3(node->plane[1][0], node->plane[1][1], node->plane[1][2]));
-			bv += ConvToIdTech4(Int3ToVec3(node->plane[2][0], node->plane[2][1], node->plane[2][2]));
-			bv += ConvToIdTech4(Int3ToVec3(node->plane[3][0], node->plane[3][1], node->plane[3][2]));
+			idVec3 v = ConvToIdTech4(Int3ToVec3(node->plane[0][0], node->plane[0][1], node->plane[0][2]));
+			idVec3 v1 = ConvToIdTech4(Int3ToVec3(node->plane[1][0], node->plane[1][1], node->plane[1][2]));
+			idVec3 v2 = ConvToIdTech4(Int3ToVec3(node->plane[2][0], node->plane[2][1], node->plane[2][2]));
+			idVec3 v3 = ConvToIdTech4(Int3ToVec3(node->plane[3][0], node->plane[3][1], node->plane[3][2]));
 
+			idVec3 bv[] = {
+				v, v1, v2, v3
+			};
 			ID_INVOKE_CALLBACK(convertMapAreaPortalCallback, (this, map, index, i, node->prev_scene, node->next_scene, bv));
+		}
+	}
 
-			if(genPortalBrush)
+	if(genPortalBrush)
+	{
+		if(model->data.data)
+		{
+			for(int i = 0; i < model->data.count; i++)
 			{
+				idEntity entity;
+				const NETLizard_3D_Mesh *mesh = model->data.data + i;
+				entity.Classname("info_location");
+				entity.NameByClass("_%d", i);
+				idVec3 min = Int3ToVec3(mesh->box.min[0], mesh->box.min[1], mesh->box.min[2]);
+				idVec3 max = Int3ToVec3(mesh->box.max[0], mesh->box.max[1], mesh->box.max[2]);
+				ConvToIdTech4(min);
+				ConvToIdTech4(max);
+				idBounds b = {min, max};
+				idVec3 locationPos = b.Center();
+				entity.Origin(locationPos);
+				entity("name", idStr::va("Area %d", i));
+				entity("location", idStr::va("Area %d", i));
+				map << entity;
+			}
+		}
+
+		if(model->bsp_data.data)
+		{
+			idList<int> res;
+			int bcount = RemoveLinkedPlane(res, model->bsp_data.data, model->bsp_data.count);
+			//for(int i = 0; i < model->bsp_data.count; i++)
+			for(int i = 0; i < bcount; i++)
+			{
+				//const NETLizard_BSP_Tree_Node *node = model->bsp_data.data + i;
+				int bindex = res[i]; // i 
+				const NETLizard_BSP_Tree_Node *node = model->bsp_data.data + bindex;
+				idVec3 v = ConvToIdTech4(Int3ToVec3(node->plane[0][0], node->plane[0][1], node->plane[0][2]));
+				idVec3 v1 = ConvToIdTech4(Int3ToVec3(node->plane[1][0], node->plane[1][1], node->plane[1][2]));
+				idVec3 v2 = ConvToIdTech4(Int3ToVec3(node->plane[2][0], node->plane[2][1], node->plane[2][2]));
+				idVec3 v3 = ConvToIdTech4(Int3ToVec3(node->plane[3][0], node->plane[3][1], node->plane[3][2]));
+				idBounds bv;
+				bv += v;
+				bv += v1;
+				bv += v2;
+				bv += v3;
+
 				idBrushDef3 brush;
-				if(GenMapBrush(brush, node))
+				if(GenMapBrush(brush, node, false))
 				{
 					map[0] << brush;
 				}
+#if 0
+				idEntity entity;
+				entity.func_static();
+				entity.NameByClass("_pppxxxxxxx_%d", i);
+				idVec3 locationPos = bv.Center();
+				entity.Origin(locationPos);
+				entity.Model();
+				idBrushDef3List brushes;
+				idStr invisibleMaterial = idMaterial::AREA_PORTAL_MATERIAL;
+				//invisibleMaterial = "clone3d/w/w1";
+				if(GenMapBrush(brushes, bv, invisibleMaterial.c_str(), false, false))
+				{
+					//map[0] << brushes;
+					//entity << brushes;
+				}
+				/*
+				   idBrushDef3 brush;
+				   if(GenMapBrush(brush, node))
+				   {
+				   map[0] << brush;
+				   }
+				   */
+				//map << entity;
+#endif
+
+				idEntity entity;
+				const NETLizard_3D_Mesh *mesh = model->data.data + i;
+				entity.Classname("info_locationSeparator");
+				entity.NameByClass("_%d", bindex);
+				idVec3 locationPos = bv.Center();
+				entity.Origin(locationPos);
+				map << entity;
 			}
 		}
 	}
@@ -887,7 +1001,7 @@ int idNETLizardConverter::ConvertMap(const char *file, int index)
 }
 
 
-bool idNETLizardConverter::GenMapBrush(idBrushDef3List &brushes, const idBounds &bv, const char *material, bool invert) const
+bool idNETLizardConverter::GenMapBrush(idBrushDef3List &brushes, const idBounds &bv, const char *material, bool invert, bool relative) const
 {
 	//idBounds bv{{5000.0f},{5000.0f}};
 	float minx = bv[0][0];
@@ -896,6 +1010,16 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3List &brushes, const idBounds 
 	float maxx = bv[1][0];
 	float maxy = bv[1][1];
 	float maxz = bv[1][2];
+	if(relative)
+	{
+		idVec3 center = bv.Center();
+		minx -= center[0];
+		miny -= center[1];
+		minz -= center[2];
+		maxx -= center[0];
+		maxy -= center[1];
+		maxz -= center[2];
+	}
 #if 0
 	idBounds bb{{-30.0f},{30.0f}};
 	float v[24];
@@ -1078,11 +1202,45 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3List &brushes, const idBounds 
 			dv->normal[2] = vn[p[2] * 3 + 2];
 			dv->st[0] = vt[p[1] * 2];
 			dv->st[1] = vt[p[1] * 2 + 1];
+
+			if(dv->normal[2] > 0) // z top
+			{
+				dv->st[0] = v[p[0] * 3];
+				dv->st[1] = v[p[0] * 3 + 1];
+			}
+			else if(dv->normal[2] < 0) // z bottom
+			{
+				dv->st[0] = -v[p[0] * 3];
+				dv->st[1] = -v[p[0] * 3 + 1];
+			}
+			else if(dv->normal[1] > 0)
+			{
+				dv->st[0] = v[p[0] * 3];
+				dv->st[1] = v[p[0] * 3 + 2];
+			}
+			else if(dv->normal[1] < 0)
+			{
+				dv->st[0] = -v[p[0] * 3];
+				dv->st[1] = -v[p[0] * 3 + 2];
+			}
+			else if(dv->normal[0] > 0)
+			{
+				dv->st[0] = v[p[0] * 3 + 1];
+				dv->st[1] = v[p[0] * 3 + 2];
+			}
+			else if(dv->normal[0] < 0)
+			{
+				dv->st[0] = -v[p[0] * 3 + 1];
+				dv->st[1] = -v[p[0] * 3 + 2];
+			}
+			dv->st[0] = idMath::Clamp(dv->st[0], 0.0f, 1.0f);
+			dv->st[1] = idMath::Clamp(dv->st[1], 0.0f, 1.0f);
+
 			if(invert)
 				dv->normal = -dv->normal;
 			//printf("%d %d: %f %f %f | %d %d %d\n", i, m, dv->normal[0],dv->normal[1], dv->normal[2], ptr[0],ptr[1], ptr[2]   );
 
-			ConvToIdTech4(dv->xyz);
+			//ConvToIdTech4(dv->xyz);
 		}
 		/*
 		idDrawVert *dv = vertexs + i * 3;
@@ -1093,7 +1251,7 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3List &brushes, const idBounds 
 	}
 #endif
 
-	idStr invisibleMaterial = /*material : */idStr(idMaterial::CAULK_MATERIAL);
+	idStr invisibleMaterial = idStr(idMaterial::NODRAW_MATERIAL);
 	float w = (float)config->tex_width;
 	for(int i = 0; i < count; i++)
 	{
@@ -1241,7 +1399,7 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, const idVec3 _points[
 	idVec3 points[4];
 	for(int i = 0; i < 4; i++)
 	{
-		points[i] = ConvToIdTech4(_points[i]);
+		points[i] = /*ConvToIdTech4*/(_points[i]);
 	}
 	if(invert)
 	{
@@ -1268,6 +1426,7 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, const idVec3 _points[
 	side.Material() = invisibleMaterial;
 	// back
 	idVec3 normal_ = -v_normal;
+	//normal_ *= DEFAULT_BRUSH_WIDTH;
 	points_[0] = points[0] + normal_;
 	points_[1] = points[1] + normal_;
 	points_[2] = points[2] + normal_;
@@ -1316,12 +1475,56 @@ bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, const idVec3 _points[
 
 bool idNETLizardConverter::GenMapBrush(idBrushDef3 &brush, const NETLizard_BSP_Tree_Node *node, bool invert) const
 {
-	idVec3 points[4];
-	for(int i = 0; i < 4; i++)
+	idVec3 v = ConvToIdTech4(Int3ToVec3(node->plane[0][0], node->plane[0][1], node->plane[0][2]));
+	idVec3 v1 = ConvToIdTech4(Int3ToVec3(node->plane[1][0], node->plane[1][1], node->plane[1][2]));
+	idVec3 v2 = ConvToIdTech4(Int3ToVec3(node->plane[2][0], node->plane[2][1], node->plane[2][2]));
+	idVec3 v3 = ConvToIdTech4(Int3ToVec3(node->plane[3][0], node->plane[3][1], node->plane[3][2]));
+
+	idBounds bv;
+	bv += v;
+	bv += v1;
+	bv += v2;
+	bv += v3;
+	idVec3 bc = bv.Center();
+	float w = 2.0f;
+	idVec3 points[4] = {
+		idVec3::MadSat(v, bc, w),
+		idVec3::MadSat(v1, bc, w),
+		idVec3::MadSat(v2, bc, w),
+		idVec3::MadSat(v3, bc, w)
+	};
+
+#if 0
+	float PW = 2.0f;
+	idVec3 v_normal = idVec3::TriangleCaleNormal(v, v1, v2);
+	v += v_normal * -PW;
+	v1 += v_normal * -PW;
+	v2 += v_normal * -PW;
+	v3 += v_normal * -PW;
+	bv += v;
+	bv += v1;
+	bv += v2;
+	bv += v3;
+
+	bv.SetCenter(bc);
+
+	idBounds bv2;
+	bv2 += v;
+	bv2 += v1;
+	bv2 += v2;
+	bv2 += v3;
+	idVec3 _points[4] = {
+		idVec3::MadSat(v, bc, 2),
+		idVec3::MadSat(v1, bc, 2),
+		idVec3::MadSat(v2, bc, 2),
+		idVec3::MadSat(v3, bc, 2)
+	};
+	idBrushDef3 _brush;
+	if(GenMapBrush(_brush, _points, "clone3d/w/w1", false))
 	{
-		for(int m = 0; m < 3; m++)
-			points[i][m] = (float)node->plane[i][m];
+		map[0] << _brush;
 	}
+#endif
 	return GenMapBrush(brush, points, idMaterial::AREA_PORTAL_MATERIAL, invert);
 }
 
@@ -1363,4 +1566,91 @@ int idNETLizardConverter::ConvertMaps()
 		}
 	}
     return res;
+}
+
+int idNETLizardConverter::RemoveLinkedPlane(idList<int> &res, const NETLizard_BSP_Tree_Node *data, int count) const
+{
+	struct ivec3
+	{
+		int index;
+		int v[3] = {0};
+		ivec3() = default;
+
+		ivec3(int a, int b, int c)
+		{
+			v[0] = a;
+			v[1] = b;
+			v[2] = c;
+		}
+
+		bool operator==(const ivec3 &o) const
+		{
+			return v[0] == o.v[0]
+				&& v[1] == o.v[1]
+				&& v[2] == o.v[2]
+				;
+		}
+	};
+	struct ivec3_hash
+	{
+		int operator()(const ivec3 &v) const
+		{
+			idStr str = idStr::va("%d,%d,%d", v.v[0], v.v[1], v.v[2]);
+			return std::hash<std::string>()(str.c_str());
+		}
+	};
+
+	std::unordered_set<ivec3, ivec3_hash> points;
+	std::set<int> indexs;
+	std::unordered_set<int> handleIndexs;
+	auto ins = [&points, &indexs, &handleIndexs](const ivec3 &v) {
+		auto itor = points.find(v);
+		if(itor == points.end())
+		{
+			points.insert(v);
+			if(handleIndexs.find(v.index) == handleIndexs.end())
+			{
+				indexs.insert(v.index);
+				handleIndexs.insert(v.index);
+			}
+		}
+		else
+			indexs.erase(v.index);
+	};
+	for(int i = 0; i < count; i++)
+	{
+		const NETLizard_BSP_Tree_Node *node = data + i;
+
+		idVec3 a = ConvToIdTech4(Int3ToVec3(node->plane[0][0], node->plane[0][1], node->plane[0][2]));
+		idVec3 b = ConvToIdTech4(Int3ToVec3(node->plane[1][0], node->plane[1][1], node->plane[1][2]));
+		idVec3 c = ConvToIdTech4(Int3ToVec3(node->plane[2][0], node->plane[2][1], node->plane[2][2]));
+		idVec3 d = ConvToIdTech4(Int3ToVec3(node->plane[3][0], node->plane[3][1], node->plane[3][2]));
+
+		idVec3 v_normal = idVec3::TriangleCaleNormal(a, b, c);
+		if(!idMath::IsZero(v_normal[2]))
+			continue;
+
+		ivec3 v0 = ivec3(node->plane[0][0], node->plane[0][1], node->plane[0][2]);
+		ivec3 v1 = ivec3(node->plane[1][0], node->plane[1][1], node->plane[1][2]);
+		ivec3 v2 = ivec3(node->plane[2][0], node->plane[2][1], node->plane[2][2]);
+		ivec3 v3 = ivec3(node->plane[3][0], node->plane[3][1], node->plane[3][2]);
+		v0.index = i;
+		v1.index = i;
+		v2.index = i;
+		v3.index = i;
+		ins(v0);
+		ins(v1);
+		ins(v2);
+		ins(v3);
+	}
+
+
+	std::cout<<"TTT: " << count<<std::endl;
+	for(auto i : indexs)
+	{
+		std::cout<<i<<std::endl;
+		res.Append(i);
+	}
+
+	return indexs.size();
 }

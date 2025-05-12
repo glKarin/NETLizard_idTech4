@@ -1,6 +1,11 @@
 #ifndef _KARIN_PLANE_H
 #define _KARIN_PLANE_H
 
+#define PLANESIDE_FRONT				0
+#define PLANESIDE_BACK				1
+#define PLANESIDE_ON				2
+#define PLANESIDE_CROSS				3
+
 class idVec3;
 
 class idPlane
@@ -23,6 +28,8 @@ class idPlane
 		void FromPoints(const idVec3 &a, const idVec3 &b, const idVec3 &c);
 		void FromPointAndNormal(const idVec3 &point, const idVec3 &normal);
 		bool IsValid() const;
+		float Distance(const idVec3 &v) const;
+		int Side(const idVec3 &v, const float epsilon = 0.0f) const;
 };
 
 inline idPlane::idPlane(float a, float b, float c, float d)

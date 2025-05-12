@@ -14,13 +14,39 @@ using std::endl;
 static idVec3 ENV_LIGHT_COLOR = { 0.6, 0.6, 0.6 };
 static bool noshadows = false;
 
-static void N_ConvertMapAreaPortalFunc(const idNETLizardConverter *converter, idMapFile &map, int level, int i, int prev_scene, int next_scene, const idBounds &bv)
+static void N_ConvertMapAreaPortalFunc(const idNETLizardConverter *converter, idMapFile &map, int level, int i, int prev_scene, int next_scene, const idVec3 v[4])
 {
 	idEntity e;
+	idBounds bv;
+	bv += v[0];
+	bv += v[1];
+	bv += v[2];
+	bv += v[3];
+
 	idVec3 center = bv.Center();
-	e.info_player_deathmatch({center[0], center[1], bv[0][2] + 1.0f});
-	e.NameByClass("_%d", i);
-	map << e;
+	idPlane plane;
+	plane.FromPoints(v[0], v[1], v[2]);
+	if(fabs(plane.Normal()[2]) < 0.00001f && (bv[1][2] - bv[0][2]) >= 80.0f)
+	{
+		idVec3 pos(center[0], center[1], bv[0][2] + 1.0f);
+		idBounds bbc = {
+			{-20.0f, -20.0f, -40.0f},
+			{20.0f, 20.0f, 40.0f}
+		};
+		bbc.Translate(center);
+		idBounds bb = {
+			{-20.0f, -20.0f, 0.0f},
+			{20.0f, 20.0f, 80.0f}
+		};
+		bb.Translate(center);
+		if(!map.IntersectItem(bb) && map.InArea(bbc))
+		{
+			e.info_player_deathmatch(pos);
+			//printf("zzz %f - %f = %f\n", bv[1][2] , bv[0][2], bv[1][2] - bv[0][2]);
+			e.NameByClass("_%d", i);
+			map << e;
+		}
+	}
 
 #if 1
 	idBounds bounds = map.AreaBounds(prev_scene);
@@ -44,9 +70,15 @@ static void N_ConvertMapAreaFunc(const idNETLizardConverter *converter, idMapFil
 
 	idVec3 radius = bv.Size();// * idVec3{0.5f, 0.5f, 1.0f};
 	bool noshadow = true;
-	if(converter->Game() == NL_SHADOW_OF_EGYPT_3D && (index == 8 || index == 9 || index == 12 || (index == 10 && i == 0)))
+	if(converter->Game() == NL_SHADOW_OF_EGYPT_3D && (index == 8 || index == 9 || index == 12 || (index == 10 && i == 0) || index == 0))
 	{
-		center[2] = bv[1][2];
+		if(index == 0)
+		{
+			center[2] = center.GetMaxAxisLength() * 2.0f;
+			radius[2] = center[2];
+		}
+		else
+			center[2] = bv[1][2];
 		radius/*[2]*/ *= 2.0f;
 		noshadow = false;
 	}
@@ -90,15 +122,18 @@ static void N_ConvertMapFunc(const idNETLizardConverter *converter, idMapFile &m
 			end = level + 1;
 		}
 
-		if(to)
+		//if(to)
 		{
 			idEntity entity;
-			entity.text(idStr::va("End level: %d. %s", end, to));
+			if(to)
+				entity.text(idStr::va("End level: %d. %s", end, to));
+			else
+				entity.text("End game");
 			entity.NameByClass("_endlevel_%d", index);
 			entity.Origin(pos + idVec3{0.0, 0.0, size[2]});
 			map << entity;
 
-			entity.target_endLevel(idStr::va("%s/%s", converter->Gamename(), to));
+			entity.target_endLevel(to ? idStr::va("%s/%s", converter->Gamename(), to) : nullptr);
 			entity.NameByClass("_endlevel_%d", index);
 			entity.Origin(pos);
 			map << entity;
@@ -253,20 +288,20 @@ int main(int argc, char *argv[])
 {
 	using namespace std;
 
-#if 0
+#if 1
 	const char *game = argv[1];
 	const char *source_path = argv[2];
 	const char *target_path = argv[3];
 #else
-	const char *game = "4";
+	const char *game = "5";
 #ifdef _MSC_VER
 	const char *source_path = R"(D:/project/harmattan/NETLizard_idTech4/resource/re3d)";
 	const char *target_path = R"(F:/pak/test/doom3/base)";
 #elif defined(__MINGW32__) || defined(__MINGW64__)
-	const char *source_path = R"(D:/project/harmattan/NETLizard_idTech4/resource/egypt3d)";
+	const char *source_path = R"(D:/project/harmattan/NETLizard_idTech4/resource/clone3d)";
 	const char *target_path = R"(F:/pak/test/doom3/base)";
 #else
-	const char *source_path = "./re3d";
+	const char *source_path = "./clone3d";
 	const char *target_path = "/sdcard/diii4a/base";
 #endif
 #endif
@@ -277,6 +312,8 @@ int main(int argc, char *argv[])
 	converter.SetConvertMapCallback(N_ConvertMapFunc);
 
 	const char *version = MAP_VERSION_DOOM3;
+	if(strstr(target_path, "quake4"))
+		version = MAP_VERSION_QUAKE4;
 	CHECK_ARG(version);
 	CHECK_ARG(noshadows);
 
@@ -290,7 +327,9 @@ int main(int argc, char *argv[])
 	converter.ConvertMapDefs();
     converter.ConvertSounds();
 	idStr cmd = converter.GenDmapCommand();
+	std::cout << std::endl;
 	std::cout << cmd.c_str() << std::endl;
+	std::cout << std::endl;
 	std::cout << "done" << std::endl;
 	return 0;
 }

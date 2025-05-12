@@ -22,6 +22,7 @@ class idEntity
 		const idStr & Classname() const;
 		const idDict & SpawnArgs() const;
 		idEntity & operator<<(const idBrushDef3 &brush);
+		idEntity & operator<<(const idBrushDef3List &brushes);
 		idEntity & operator()(const char *name, const char *value);
 		idEntity & operator()(const char *name, float value);
 		idEntity & operator()(const char *name, int value);
@@ -83,6 +84,13 @@ using idEntityList = idList<idEntity>;
 inline idEntity & idEntity::operator<<(const idBrushDef3 &brush)
 {
 	brushs.push_back(brush);
+	return *this;
+}
+
+inline idEntity & idEntity::operator<<(const idBrushDef3List &brushes)
+{
+	for(const auto &a : brushes)
+		brushs.push_back(a);
 	return *this;
 }
 

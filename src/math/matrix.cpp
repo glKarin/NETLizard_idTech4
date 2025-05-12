@@ -129,6 +129,20 @@ idStr idMat3::ToString(const char *s) const
    ));
 }
 
+idVec3 idMat3::operator*(const idVec3 &vec) const
+{
+	return idVec3(
+	               operator()( 0, 0 ) * vec[0] + operator()( 1, 0 ) * vec[1] + operator()( 2, 0 ) * vec[2],
+	               operator()( 0, 1 ) * vec[0] + operator()( 1, 1 ) * vec[1] + operator()( 2, 1 ) * vec[2],
+	               operator()( 0, 2 ) * vec[0] + operator()( 1, 2 ) * vec[1] + operator()( 2, 2 ) * vec[2]);
+}
+
+idVec3 operator*(const idVec3 &vec, const idMat3 &mat)
+{
+	return mat * vec;
+}
+
+
 
 
 void idMat4::Translate(const idVec3 &v)

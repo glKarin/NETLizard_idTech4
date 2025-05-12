@@ -30,3 +30,22 @@ bool idPlane::IsValid() const
 {
 	return !Normal().IsZero();
 }
+
+float idPlane::Distance(const idVec3 &v) const
+{
+	return a * v[0] + b * v[1] + c * v[2] + d;
+}
+
+int idPlane::Side(const idVec3 &v, const float epsilon) const
+{
+	float dist = Distance(v);
+
+	if (dist > epsilon) {
+		return PLANESIDE_FRONT;
+	} else if (dist < -epsilon) {
+		return PLANESIDE_BACK;
+	} else {
+		return PLANESIDE_ON;
+	}
+}
+

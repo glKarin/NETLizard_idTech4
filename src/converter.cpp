@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <iostream>
 
 #include "filesystem.h"
 #include "buffer.h"
@@ -29,7 +30,6 @@ bool idNETLizardConverter::ReadFile(idBuffer &buffer, const char *path) const
 	return buffer.file_get_contents(path) > 0;
 }
 
-#include <iostream>
 idStr idNETLizardConverter::GetDir(const char *path)
 {
     idStr dir;

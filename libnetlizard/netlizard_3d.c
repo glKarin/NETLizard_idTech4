@@ -1181,12 +1181,12 @@ static const NLint Specnaz3D_Level_Elevator_Count[] = {
 };
 
 static const NETLizard_Level_Elevator Egypt3D_Level_Elevator_10[] = {
-    {NL_SHADOW_OF_EGYPT_3D, 10, 51, 14, 1, 0, 1200, NL_TRUE},
-    {NL_SHADOW_OF_EGYPT_3D, 10, 52, 14, 1, 0, 1200, NL_TRUE},
-    {NL_SHADOW_OF_EGYPT_3D, 10, 64, 14, 1, 0, 1200, NL_TRUE},
-    {NL_SHADOW_OF_EGYPT_3D, 10, 51, 13, 1, 0, 1200, NL_TRUE},
-    {NL_SHADOW_OF_EGYPT_3D, 10, 52, 13, 1, 0, 1200, NL_TRUE},
-    {NL_SHADOW_OF_EGYPT_3D, 10, 64, 13, 1, 0, 1200, NL_TRUE},
+    {NL_SHADOW_OF_EGYPT_3D, 10, 51, 14, 2, 0, 1200, NL_TRUE},
+    {NL_SHADOW_OF_EGYPT_3D, 10, 52, 14, 2, 0, 1200, NL_TRUE},
+    {NL_SHADOW_OF_EGYPT_3D, 10, 64, 14, 2, 0, 1200, NL_TRUE},
+    {NL_SHADOW_OF_EGYPT_3D, 10, 51, 13, 2, 0, 1200, NL_TRUE},
+    {NL_SHADOW_OF_EGYPT_3D, 10, 52, 13, 2, 0, 1200, NL_TRUE},
+    {NL_SHADOW_OF_EGYPT_3D, 10, 64, 13, 2, 0, 1200, NL_TRUE},
 };
 
 static const NETLizard_Level_Elevator *Egypt3D_Level_Elevator[] = {
@@ -1376,19 +1376,22 @@ static const NETLizard_Level_Door CT3D_Level_Door_1[] = {
 static const NETLizard_Level_Door CT3D_Level_Door_2[] = {
     {NL_CONTR_TERRORISM_3D, 2, {{28, 750, 900}, {27, 600, 450}}, 3, 1, {{1460, -5250, 600}, {1500, -4750, 900}}},
 };
+static const NETLizard_Level_Door CT3D_Level_Door_3[] = {
+    {NL_CONTR_TERRORISM_3D, 3, {{21, 1625, 1625 + 250}, {22, 1875, 1875 - 250}}, 3, 2, {{1625 - 150, 5231 - 5, 0}, {1875 + 150, 5231 + 5, 400}}},
+};
 static const NETLizard_Level_Door CT3D_Level_Door_6[] = {
-    {NL_CONTR_TERRORISM_3D, 0, {{48, 150, 300}, {47, 0, -150}}, 3, 1, {{3250, 2210, 0}, {3750, 2250, 300}}},
-    {NL_CONTR_TERRORISM_3D, 0, {{50, 150, 300}, {49, 0, -150}}, 3, 1, {{6750, 1710, 0}, {7250, 1750, 300}}},
-    {NL_CONTR_TERRORISM_3D, 0, {{52, 150, 300}, {51, 0, -150}}, 3, 1, {{2000, 3210, 0}, {2500, 3250, 300}}},
+    {NL_CONTR_TERRORISM_3D, 6, {{48, 150, 300}, {47, 0, -150}}, 3, 1, {{3250, 2210, 0}, {3750, 2250, 300}}},
+    {NL_CONTR_TERRORISM_3D, 6, {{50, 150, 300}, {49, 0, -150}}, 3, 1, {{6750, 1710, 0}, {7250, 1750, 300}}},
+    {NL_CONTR_TERRORISM_3D, 6, {{52, 150, 300}, {51, 0, -150}}, 3, 1, {{2000, 3210, 0}, {2500, 3250, 300}}},
 };
 static const NETLizard_Level_Door *CT3D_Level_Door[] = {
     NULL,
-    CT3D_Level_Door_1, CT3D_Level_Door_2, NULL, NULL, NULL,
+    CT3D_Level_Door_1, CT3D_Level_Door_2, CT3D_Level_Door_3, NULL, NULL,
     CT3D_Level_Door_6, NULL, NULL, NULL, NULL,
 };
 static const NLint CT3D_Level_Door_Count[] = {
     0,
-    COUNTOF(CT3D_Level_Door_1), COUNTOF(CT3D_Level_Door_2), 0, 0, 0,
+    COUNTOF(CT3D_Level_Door_1), COUNTOF(CT3D_Level_Door_2), COUNTOF(CT3D_Level_Door_3), 0, 0,
     COUNTOF(CT3D_Level_Door_6), 0, 0, 0, 0,
 };
 
@@ -1436,14 +1439,14 @@ static const NETLizard_Level_Door Specnaz3D_Level_Door_8[] = {
     {NL_ARMY_RANGER_3D, 8, {{27, 550, 699}, {28, 400, 250}}, 3, 1, {{-300, -7400, 400}, {300, -7300, 699}}},
 };
 static const NETLizard_Level_Door Specnaz3D_Level_Door_9[] = {
-    {NL_ARMY_RANGER_3D, 0, {{1, 150, 299}, {0, 0, -150}}, 3, 1, {{-2000, 2400, 0}, {-1900, 3000, 299}}},
-    {NL_ARMY_RANGER_3D, 0, {{3, 150, 299}, {2, 0, -150}}, 3, 1, {{-1300, 2400, 0}, {-1200, 3000, 299}}},
-    {NL_ARMY_RANGER_3D, 0, {{10, 1050, 1199}, {11, 900, 750}}, 3, 1, {{1200, -600, 900}, {1300, 0, 1199}}},
-    {NL_ARMY_RANGER_3D, 0, {{13, 1050, 1199}, {12, 900, 750}}, 3, 1, {{1200, 0, 900}, {1300, 600, 1199}}},
-    {NL_ARMY_RANGER_3D, 0, {{7, 2250, 2399}, {6, 2100, 1950}}, 3, 1, {{-600, -1300, 2100}, {0, -1200, 2399}}},
-    {NL_ARMY_RANGER_3D, 0, {{8, 2250, 2399}, {9, 2100, 1950}}, 3, 1, {{0, -1300, 2100}, {600, -1200, 2399}}},
-    {NL_ARMY_RANGER_3D, 0, {{17, 3450, 3599}, {16, 3300, 3150}}, 3, 1, {{-1300, 0, 3300}, {-1200, 600, 3599}}},
-    {NL_ARMY_RANGER_3D, 0, {{14, 3450, 3599}, {15, 3300, 3150}}, 3, 1, {{-1300, -599, 3300}, {-1200, 1, 3599}}},
+    {NL_ARMY_RANGER_3D, 9, {{1, 150, 299}, {0, 0, -150}}, 3, 1, {{-2000, 2400, 0}, {-1900, 3000, 299}}},
+    {NL_ARMY_RANGER_3D, 9, {{3, 150, 299}, {2, 0, -150}}, 3, 1, {{-1300, 2400, 0}, {-1200, 3000, 299}}},
+    {NL_ARMY_RANGER_3D, 9, {{10, 1050, 1199}, {11, 900, 750}}, 3, 1, {{1200, -600, 900}, {1300, 0, 1199}}},
+    {NL_ARMY_RANGER_3D, 9, {{13, 1050, 1199}, {12, 900, 750}}, 3, 1, {{1200, 0, 900}, {1300, 600, 1199}}},
+    {NL_ARMY_RANGER_3D, 9, {{7, 2250, 2399}, {6, 2100, 1950}}, 3, 1, {{-600, -1300, 2100}, {0, -1200, 2399}}},
+    {NL_ARMY_RANGER_3D, 9, {{8, 2250, 2399}, {9, 2100, 1950}}, 3, 1, {{0, -1300, 2100}, {600, -1200, 2399}}},
+    {NL_ARMY_RANGER_3D, 9, {{17, 3450, 3599}, {16, 3300, 3150}}, 3, 1, {{-1300, 0, 3300}, {-1200, 600, 3599}}},
+    {NL_ARMY_RANGER_3D, 9, {{14, 3450, 3599}, {15, 3300, 3150}}, 3, 1, {{-1300, -599, 3300}, {-1200, 1, 3599}}},
 };
 static const NETLizard_Level_Door *Specnaz3D_Level_Door[] = {
     NULL,
@@ -1456,9 +1459,13 @@ static const NLint Specnaz3D_Level_Door_Count[] = {
     COUNTOF(Specnaz3D_Level_Door_6), COUNTOF(Specnaz3D_Level_Door_7), COUNTOF(Specnaz3D_Level_Door_8), COUNTOF(Specnaz3D_Level_Door_9), 0,
 };
 
+static const NETLizard_Level_Door CT3DEp2_Level_Door_2[] = {
+    {NL_CONTR_TERRORISM_3D_EPISODE_2, 2, {{1, -1650, -1650 + 300}, {0, -1950, -1950 - 300}}, 3, 2, {{-1950 - 150, 1799 - 1, 0}, {-1665 + 150, 1799 + 1, 300}}},
+};
 static const NETLizard_Level_Door CT3DEp2_Level_Door_4[] = {
     {NL_CONTR_TERRORISM_3D_EPISODE_2, 4, {{25, 1150, 1300}, {26, 1000, 850}}, 3, 1, {{-3100, 900, 1000}, {-3000, 1500, 1300}}},
     {NL_CONTR_TERRORISM_3D_EPISODE_2, 4, {{31, 1550, 1700}, {32, 1400, 1250}}, 3, 1, {{-5200, 4200, 1400}, {-4600, 4300, 1700}}},
+    {NL_CONTR_TERRORISM_3D_EPISODE_2, 4, {{12, -4650, -4650 + 300}, {11, -4950, -4950 - 300}}, 3, 2, {{-4950 - 150, 1500 - 1, 0}, {-4665 + 150, 1500 + 1, 300}}},
 };
 static const NETLizard_Level_Door CT3DEp2_Level_Door_5[] = {
     {NL_CONTR_TERRORISM_3D_EPISODE_2, 5, {{1, 150, 300}, {2, 0, -150}}, 3, 1, {{2200, -1800, 0}, {2300, -1200, 300}}},
@@ -1487,12 +1494,12 @@ static const NETLizard_Level_Door CT3DEp2_Level_Door_9[] = {
 };
 static const NETLizard_Level_Door *CT3DEp2_Level_Door[] = {
     NULL,
-    NULL, NULL, NULL, CT3DEp2_Level_Door_4, CT3DEp2_Level_Door_5,
+    NULL, CT3DEp2_Level_Door_2, NULL, CT3DEp2_Level_Door_4, CT3DEp2_Level_Door_5,
     NULL, NULL, CT3DEp2_Level_Door_8, CT3DEp2_Level_Door_9,
 };
 static const NLint CT3DEp2_Level_Door_Count[] = {
     0,
-    0, 0, 0, COUNTOF(CT3DEp2_Level_Door_4), COUNTOF(CT3DEp2_Level_Door_5),
+    0, COUNTOF(CT3DEp2_Level_Door_2), 0, COUNTOF(CT3DEp2_Level_Door_4), COUNTOF(CT3DEp2_Level_Door_5),
     0, 0, COUNTOF(CT3DEp2_Level_Door_8), COUNTOF(CT3DEp2_Level_Door_9),
 };
 
@@ -1940,6 +1947,28 @@ NLboolean nlGetTextureColor(NETLizard_Game game, NLint index, NLuchar *color)
             if(color)
             {
                 color[0] = color[1] = 0;
+				color[2] = 0xFF;
+                color[3] = 0xFF;
+            }
+            return NL_TRUE;
+        }
+        else if(index == 57)
+        {
+            if(color)
+            {
+                color[0] = 0xFF;
+				color[1] = 0xFF;
+				color[2] = 0x00;
+                color[3] = 0xFF;
+            }
+            return NL_TRUE;
+        }
+        else if(index == 52)
+        {
+            if(color)
+            {
+                color[0] = 0xFF;
+				color[1] = 0;
 				color[2] = 0xFF;
                 color[3] = 0xFF;
             }

@@ -188,3 +188,10 @@ float idVec3::GetMaxAxisLength(void) const
 	float z = fabs(v[2]);
 	return idMath::Max(x, idMath::Max(y, z));
 }
+
+idVec3 idVec3::MadSat(const idVec3 &a, const idVec3 &b, float len)
+{
+	idVec3 v = a - b;
+	v.Normalized();
+	return a + v * len;
+}

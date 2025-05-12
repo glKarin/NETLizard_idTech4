@@ -21,7 +21,17 @@ idMapFile & idMapFile::operator+=(const idBounds &b)
 
 void idMapFile::AddAreaBounds(int i, const idBounds &b)
 {
-	areas.insert({i, b});
+	areaBounds.insert({i, b});
+}
+
+void idMapFile::AddAreaPlane(int i, const idPlane &p)
+{
+	areaPlanes[i].push_back(p);
+}
+
+void idMapFile::AddItemBounds(int i, const idBounds &bv)
+{
+	itemBounds.push_back(bv);
 }
 
 ostream & operator<<(ostream &o, const idMapFile &v)
@@ -35,6 +45,55 @@ ostream & operator<<(ostream &o, const idMapFile &v)
 	}
 
 	return o;
+}
+
+bool idMapFile::IntersectItem(const idBounds &b) const
+{
+	for(const idBounds &bv : itemBounds)
+	{
+		if(bv.HasIntersection(b))
+			return true;
+	}
+	return false;
+}
+
+bool idMapFile::InArea(const idBounds &b) const
+{
+	idVec3 points[8];
+	b.ToPoints(points);
+	for(int i = 0; i < 8; i++)
+	{
+		int found = -1;
+		for(const auto &bv : areaBounds)
+		{
+		auto str = bv.second.ToString();
+			if(bv.second.ContainsPoint(points[i]))
+			{
+				found = bv.first;
+				break;
+			}
+		}
+		if(found < 0)
+			return false;
+
+		if(areaPlanes.find(found) == areaPlanes.end())
+			continue;
+
+		const auto &ap = (((idMapFile *)this)->areaPlanes)[found];
+		bool out = false;
+		for(const auto &p : ap)
+		{
+			if(p.Side(points[i]) < 0.0f)
+			{
+				out = true;
+				break;
+			}
+		}
+		if(out)
+			return false;
+	}
+
+	return true;
 }
 
 #if 0

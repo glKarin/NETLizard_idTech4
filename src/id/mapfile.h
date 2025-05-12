@@ -27,6 +27,10 @@ class idMapFile
 		idBounds & AreaBounds(int i);
 		idEntity & operator[](int i);
 		const idEntity & operator[](int i) const;
+		void AddAreaPlane(int i, const idPlane &p);
+		void AddItemBounds(int i, const idBounds &bv);
+		bool IntersectItem(const idBounds &bv) const;
+		bool InArea(const idBounds &bv) const;
 
 		idMapFile & operator<<(const idEntity &entity);
 		friend std::ostream & operator<<(std::ostream &o, const idMapFile &v);
@@ -38,7 +42,9 @@ class idMapFile
 		float startAngle;
 		idBounds bounds;
 		bool boundsInited = false;
-		std::map<int, idBounds> areas;
+		idList<idBounds> itemBounds;
+		std::map<int, idBounds> areaBounds;
+		std::map<int, idList<idPlane> > areaPlanes;
 };
 
 inline idMapFile & idMapFile::operator<<(const idEntity &entity)
@@ -89,6 +95,6 @@ inline const idEntity & idMapFile::operator[](int i) const
 
 inline idBounds & idMapFile::AreaBounds(int i)
 {
-	return areas[i];
+	return areaBounds[i];
 }
 #endif
